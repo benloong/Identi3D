@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModuleTest", "ModuleTest\ModuleTest.vcxproj", "{F47FCAC5-2F6E-47C1-B65F-66035E84F676}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nova-3d", "src\nova-3d\nova-3d.vcxproj", "{B359302F-E54B-44FD-AA4E-3313B66D68B7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "debug-manager", "src\debug-manager\debug-manager.vcxproj", "{D68086B1-56FB-417F-9F5E-2E2AD63508A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F47FCAC5-2F6E-47C1-B65F-66035E84F676}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F47FCAC5-2F6E-47C1-B65F-66035E84F676}.Debug|Win32.Build.0 = Debug|Win32
+		{F47FCAC5-2F6E-47C1-B65F-66035E84F676}.Release|Win32.ActiveCfg = Release|Win32
+		{F47FCAC5-2F6E-47C1-B65F-66035E84F676}.Release|Win32.Build.0 = Release|Win32
+		{B359302F-E54B-44FD-AA4E-3313B66D68B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B359302F-E54B-44FD-AA4E-3313B66D68B7}.Debug|Win32.Build.0 = Debug|Win32
+		{B359302F-E54B-44FD-AA4E-3313B66D68B7}.Release|Win32.ActiveCfg = Release|Win32
+		{B359302F-E54B-44FD-AA4E-3313B66D68B7}.Release|Win32.Build.0 = Release|Win32
+		{D68086B1-56FB-417F-9F5E-2E2AD63508A4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D68086B1-56FB-417F-9F5E-2E2AD63508A4}.Debug|Win32.Build.0 = Debug|Win32
+		{D68086B1-56FB-417F-9F5E-2E2AD63508A4}.Release|Win32.ActiveCfg = Release|Win32
+		{D68086B1-56FB-417F-9F5E-2E2AD63508A4}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

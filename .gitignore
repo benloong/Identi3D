@@ -1,0 +1,6 @@
+# Compiled Binary
+*.exe
+*.dll
+
+# Excludes system file
+thumbs.db

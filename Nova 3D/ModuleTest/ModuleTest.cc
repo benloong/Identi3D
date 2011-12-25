@@ -6,8 +6,13 @@
 #include "stdafx.h"
 #include "ModuleTest.h"
 
-const TCHAR *class_name		= TEXT("MODULE_TEST");
-const TCHAR *app_title		= TEXT("Module Test");
+#include "src/debug-manager/DebugManager.h"
+#pragma comment (lib, "debug-manager_d.lib")
+
+using namespace Nova3D;
+
+const TCHAR *class_name		= __T("MODULE_TEST");
+const TCHAR *app_title		= __T("Module Test");
 
 const LONG window_style	= (	WS_OVERLAPPED	| \
 							WS_CAPTION		| \
@@ -20,6 +25,13 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	MSG msg;
+	DebugManager *dbgmgr;
+
+	dbgmgr = new DebugManager();
+	dbgmgr->createDebugConsole();
+	dbgmgr->setOutputFlag(dbgmgr->getOutputFlag() | DebugFlag_ConsoleOutput);
+	dbgmgr->print(__FILE__, __LINE__, __T("Hello world! %s."), __T("This is a welcome from Nova3D"));
+	_DEBUGPRINT(dbgmgr, __T("1 + 1 = %d"), 1 + 1);
 
 	registerClass(hInstance);
 	if (!initInstance(hInstance, nCmdShow)) 
@@ -30,6 +42,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		DispatchMessage(&msg);
 	}
 
+	delete dbgmgr;
 	return static_cast<int>(msg.wParam);
 }
 

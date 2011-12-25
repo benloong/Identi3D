@@ -34,6 +34,11 @@ obj/
 Nova\ 3D/[Dd]ebug*/
 Nova\ 3D/[Rr]elease*/
 Ankh.NoLoad
+*.tlog
+*.lastbuildstate
+*.pdb
+*.idb
+
 
 #Tooling
 _ReSharper*/

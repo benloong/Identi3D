@@ -6,7 +6,7 @@
 // Copyright (c) Sparkfire, 2011 - 2012
 //
 
-#include "src/debug-manager/DebugManager.h"
+#include "src/utils/DebugManager.h"
 
 namespace Nova3D {
 	

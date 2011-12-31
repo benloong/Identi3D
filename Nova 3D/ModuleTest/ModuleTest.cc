@@ -6,8 +6,8 @@
 #include "stdafx.h"
 #include "ModuleTest.h"
 
-#include "src/debug-manager/DebugManager.h"
-#pragma comment (lib, "debug-manager_d.lib")
+#include "src/nova-3d/Nova.h"
+#pragma comment (lib, "utils_d.lib")
 
 using namespace Nova3D;
 

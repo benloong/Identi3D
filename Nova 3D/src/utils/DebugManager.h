@@ -3,8 +3,8 @@
 // ====================
 //
 
-#ifndef NOVA3D_SRC_DEBUGMANAGER_DEBUGMANAGER_H
-#define NOVA3D_SRC_DEBUGMANAGER_DEBUGMANAGER_H
+#ifndef NOVA3D_SRC_UTILS_DEBUGMANAGER_H
+#define NOVA3D_SRC_UTILS_DEBUGMANAGER_H
 
 #include "src/nova-3d/NovaGeneral.h"
 

@@ -9,11 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModuleTest", "ModuleTest\Mo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nova-3d", "src\nova-3d\nova-3d.vcxproj", "{B359302F-E54B-44FD-AA4E-3313B66D68B7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "debug-manager", "src\debug-manager\debug-manager.vcxproj", "{D68086B1-56FB-417F-9F5E-2E2AD63508A4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B359302F-E54B-44FD-AA4E-3313B66D68B7} = {B359302F-E54B-44FD-AA4E-3313B66D68B7}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

@@ -7,17 +7,49 @@
 #include "ModuleTest.h"
 
 #include "src/nova-3d/Nova.h"
+#include "src/utils/JsonParser.h"
+
 #pragma comment (lib, "utils_d.lib")
 
 using namespace Nova3D;
 
 const TCHAR *class_name		= __T("MODULE_TEST");
 const TCHAR *app_title		= __T("Module Test");
+DebugManager *dbgmgr;
 
 const LONG window_style	= (	WS_OVERLAPPED	| \
 							WS_CAPTION		| \
 							WS_SYSMENU		| \
 							WS_MINIMIZEBOX);
+
+class testclass : public JsonReaderListener
+{
+public:
+	void newBool(const TCHAR *name, bool value)
+	{
+		_DEBUGPRINT(dbgmgr, __T("%s = %s"), name, (value ? __T("true") : __T("false")));
+	}
+	void newNumber(const TCHAR *name, double value)
+	{
+		_DEBUGPRINT(dbgmgr, __T("%s = %.6f"), name, value);
+	}
+	void newObject(const TCHAR *name)
+	{
+		_DEBUGPRINT(dbgmgr, __T("New object %s"), name);
+	}
+	void enterObject(const TCHAR *name)
+	{
+		_DEBUGPRINT(dbgmgr, __T("Entered into object %s"), name);
+	}
+	void quitObject(const TCHAR *name)
+	{
+		_DEBUGPRINT(dbgmgr, __T("Quited from object %s"), name);
+	}
+	void newString(const TCHAR *name, const TCHAR *value)
+	{
+		_DEBUGPRINT(dbgmgr, __T("%s = %s"), name, value);
+	}
+};
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -25,13 +57,20 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	MSG msg;
-	DebugManager *dbgmgr;
+	JsonReader *reader;
+	testclass *listener;
 
 	dbgmgr = new DebugManager();
 	dbgmgr->createDebugConsole();
 	dbgmgr->setOutputFlag(dbgmgr->getOutputFlag() | DebugFlag_ConsoleOutput);
 	dbgmgr->print(__FILE__, __LINE__, __T("Hello world! %s."), __T("This is a welcome from Nova3D"));
 	_DEBUGPRINT(dbgmgr, __T("1 + 1 = %d"), 1 + 1);
+
+	listener = new testclass();
+	reader = new JsonReader(listener);
+	reader->lockFile(__T("data.json"));
+	if(FAILED(reader->parse()))
+		_DEBUGPRINT(dbgmgr, __T("Failed to parse data.json!"));
 
 	registerClass(hInstance);
 	if (!initInstance(hInstance, nCmdShow)) 
@@ -42,6 +81,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		DispatchMessage(&msg);
 	}
 
+	delete reader;
+	delete listener;
 	delete dbgmgr;
 	return static_cast<int>(msg.wParam);
 }

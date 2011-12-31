@@ -1,0 +1,11 @@
+{
+	"System":
+	{
+		"Config1" : "This is the value of \tan \"item\".\n",
+		"Config2" : true,
+		"Config3" : 0.123,
+		"Config4" : -2e10
+	},
+	"This is an sample test for json reading ability." : null,
+	"Lines ended with null will be regarded as comments." : null
+}

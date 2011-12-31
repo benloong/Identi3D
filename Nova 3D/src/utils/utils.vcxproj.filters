@@ -18,9 +18,15 @@
     <ClInclude Include="DebugManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="JsonParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DebugManager.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonParser.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

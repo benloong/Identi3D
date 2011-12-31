@@ -12,9 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DebugManager.h" />
+    <ClInclude Include="JsonParser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DebugManager.cc" />
+    <ClCompile Include="JsonParser.cc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{625EA963-2DA5-43EF-9D86-E3191ABAF604}</ProjectGuid>

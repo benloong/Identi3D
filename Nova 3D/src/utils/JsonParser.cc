@@ -40,6 +40,9 @@ namespace Nova3D
 
 	HRESULT JsonReader::lockFile(const TCHAR *file_name)
 	{
+		if(file_name == NULL)
+			return E_FAIL;
+
 		_tfopen_s(&fp, file_name, __T("r"));
 		if(fp == NULL)
 			return E_FAIL;
@@ -196,6 +199,151 @@ namespace Nova3D
 		}
 
 		return (object_stack.empty() ? S_OK : E_FAIL);
+	}
+
+	JsonWriter::JsonWriter(void)
+	{
+		fp = NULL;
+		layer = 0;
+	}
+
+	JsonWriter::~JsonWriter(void)
+	{
+		unlockFile();
+	}
+
+	HRESULT JsonWriter::lockFile(const TCHAR *file_name)
+	{
+		if(file_name == NULL)
+			return E_FAIL;
+
+		_tfopen_s(&fp, file_name, __T("w"));
+		if(fp == NULL)
+			return E_FAIL;
+
+		_fputts(__T("{\n"), fp);
+		layer = 1;
+		item_count = 0;
+
+		return S_OK;
+	}
+
+	HRESULT JsonWriter::unlockFile(void)
+	{
+		if(fp != NULL) {
+			encloseAllObjects();
+			fclose(fp);
+		}
+		return S_OK;
+	}
+
+	void JsonWriter::parseString(const TCHAR *str)
+	{
+		const TCHAR *p = str;
+		_fputtc(__T('\"'), fp);
+		while(*p != __T('\0'))
+		{
+			switch(*p)
+			{
+			case __T('"'): _fputts(__T("\\\""), fp); break;
+			case __T('\\'): _fputts(__T("\\\\"), fp); break;
+			case __T('/'): _fputts(__T("\\/"), fp); break;
+			case __T('\b'): _fputts(__T("\\b"), fp); break;
+			case __T('\f'): _fputts(__T("\\f"), fp); break;
+			case __T('\n'): _fputts(__T("\\n"), fp); break;
+			case __T('\r'): _fputts(__T("\\r"), fp); break;
+			case __T('\t'): _fputts(__T("\\t"), fp); break;
+			default: _fputtc(*p, fp);
+			}
+			p++;
+		}
+		_fputtc(__T('\"'), fp);
+	}
+	HRESULT JsonWriter::writeBool(const TCHAR *name, const bool value)
+	{
+		if(fp == NULL) return E_FAIL;
+		doIndent();
+		parseString(name);
+		_ftprintf_s(fp, __T(" : %s,\n"), (value ? __T("true") : __T("false")));
+		item_count++;
+		return S_OK;
+	}
+
+	HRESULT JsonWriter::writeNumber(const TCHAR *name, const double value, bool forceInt)
+	{
+		if(fp == NULL) return E_FAIL;
+		doIndent();
+		parseString(name);
+		if(forceInt) {
+			_ftprintf_s(fp, __T(" : %ld,\n"), static_cast<long>(value));
+		}else{
+			_ftprintf_s(fp, __T(" : %E,\n"), value);
+		}
+		item_count++;
+		return S_OK;
+	}
+
+	HRESULT JsonWriter::writeObject(const TCHAR *name)
+	{
+		if(fp == NULL) return E_FAIL;
+		doIndent();
+		parseString(name);
+		_ftprintf_s(fp, __T(" :\n"), name);
+		doIndent();
+		_ftprintf_s(fp, __T("{\n"));
+		item_count++;
+		layer++;
+		return S_OK;
+	}
+
+	HRESULT JsonWriter::encloseObject()
+	{
+		if(fp == NULL) return E_FAIL;
+		if(layer == 0) return E_FAIL;
+		layer--;
+		doIndent();
+		_ftprintf_s(fp, __T("},\n"));
+		return S_OK;
+	}
+
+	HRESULT JsonWriter::encloseAllObjects()
+	{
+		if(fp == NULL) return E_FAIL;
+		while(layer != 0)
+		{
+			layer--;
+			doIndent();
+			_ftprintf_s(fp, __T("}\n"));
+		}
+		return S_OK;
+	}
+
+	HRESULT JsonWriter::writeString(const TCHAR *name, const TCHAR *value)
+	{
+		if(fp == NULL) return E_FAIL;
+		doIndent();
+		parseString(name);
+		_ftprintf_s(fp, __T(" : "));
+		parseString(value);
+		_ftprintf_s(fp, __T(",\n"));
+		item_count++;
+		return S_OK;
+	}
+
+	HRESULT JsonWriter::writeComment(const TCHAR *comment)
+	{
+		if(fp == NULL) return E_FAIL;
+		doIndent();
+		parseString(comment);
+		_ftprintf_s(fp, __T(" : null,\n"));
+		item_count++;
+		return S_OK;
+	}
+
+	void JsonWriter::doIndent(void)
+	{
+		for(unsigned int i = 0; i < layer; i++)
+			_fputts(__T("\t"), fp);
 	}
 
 };

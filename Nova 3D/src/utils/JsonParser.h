@@ -50,6 +50,34 @@ namespace Nova3D
 		HRESULT parse(void);
 	};
 
+	class JsonWriter
+	{
+	private:
+		FILE *fp;
+		UINT layer, item_count;
+
+		void doIndent(void);
+		void parseString(const TCHAR *str);
+		
+	public:
+		JsonWriter(void);
+		~JsonWriter(void);
+
+		HRESULT lockFile(const TCHAR *file_name);
+		HRESULT unlockFile(void);
+
+		HRESULT writeObject(const TCHAR *name);
+		HRESULT encloseObject(void);
+		HRESULT encloseAllObjects(void);
+
+		HRESULT writeString(const TCHAR *name, const TCHAR *value);
+		HRESULT writeNumber(const TCHAR *name, const double value, bool forceInt);
+		HRESULT writeBool(const TCHAR *name, const bool value);
+		HRESULT writeComment(const TCHAR *comment);
+
+		inline UINT getItemCount(void) { return item_count; }
+	};
+
 };
 
 #endif

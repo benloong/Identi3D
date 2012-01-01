@@ -58,6 +58,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 {
 	MSG msg;
 	JsonReader *reader;
+	JsonWriter *writer;
 	testclass *listener;
 
 	dbgmgr = new DebugManager();
@@ -71,6 +72,20 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	reader->lockFile(__T("data.json"));
 	if(FAILED(reader->parse()))
 		_DEBUGPRINT(dbgmgr, __T("Failed to parse data.json!"));
+
+	writer = new JsonWriter();
+	writer->lockFile(__T(".nova_settings"));
+	writer->writeComment(__T("Nova 3D\t\n Sample Configuration File"));
+	writer->writeObject(__T("General"));
+	writer->writeBool(__T("Windowed"), false);
+	writer->writeNumber(__T("Antialias"), 2.0f, false);
+	writer->writeNumber(__T("Width"), 800, true);
+	writer->writeNumber(__T("Height"), 600, true);
+	writer->encloseObject();
+	writer->writeObject(__T("Direct3D9"));
+	writer->writeBool(__T("HardwareAcceleration"), true);
+	writer->encloseAllObjects();
+	delete writer;
 
 	registerClass(hInstance);
 	if (!initInstance(hInstance, nCmdShow)) 

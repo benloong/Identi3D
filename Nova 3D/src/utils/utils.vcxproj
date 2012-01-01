@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="DebugManager.h" />
     <ClInclude Include="JsonParser.h" />
+    <ClInclude Include="SettingsManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DebugManager.cc" />

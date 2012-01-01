@@ -3,9 +3,9 @@
 	{
 		"Config1" : "This is the value of \tan \"item\".\n",
 		"Config2" : true,
-		"Config3" : 0.123,
-		"Config4" : -2e10
+		"Config3" avoid the dead loop!!! 0.123,
+		"Config4" : -2esssshhhhiiiitttt
 	},
-	"This is an sample test for json reading ability." : null,
-	"Lines ended with null will be regarded as comments." : null
+	"This is an sample test 
+	do some destruction...
 }

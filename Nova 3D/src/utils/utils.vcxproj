@@ -18,6 +18,7 @@
   <ItemGroup>
     <ClCompile Include="DebugManager.cc" />
     <ClCompile Include="JsonParser.cc" />
+    <ClCompile Include="SettingsManager.cc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{625EA963-2DA5-43EF-9D86-E3191ABAF604}</ProjectGuid>

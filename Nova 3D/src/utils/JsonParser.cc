@@ -239,6 +239,7 @@ namespace Nova3D
 
 	void JsonWriter::parseString(const TCHAR *str)
 	{
+		if(str == NULL) return ;
 		const TCHAR *p = str;
 		_fputtc(__T('\"'), fp);
 		while(*p != __T('\0'))
@@ -261,7 +262,7 @@ namespace Nova3D
 	}
 	HRESULT JsonWriter::writeBool(const TCHAR *name, const bool value)
 	{
-		if(fp == NULL) return E_FAIL;
+		if(fp == NULL || name == NULL) return E_FAIL;
 		doIndent();
 		parseString(name);
 		_ftprintf_s(fp, __T(" : %s,\n"), (value ? __T("true") : __T("false")));
@@ -271,7 +272,7 @@ namespace Nova3D
 
 	HRESULT JsonWriter::writeNumber(const TCHAR *name, const double value, bool forceInt)
 	{
-		if(fp == NULL) return E_FAIL;
+		if(fp == NULL || name == NULL) return E_FAIL;
 		doIndent();
 		parseString(name);
 		if(forceInt) {
@@ -285,7 +286,7 @@ namespace Nova3D
 
 	HRESULT JsonWriter::writeObject(const TCHAR *name)
 	{
-		if(fp == NULL) return E_FAIL;
+		if(fp == NULL || name == NULL) return E_FAIL;
 		doIndent();
 		parseString(name);
 		_ftprintf_s(fp, __T(" :\n"), name);
@@ -320,7 +321,7 @@ namespace Nova3D
 
 	HRESULT JsonWriter::writeString(const TCHAR *name, const TCHAR *value)
 	{
-		if(fp == NULL) return E_FAIL;
+		if(fp == NULL || name == NULL || value == NULL) return E_FAIL;
 		doIndent();
 		parseString(name);
 		_ftprintf_s(fp, __T(" : "));
@@ -332,7 +333,7 @@ namespace Nova3D
 
 	HRESULT JsonWriter::writeComment(const TCHAR *comment)
 	{
-		if(fp == NULL) return E_FAIL;
+		if(fp == NULL || comment == NULL) return E_FAIL;
 		doIndent();
 		parseString(comment);
 		_ftprintf_s(fp, __T(" : null,\n"));

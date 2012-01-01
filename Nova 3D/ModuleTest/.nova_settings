@@ -1,14 +1,13 @@
 {
-	"Nova 3D\t\n Sample Configuration File" : null,
 	"General" :
 	{
-		"Windowed" : false,
-		"Antialias" : 2.000000E+000,
-		"Width" : 800,
-		"Height" : 600,
+		"Windowed" : "DEFAULT_VALUE_HERE",
+		"Antialias" : "DEFAULT_VALUE_HERE",
+		"Width" : "DEFAULT_VALUE_HERE",
+		"Height" : "DEFAULT_VALUE_HERE",
 	},
 	"Direct3D9" :
 	{
-		"HardwareAcceleration" : true,
-	}
+		"HardwareAcceleration" : "true",
+	},
 }

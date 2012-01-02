@@ -40,7 +40,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	MSG msg;
-	testclass *tc;
+	Renderer *renderer;
+	RenderDevice *device;
 
 	dbgmgr = new DebugManager();
 	dbgmgr->createDebugConsole();
@@ -51,13 +52,17 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	settingsmgr = new SettingsManager();
 	if(FAILED(settingsmgr->read(__T(".nova_settings")))) {
 		_DEBUGPRINT(dbgmgr, __T("Failed to read configuration!"));
-	} else {
-		tc = new testclass;
-		tc->enumerateSettings(__T("General"), settingsmgr);
-		delete tc;
+		delete settingsmgr;
+		delete dbgmgr;
+		return -255;
 	}
-	settingsmgr->write(__T(".nova_settings"));
-	delete settingsmgr;
+
+	renderer = new Renderer(settingsmgr, dbgmgr);
+	renderer->createDevice(RenderBackendType_Direct3D9);
+	device = renderer->getDevice();
+	if(device != NULL) {
+		device->init(NULL, 0, 0);
+	}
 
 	registerClass(hInstance);
 	if (!initInstance(hInstance, nCmdShow)) 
@@ -67,7 +72,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-
+	
+	settingsmgr->write(__T(".nova_settings"));
+	delete renderer;
+	delete settingsmgr;
 	delete dbgmgr;
 	return static_cast<int>(msg.wParam);
 }

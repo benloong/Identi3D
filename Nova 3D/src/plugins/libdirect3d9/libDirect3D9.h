@@ -16,7 +16,7 @@ namespace Nova3D
 {
 	class DebugManager;
 
-	class Direct3D9SettingsEnumerator : SettingsEnumerator
+	class Direct3D9SettingsEnumerator : public SettingsEnumerator
 	{
 	private:
 		bool windowed, hardware_accel;
@@ -55,7 +55,7 @@ namespace Nova3D
 		D3DCOLOR				clear_color;
 
 		DebugManager				*debug_manager;
-		Direct3D9SettingsEnumerator	*settings_enumerator;
+		Direct3D9SettingsEnumerator	settings_enumerator;
 
 		bool	is_scene_running;
 		bool	is_stencil_enabled;

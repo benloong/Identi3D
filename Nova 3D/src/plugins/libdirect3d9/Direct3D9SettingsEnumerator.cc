@@ -28,6 +28,7 @@ namespace Nova3D
 	{
 		width = 800;
 		height = 600;
+		refresh_rate = 60;
 		windowed = true;
 		hardware_accel = true;
 	}
@@ -36,15 +37,15 @@ namespace Nova3D
 	{
 		if(need_update) {
 			if(EqualString(name, __T("Width"))) {
-				_sntprintf(value, buffer_size, __T("%d"), width);
+				_sntprintf_s(value, buffer_size, buffer_size, __T("%d"), width);
 			}else if(EqualString(name, __T("Height"))) {
-				_sntprintf(value, buffer_size, __T("%d"), height);
+				_sntprintf_s(value, buffer_size, buffer_size, __T("%d"), height);
 			}else if(EqualString(name, __T("RefreshRate"))) {
-				_sntprintf(value, buffer_size, __T("%d"), refresh_rate);
+				_sntprintf_s(value, buffer_size, buffer_size, __T("%d"), refresh_rate);
 			}else if(EqualString(name, __T("Windowed"))) {
-				_sntprintf(value, buffer_size, __T("%s"), (windowed ? __T("true") : __T("false")));
+				_sntprintf_s(value, buffer_size, buffer_size, __T("%s"), (windowed ? __T("true") : __T("false")));
 			}else if(EqualString(name, __T("HardwareAcceleration"))) {
-				_sntprintf(value, buffer_size, __T("%s"),
+				_sntprintf_s(value, buffer_size, buffer_size, __T("%s"),
 					(hardware_accel ? __T("true") : __T("false")));
 			}
 			need_update = false;

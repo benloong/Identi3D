@@ -55,7 +55,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;utils_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>libdirect3d9.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>

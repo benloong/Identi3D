@@ -14,15 +14,20 @@
 #define _THROW_FATAL_ERROR(error_string) \
 	{\
 		char tmp[256];\
-		sprintf(tmp, "%ls", error_string);\
+		sprintf_s(tmp, "%ls", error_string);\
 		throw std::exception(tmp);\
 	}
 
 namespace Nova3D
 {
 
+#ifndef _DEBUG
 	const TCHAR *render_plugin_path[] = {	__T("libdirect3d9.dll"),
 											__T("libopengl.dll"), };
+#else
+	const TCHAR *render_plugin_path[] = {	__T("libdirect3d9_d.dll"),
+											__T("libopengl_d.dll"), };
+#endif
 
 	const TCHAR *render_settings_group_name = __T("Graphics");
 

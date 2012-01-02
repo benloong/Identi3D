@@ -31,5 +31,7 @@
 #define E_ENUMERATE_DISPLAY_MODE_FAILURE	__T("Failed to enumerate display mode.")
 #define E_NO_SUITABLE_DISPLAY_MODE			__T("No suitable display mode found. Please check configuration.")
 #define E_NOT_SUPPORTED_MODE				__T("The selected mode is not supported by the graphics card.")
-
+#define E_GET_DEVICE_CAPABILITIES_FAILURE	__T("Failed to get device capabilities.")
+#define E_FSAA_NOT_AVAILABLE				__T("FSAA not available on your hardware.")
+#define E_CREATE_DIRECT3D_DEVICE_FAILURE	__T("Failed to create Direct3D device.")
 #endif

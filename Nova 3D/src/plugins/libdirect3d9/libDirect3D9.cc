@@ -89,6 +89,61 @@ namespace Nova3D
 
 	HRESULT PluginDirect3D9::run(void)
 	{
+		HRESULT hr;
+		DWORD flag;
+		D3DCAPS9 caps;
+
+		hr = direct3d->GetDeviceCaps(D3DADAPTER_DEFAULT,
+			(settings_enumerator.isHardwareAccelerated() ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
+			&caps);
+		if(FAILED(hr)) {
+			_DEBUGPRINT(debug_manager, E_GET_DEVICE_CAPABILITIES_FAILURE);
+			return E_FAIL;
+		}
+		
+		flag = 0;
+		if(caps.VertexProcessingCaps) {
+			flag |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
+		} else {
+			flag |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+		}
+
+		memset(&present_parameters, 0, sizeof(present_parameters));
+		present_parameters.Windowed = settings_enumerator.isWindowed();
+		present_parameters.BackBufferWidth = settings_enumerator.getWidth();
+		present_parameters.BackBufferHeight = settings_enumerator.getHeight();
+		present_parameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
+		if(!settings_enumerator.isWindowed()) {
+			present_parameters.FullScreen_RefreshRateInHz = settings_enumerator.getRefreshRate();
+		}
+		present_parameters.BackBufferFormat = D3DFMT_X8R8G8B8;
+		present_parameters.hDeviceWindow = render_window;
+
+		// Enable FSAA ( TODO: Replace it by reading configuration. )
+		hr = direct3d->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT,
+			(settings_enumerator.isHardwareAccelerated() ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
+			D3DFMT_X8R8G8B8,
+			(settings_enumerator.isWindowed() ? TRUE : FALSE),
+			D3DMULTISAMPLE_2_SAMPLES,
+			NULL);
+		if(FAILED(hr)) {
+			_DEBUGPRINT(debug_manager, E_FSAA_NOT_AVAILABLE);
+			present_parameters.MultiSampleType = D3DMULTISAMPLE_NONE;
+		} else {
+			present_parameters.MultiSampleType = D3DMULTISAMPLE_2_SAMPLES;
+		}
+
+		hr = direct3d->CreateDevice(D3DADAPTER_DEFAULT,
+			(settings_enumerator.isHardwareAccelerated() ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
+			render_window,
+			flag,
+			&present_parameters,
+			&direct_device);
+		if(FAILED(hr)) {
+			_DEBUGPRINT(debug_manager, E_CREATE_DIRECT3D_DEVICE_FAILURE);
+			return E_FAIL;
+		}
+
 		return S_OK;
 	}
 

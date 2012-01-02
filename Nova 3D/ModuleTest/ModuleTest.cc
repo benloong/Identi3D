@@ -46,8 +46,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	dbgmgr = new DebugManager();
 	dbgmgr->createDebugConsole();
 	dbgmgr->setOutputFlag(dbgmgr->getOutputFlag() | DebugFlag_ConsoleOutput);
-	dbgmgr->print(__FILE__, __LINE__, __T("Hello world! %s."), __T("This is a welcome from Nova3D"));
-	_DEBUGPRINT(dbgmgr, __T("1 + 1 = %d"), 1 + 1);
+	dbgmgr->print(__FILE__, __LINE__, __T("Program started."));
 
 	settingsmgr = new SettingsManager();
 	if(FAILED(settingsmgr->read(__T(".nova_settings")))) {

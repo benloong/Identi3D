@@ -23,5 +23,16 @@
     <ClCompile Include="libDirect3D9.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderDeviceInterface.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3D9SettingsEnumerator.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libDirect3D9.def">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

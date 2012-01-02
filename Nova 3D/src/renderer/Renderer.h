@@ -39,10 +39,8 @@ namespace Nova3D
 		HRESULT	createDevice(RenderBackendType type);
 		void	releaseDevice(void);
 
-		inline RenderDevice	*getDevice(void) 
-							{ return render_device; }
-		inline HMODULE	getPluginsHandle(void) 
-							{ return plugin_handle; }
+		inline RenderDevice	*getDevice(void) { return render_device; }
+		inline HMODULE	getPluginsHandle(void) { return plugin_handle; }
 	};
 
 };

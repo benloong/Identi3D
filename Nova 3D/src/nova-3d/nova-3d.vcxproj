@@ -63,7 +63,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Nova.h" />
-    <ClInclude Include="NovaException.h" />
+    <ClInclude Include="NovaNotification.h" />
     <ClInclude Include="NovaGeneral.h" />
   </ItemGroup>
   <ItemGroup>

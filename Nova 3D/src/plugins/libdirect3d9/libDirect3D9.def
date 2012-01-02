@@ -1,0 +1,9 @@
+;
+; libDirect3D9.def
+; ================
+;
+
+LIBRARY "libdirect3d9.dll"
+EXPORTS
+	CreateRenderDevice
+	ReleaseRenderDevice

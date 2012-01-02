@@ -29,7 +29,7 @@
 #include <cstdarg>
 #include <sstream>
 
-#include "NovaException.h"
+#include "NovaNotification.h"
 
 // General name string for Nova3D
 #if !defined(NOVA3D_NAME)

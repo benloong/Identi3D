@@ -18,10 +18,10 @@
     <ClInclude Include="Nova.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NovaException.h">
+    <ClInclude Include="NovaGeneral.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NovaGeneral.h">
+    <ClInclude Include="NovaNotification.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

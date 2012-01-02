@@ -93,7 +93,9 @@ namespace Nova3D
 		JsonReader *reader;
 		HRESULT hr;
 
-		reader = new JsonReader(this);
+		reader = new (std::nothrow) JsonReader(this);
+		if(reader == NULL)
+			return E_FAIL;
 		hr = reader->lockFile(file_name);
 		if(FAILED(hr)) {
 			delete reader;
@@ -118,7 +120,9 @@ namespace Nova3D
 		ItemProperties *p;
 		SettingsGroup *s;
 
-		writer = new JsonWriter();
+		writer = new (std::nothrow) JsonWriter();
+		if(writer == NULL)
+			return E_FAIL;
 		hr = writer->lockFile(file_name);
 		if(FAILED(hr)) {
 			delete writer;
@@ -177,7 +181,7 @@ namespace Nova3D
 		} else if(state == ListenerState_Group) {
 			hashval = hashByString(name);
 			if(global_config[hashval] == NULL) {
-				global_config[hashval] = new SettingsGroup;
+				global_config[hashval] = new (std::nothrow) SettingsGroup;
 				s = global_config[hashval];
 			} else {
 				p = global_config[hashval];
@@ -187,10 +191,18 @@ namespace Nova3D
 					p = s;
 					s = s->next;
 				}
-				p->next = new SettingsGroup;
+				p->next = new (std::nothrow) SettingsGroup;
 				s = p->next;
 			}
-			s->name = new TCHAR[DEFAULT_STRING_LENGTH];
+			if(s == NULL) {
+				state = ListenerState_Idle;
+				return ;
+			}
+			s->name = new (std::nothrow) TCHAR[DEFAULT_STRING_LENGTH];
+			if(s->name == NULL) {
+				state = ListenerState_Idle;
+				return ;
+			}
 			_tcsncpy_s(s->name, DEFAULT_STRING_LENGTH, name,  DEFAULT_STRING_LENGTH - 1);
 			s->prop = NULL;
 			s->next = NULL;
@@ -215,7 +227,7 @@ namespace Nova3D
 		if(state == ListenerState_Item) {
 			if(current == NULL) return ;
 			if(current->prop == NULL) {
-				current->prop = new ItemProperties;
+				current->prop = new (std::nothrow) ItemProperties;
 				s = current->prop;
 			} else {
 				p = current->prop;
@@ -225,11 +237,23 @@ namespace Nova3D
 					p = s;
 					s = s->next;
 				}
-				p->next = new ItemProperties;
+				p->next = new (std::nothrow) ItemProperties;
 				s = p->next;
 			}
-			s->name = new TCHAR[DEFAULT_STRING_LENGTH];
-			s->value = new TCHAR[DEFAULT_STRING_LENGTH];
+			if(s == NULL) {
+				state = ListenerState_Idle;
+				return ;
+			}
+			s->name = new (std::nothrow) TCHAR[DEFAULT_STRING_LENGTH];
+			if(s->name == NULL) {
+				state = ListenerState_Idle;
+				return ;
+			}
+			s->value = new (std::nothrow) TCHAR[DEFAULT_STRING_LENGTH];
+			if(s->value == NULL) {
+				state = ListenerState_Idle;
+				return ;
+			}
 			_tcsncpy_s(s->name, DEFAULT_STRING_LENGTH, name, DEFAULT_STRING_LENGTH - 1);
 			_tcsncpy_s(s->value, DEFAULT_STRING_LENGTH, value, DEFAULT_STRING_LENGTH - 1);
 			s->next = NULL;

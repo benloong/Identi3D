@@ -11,6 +11,7 @@
 namespace Nova3D
 {
 	class DebugManager;
+	class SettingsEnumerator;
 
 	class RenderDevice 
 	{
@@ -33,14 +34,16 @@ namespace Nova3D
 		virtual HRESULT	clear(bool clear_pixel, bool clear_depth, bool clear_stencil) = 0;
 
 		virtual void	setClearColor(float red, float green, float blue) = 0;
+
+		virtual SettingsEnumerator	&getSettingsEnumerator(void) = 0;
 	};
 
 	typedef class RenderDevice *RENDERDEVICE;
 
 	extern "C"
 	{
-		HRESULT CreateRenderDevice(HMODULE plugin, RenderDevice **device, DebugManager *debug_manager);
-		typedef HRESULT (*CREATERENDERDEVICE)(HMODULE plugin, RenderDevice **device, DebugManager *debug_manager);
+		HRESULT CreateRenderDevice(HMODULE plugin, RenderDevice **device, DebugManager *debugmgr);
+		typedef HRESULT (*CREATERENDERDEVICE)(HMODULE plugin, RenderDevice **device, DebugManager *debugmgr);
 
 		void ReleaseRenderDevice(RenderDevice **device);
 		typedef void (*RELEASERENDERDEVICE)(RenderDevice **device);

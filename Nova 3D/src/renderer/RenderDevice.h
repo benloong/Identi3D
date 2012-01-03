@@ -36,6 +36,8 @@ namespace Nova3D
 		virtual void	setClearColor(float red, float green, float blue) = 0;
 
 		virtual SettingsEnumerator	&getSettingsEnumerator(void) = 0;
+		virtual const UINT	getWidth(void) const = 0;
+		virtual const UINT	getHeight(void) const = 0;
 	};
 
 	typedef class RenderDevice *RENDERDEVICE;

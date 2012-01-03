@@ -8,6 +8,7 @@
 
 #include "src/nova-3d/Nova.h"
 #include "src/utils/SettingsManager.h"
+#include "src/renderer/RenderWindow.h"
 
 #pragma comment (lib, "utils_d.lib")
 
@@ -17,6 +18,7 @@ const TCHAR *class_name		= __T("MODULE_TEST");
 const TCHAR *app_title		= __T("Module Test");
 DebugManager *dbgmgr;
 SettingsManager *settingsmgr;
+HWND hWnd;
 
 const LONG window_style	= (	WS_OVERLAPPED	| \
 							WS_CAPTION		| \
@@ -39,9 +41,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      LPTSTR    lpCmdLine,
                      int       nCmdShow)
 {
-	MSG msg;
+	int retval;
+	//MSG msg;
 	Renderer *renderer;
 	RenderDevice *device;
+	RenderWindow *rw;
+	HRESULT hr;
 
 	dbgmgr = new DebugManager();
 	dbgmgr->createDebugConsole();
@@ -57,26 +62,46 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	}
 
 	renderer = new Renderer(settingsmgr, dbgmgr);
-	renderer->createDevice(RenderBackendType_Direct3D9);
-	device = renderer->getDevice();
-	if(device != NULL) {
-		device->init(NULL, 0, 0);
-	}
-
-	registerClass(hInstance);
-	if (!initInstance(hInstance, nCmdShow)) 
+	
+	hr = renderer->createDevice(RenderBackendType_Direct3D9);
+	if(FAILED(hr)) {
+		_DEBUGPRINT(dbgmgr, E_FATAL_ERROR);
+		delete renderer;
+		delete settingsmgr;
+		delete dbgmgr;
 		return -255;
-
-	while(GetMessage(&msg, NULL, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
 	}
+	device = renderer->getDevice();
+
+	rw = new RenderWindow(dbgmgr);
+	hr = rw->assign(device, __T("Nova3D Test"));
+	if(FAILED(hr)) {
+		_DEBUGPRINT(dbgmgr, E_FATAL_ERROR);
+		delete rw;
+		delete renderer;
+		delete settingsmgr;
+		delete dbgmgr;
+		return -255;
+	}
+	device->init(rw->getWindowHandle(), 0, 0);
+	
+	//registerClass(hInstance);
+	//if (!initInstance(hInstance, nCmdShow)) 
+	//	return -255;
+	
+	retval = rw->start();
+
+	//while(GetMessage(&msg, NULL, 0, 0)) {
+	//	TranslateMessage(&msg);
+	//	DispatchMessage(&msg);
+	//}
 	
 	settingsmgr->write(__T(".nova_settings"));
+	delete rw;
 	delete renderer;
 	delete settingsmgr;
 	delete dbgmgr;
-	return static_cast<int>(msg.wParam);
+	return retval;
 }
 
 void registerClass(HINSTANCE hInstance)
@@ -102,7 +127,6 @@ void registerClass(HINSTANCE hInstance)
 
 bool initInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   HWND hWnd;
 
    hWnd = CreateWindow(class_name, app_title, window_style,
 	   CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);

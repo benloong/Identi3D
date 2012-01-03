@@ -11,6 +11,7 @@
 // Information	starts with	letter 'I'
 
 // General
+#define E_FATAL_ERROR						__T("System experienced a fatal error. Exiting...")
 #define E_OUT_OF_MEMORY						__T("Memory insufficient.")
 #define E_INVALID_PARAMETERS				__T("Invalid parameters.")
 #define E_FILE_OPEN_FAILURE					__T("Unable to open \'%s\'.")
@@ -34,4 +35,8 @@
 #define E_GET_DEVICE_CAPABILITIES_FAILURE	__T("Failed to get device capabilities.")
 #define E_FSAA_NOT_AVAILABLE				__T("FSAA not available on your hardware.")
 #define E_CREATE_DIRECT3D_DEVICE_FAILURE	__T("Failed to create Direct3D device.")
+
+// Render Window
+#define E_CREATE_RENDER_WINDOW_FAILURE		__T("Failed to create render window.")
+
 #endif

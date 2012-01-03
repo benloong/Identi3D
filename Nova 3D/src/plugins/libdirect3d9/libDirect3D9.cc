@@ -37,6 +37,7 @@ namespace Nova3D
 			_DEBUGPRINT(debug_manager, E_DIRECT3D_INIT_FAILURE);
 			return E_FAIL;
 		}
+		render_window = window;
 
 		if(!checkPrerequisite()) return E_FAIL;
 		return run();

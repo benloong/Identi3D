@@ -34,11 +34,11 @@ namespace Nova3D
 
 		inline void reset(void) { setDefaultValue(), need_update = true; }
 
-		inline UINT getWidth(void) { return width; }
-		inline UINT getHeight(void) { return height; }
-		inline UINT getRefreshRate(void) { return refresh_rate; }
-		inline bool isWindowed(void) { return windowed; }
-		inline bool isHardwareAccelerated(void) { return hardware_accel; }
+		inline const UINT getWidth(void) const { return width; }
+		inline const UINT getHeight(void) const { return height; }
+		inline const UINT getRefreshRate(void) const { return refresh_rate; }
+		inline const bool isWindowed(void) const { return windowed; }
+		inline const bool isHardwareAccelerated(void) const { return hardware_accel; }
 
 		void setResolution(UINT new_width, UINT new_height, UINT new_refresh_rate);
 		inline void setWindowed(bool is_windowed) { windowed = is_windowed, need_update = true; }
@@ -79,6 +79,8 @@ namespace Nova3D
 		void	setClearColor(float red, float green, float blue);
 
 		SettingsEnumerator	&getSettingsEnumerator(void);
+		inline const UINT	getWidth(void) const { return settings_enumerator.getWidth(); }
+		inline const UINT	getHeight(void) const { return settings_enumerator.getHeight(); }
 	};
 
 };

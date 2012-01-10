@@ -22,6 +22,7 @@ public:
 	int		run(void);
 
 	void onKeyboardInput(Nova3D::KeyType key, UINT repeat_times, bool previous_key_pressed);
+	void onRendering(void);
 };
 
 #endif

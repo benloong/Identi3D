@@ -31,7 +31,7 @@ namespace Nova3D
 		virtual bool	isRunning(void) = 0;
 
 		virtual HRESULT startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil) = 0;
-		virtual void	stopRendering(void) = 0;
+		virtual void	endRendering(void) = 0;
 		virtual HRESULT	clear(bool clear_pixel, bool clear_depth, bool clear_stencil) = 0;
 
 		virtual void	setClearColor(float red, float green, float blue) = 0;

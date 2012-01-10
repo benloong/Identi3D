@@ -41,6 +41,10 @@ namespace Nova3D
 
 		virtual void onKeyboardInput(KeyType key, UINT repeat_times, bool previous_key_pressed) {};
 
+		virtual void onStartRendering(void);
+		virtual void onRendering(void) = 0;
+		virtual void onEndRendering(void);
+
 		inline HWND getWindowHandle(void) { return window; }
 		inline RenderDevice *getRenderDevice(void) { return render_device; }
 	};

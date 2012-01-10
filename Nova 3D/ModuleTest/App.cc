@@ -44,7 +44,12 @@ HRESULT App::init(void)
 
 int App::run(void)
 {
-	return start();
+	int retval;
+
+	device->setClearColor(0, 0, 1.0f);
+	retval = start();
+
+	return retval;
 }
 
 App::~App(void)
@@ -55,10 +60,16 @@ App::~App(void)
 
 void App::onKeyboardInput(KeyType key, UINT repeat_times, bool previous_key_pressed)
 {
+	_DebugPrint(__T("Keyboard Input Event: %d, %d, %s"), key, repeat_times, previous_key_pressed ? __T("true") : __T("false"));
 	switch(key)
 	{
 	case KeyType_Escape:
 		release();
 		return ;
 	}
+}
+
+void App::onRendering(void)
+{
+	return ;
 }

@@ -16,7 +16,9 @@ namespace Nova3D
 		this->plugin_handle = plugin;
 		this->debug_manager = debug_manager;
 		is_running = false;
-
+		
+		is_scene_running = false;
+		is_stencil_enabled = false;
 		this->direct3d = NULL;
 		this->direct_device = NULL;
 		this->clear_color = RGB(0, 0, 0);
@@ -53,34 +55,28 @@ namespace Nova3D
 		count = direct3d->GetAdapterModeCount(D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8);
 		if(0 == count){
 			_DebugPrintS(debug_manager, E_NO_DISPLAY_MODE_AVAILABLE);
-			//debug_manager->print(__FILE__, __LINE__, E_NO_DISPLAY_MODE_AVAILABLE);
 			return false;
 		}
 
 		_DebugPrintSV(debug_manager, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
-		//debug_manager->print(__FILE__, __LINE__, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
 
 		for(i = 0; i < count; i++){
 			hr = direct3d->EnumAdapterModes(D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8, i, &mode);
 			if(FAILED(hr)){
 				_DebugPrintS(debug_manager, E_ENUMERATE_DISPLAY_MODE_FAILURE);
-				//debug_manager->print(__FILE__, __LINE__, E_ENUMERATE_DISPLAY_MODE_FAILURE);
 				return false;
 			}
 			_DebugPrintSV(debug_manager, I_DISPLAY_MODE_FORMAT, mode.Width, mode.Height, mode.RefreshRate);
-			//debug_manager->print(__FILE__, __LINE__, I_DISPLAY_MODE_FORMAT, mode.Width, mode.Height, mode.RefreshRate);
 			if(settings_enumerator.getWidth() == mode.Width && 
 				settings_enumerator.getHeight() == mode.Height &&
 				settings_enumerator.getRefreshRate() == mode.RefreshRate &&
 				mode.Format == D3DFMT_X8R8G8B8){
 					_DebugPrintS(debug_manager, I_DISPLAY_MODE_FOUND);
-					//debug_manager->print(__FILE__, __LINE__, I_DISPLAY_MODE_FOUND);
 					break;
 			}
 		}
 		if(i >= count){
 			_DebugPrintS(debug_manager, E_NO_SUITABLE_DISPLAY_MODE);
-			//debug_manager->print(__FILE__, __LINE__, E_NO_SUITABLE_DISPLAY_MODE);
 			return false;
 		}
 
@@ -89,7 +85,6 @@ namespace Nova3D
 			D3DFMT_X8R8G8B8, D3DFMT_X8R8G8B8, settings_enumerator.isWindowed());
 		if(FAILED(hr)){
 			_DebugPrintS(debug_manager, E_NOT_SUPPORTED_MODE);
-			//debug_manager->print(__FILE__, __LINE__, E_NOT_SUPPORTED_MODE);
 			return false;
 		}
 
@@ -107,7 +102,6 @@ namespace Nova3D
 			&caps);
 		if(FAILED(hr)) {
 			_DebugPrintS(debug_manager, E_GET_DEVICE_CAPABILITIES_FAILURE);
-			//debug_manager->print(__FILE__, __LINE__, E_GET_DEVICE_CAPABILITIES_FAILURE);
 			return E_FAIL;
 		}
 		
@@ -117,17 +111,25 @@ namespace Nova3D
 		} else {
 			flag |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 		}
-
+		
 		memset(&present_parameters, 0, sizeof(present_parameters));
-		present_parameters.Windowed = settings_enumerator.isWindowed();
-		present_parameters.BackBufferWidth = settings_enumerator.getWidth();
-		present_parameters.BackBufferHeight = settings_enumerator.getHeight();
+		present_parameters.hDeviceWindow = render_target->getWindowHandle();
+		present_parameters.Windowed = (settings_enumerator.isWindowed()) ? TRUE : FALSE;
+		present_parameters.BackBufferCount = 1;
+		present_parameters.BackBufferFormat = D3DFMT_X8R8G8B8;		// Temporarily set to D3DFMT_X8R8G8B8
+		present_parameters.EnableAutoDepthStencil = TRUE;
+		present_parameters.AutoDepthStencilFormat = D3DFMT_D24S8;	// Temporarily set to D3DFMT_D24S8
 		present_parameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
+
 		if(!settings_enumerator.isWindowed()) {
 			present_parameters.FullScreen_RefreshRateInHz = settings_enumerator.getRefreshRate();
+			present_parameters.BackBufferWidth = settings_enumerator.getWidth();
+			present_parameters.BackBufferHeight = settings_enumerator.getHeight();
+			ShowCursor(FALSE);
+		} else {
+			present_parameters.BackBufferWidth = GetSystemMetrics(SM_CXSCREEN);
+			present_parameters.BackBufferHeight = GetSystemMetrics(SM_CYSCREEN);
 		}
-		present_parameters.BackBufferFormat = D3DFMT_X8R8G8B8;
-		present_parameters.hDeviceWindow = render_target->getWindowHandle();
 
 		// Enable FSAA ( TODO: Replace it by reading configuration. )
 		hr = direct3d->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT,
@@ -138,7 +140,6 @@ namespace Nova3D
 			NULL);
 		if(FAILED(hr)) {
 			_DebugPrintS(debug_manager, E_FSAA_NOT_AVAILABLE);
-			//debug_manager->print(__FILE__, __LINE__, E_FSAA_NOT_AVAILABLE);
 			present_parameters.MultiSampleType = D3DMULTISAMPLE_NONE;
 		} else {
 			present_parameters.MultiSampleType = D3DMULTISAMPLE_2_SAMPLES;
@@ -152,10 +153,11 @@ namespace Nova3D
 			&direct_device);
 		if(FAILED(hr)) {
 			_DebugPrintS(debug_manager, E_CREATE_DIRECT3D_DEVICE_FAILURE);
-			//debug_manager->print(__FILE__, __LINE__, E_CREATE_DIRECT3D_DEVICE_FAILURE);
 			return E_FAIL;
 		}
 
+		is_running = true;
+		is_scene_running = false;
 		return S_OK;
 	}
 
@@ -174,18 +176,67 @@ namespace Nova3D
 
 	HRESULT PluginDirect3D9::startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil)
 	{
-		// TODO: add detailed code here.
+		DWORD clear_flag = 0;
+		HRESULT hr;
+
+		if(clear_pixel) clear_flag |= D3DCLEAR_TARGET;
+		if(clear_depth) clear_flag |= D3DCLEAR_ZBUFFER;
+		if(clear_stencil && is_stencil_enabled) clear_flag |= D3DCLEAR_STENCIL;
+
+		hr = direct_device->Clear(0, NULL, clear_flag, clear_color, 1.0f, 0);
+		if(FAILED(hr)) {
+			_DebugPrintS(debug_manager, E_CLEAR_BUFFER_FAILURE);
+			return E_FAIL;
+		}
+
+		hr = direct_device->BeginScene();
+		if(FAILED(hr)) {
+			_DebugPrintS(debug_manager, E_BEGIN_SCENE_FAILURE);
+			return E_FAIL;
+		}
+
+		is_scene_running = true;
 		return S_OK;
 	}
 
-	void PluginDirect3D9::stopRendering(void)
+	void PluginDirect3D9::endRendering(void)
 	{
-		// TODO: add detailed code here.
+		if(!is_scene_running) return ;
+		direct_device->EndScene();
+		direct_device->Present(NULL, NULL, NULL, NULL);
+		is_scene_running = false;
 	}
 
 	HRESULT PluginDirect3D9::clear(bool clear_pixel, bool clear_depth, bool clear_stencil)
 	{
-		// TODO: add detailed code here.
+		DWORD clear_flag = 0;
+		HRESULT hr;
+
+		if(clear_pixel) clear_flag |= D3DCLEAR_TARGET;
+		if(clear_depth) clear_flag |= D3DCLEAR_ZBUFFER;
+		if(clear_stencil && is_stencil_enabled) clear_flag |= D3DCLEAR_STENCIL;
+
+		if(is_scene_running) {
+			hr = direct_device->EndScene();
+			if(FAILED(hr)) {
+				_DebugPrintS(debug_manager, E_END_SCENE_FAILURE);
+				return E_FAIL;
+			}
+		}
+
+		hr = direct_device->Clear(0, NULL, clear_flag, clear_color, 1.0f, 0);
+		if(FAILED(hr)) {
+			_DebugPrintS(debug_manager, E_CLEAR_BUFFER_FAILURE);
+			return E_FAIL;
+		}
+
+		if(is_scene_running) {
+			hr = direct_device->BeginScene();
+			if(FAILED(hr)) {
+				_DebugPrintS(debug_manager, E_BEGIN_SCENE_FAILURE);
+				return E_FAIL;
+			}
+		}
 		return S_OK;
 	}
 

@@ -118,6 +118,9 @@ namespace Nova3D
 				DispatchMessage(&msg);
 			}
 			if(msg.message == WM_QUIT) break;
+			onStartRendering();
+			onRendering();
+			onEndRendering();
 		}
 
 		return static_cast<int>(msg.wParam);
@@ -164,4 +167,21 @@ namespace Nova3D
 		return 0;
 	}
 
+	void RenderWindow::onStartRendering(void)
+	{
+		HRESULT hr;
+
+		if(render_device->isRunning()) {
+			hr = render_device->startRendering(true, true, true);
+			if(FAILED(hr)) {
+				_DebugPrint(E_START_RENDERING_FAILURE);
+			}
+		}
+	}
+
+	void RenderWindow::onEndRendering(void)
+	{
+		if(render_device->isRunning())
+			render_device->endRendering();
+	}
 };

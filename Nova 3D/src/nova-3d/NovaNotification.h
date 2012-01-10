@@ -39,8 +39,14 @@
 #define E_FSAA_NOT_AVAILABLE				__T("FSAA not available on your hardware.")
 #define E_CREATE_DIRECT3D_DEVICE_FAILURE	__T("Failed to create Direct3D device.")
 
+#define E_CLEAR_BUFFER_FAILURE				__T("Failed to clear buffers.")
+#define E_BEGIN_SCENE_FAILURE				__T("Failed to begin scene.")
+#define E_END_SCENE_FAILURE					__T("Failed to end scene.")
+
 // Render Window
 #define E_CREATE_RENDER_WINDOW_FAILURE		__T("Failed to create render window.")
 #define I_WINDOW_CLASS_NAME_ALLOCATED		__T("New render window: \"%s\".")
+
+#define E_START_RENDERING_FAILURE			__T("Failed to start rendering.")
 
 #endif

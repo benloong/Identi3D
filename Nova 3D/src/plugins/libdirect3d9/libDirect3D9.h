@@ -134,7 +134,7 @@ namespace Nova3D
 		D3DPRESENT_PARAMETERS	present_parameters;
 		D3DCOLOR				clear_color;
 
-		DebugManager				*debug_manager;
+		DebugManager			*debug_manager;
 		Direct3D9SettingsEnumerator	settings_enumerator;
 
 		bool	is_scene_running;
@@ -190,11 +190,11 @@ namespace Nova3D
 		HRESULT startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil);
 
 		//
-		// Function: stopRendering(void)
+		// Function: endRendering(void)
 		// =============================
 		// Stops rendering procedure.
 		//
-		void	stopRendering(void);
+		void	endRendering(void);
 		
 		//
 		// Function: clear(ClearPixelBuffer, ClearDepthBuffer, ClearStencilBuffer)

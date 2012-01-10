@@ -1,10 +1,7 @@
 //
 // File: DebugManager.cc
 // =====================
-// Provides a basic debug & logging system for Nova 3D.
-//
-// Copyright (c) Sparkfire, 2011 - 2012
-//
+// 
 
 #include "src/utils/DebugManager.h"
 
@@ -25,16 +22,19 @@ namespace Nova3D {
 	DebugManager::DebugManager(void)
 	{
 		log_file = NULL;
+		console = NULL;
 		output_flag = DEBUGFLAG_DEFAULT;
 	}
 
 	DebugManager::~DebugManager(void)
 	{
 		if(log_file != NULL) fclose(log_file);
+		if(console != NULL) fclose(console);
 	}
 
 	inline void connectString(TCHAR *dest, const TCHAR *src)
 	{
+		if(dest == NULL && src == NULL) return ;
 		TCHAR *p = dest;
 		const TCHAR *s = src;
 		while(*p != __T('\0')) p++;
@@ -44,6 +44,7 @@ namespace Nova3D {
 
 	inline void truncSourceFileName(TCHAR *src_filename)
 	{
+		if(src_filename == NULL) return ;
 		TCHAR *p = src_filename + _tcslen(src_filename) - 1, *s = src_filename;
 		while(p != src_filename && *p != __T('/') && *p != __T('\\')) p--;
 		if(p == src_filename) return ;
@@ -54,6 +55,7 @@ namespace Nova3D {
 
 	HRESULT DebugManager::print(const char *src_filename, 
 								int line_number, 
+								bool verbose,
 								const TCHAR *message,
 								...)
 	{
@@ -68,6 +70,8 @@ namespace Nova3D {
 		
 		if(src_filename == NULL || message == NULL) 
 			return E_FAIL;
+		if((output_flag & DebugFlag_VerboseMode) == 0 && verbose) 
+			return S_FALSE;
 
 		va_start(arg, message);
 		_vsntprintf_s(msg_buffer, max_buffer_length, message, arg);
@@ -106,18 +110,19 @@ namespace Nova3D {
 		connectString(buffer, msg_buffer);
 		connectString(buffer, __T("\n"));
 
-		if(output_flag & DebugFlag_ConsoleOutput)					// Write to console window (if any).
+		if(output_flag & DebugFlag_ConsoleOutput && console != NULL)					// Write to console window (if any).
 			_fputts(buffer, console);
 		
 		if(output_flag & DebugFlag_FileOutput){						// Write to log file.
 			if(log_file == NULL){
 				_tfopen_s(&log_file, DEBUG_DEFAULT_FILENAME, __T("w"));
 				if(log_file == NULL){
-					_fputts(__T("warning: failed to open log file for writing!"), stderr);
+					_ftprintf(stderr, E_FILE_OPEN_FAILURE, DEBUG_DEFAULT_FILENAME);
 					output_flag &= ~DebugFlag_FileOutput;
 				}
-				_fputts(__T("Nova3D debug system started.\n\n"), log_file);
+				_fputts(I_LOG_STARTED, log_file);
 			}
+
 			_fputts(buffer, log_file);
 		}
 
@@ -143,6 +148,8 @@ namespace Nova3D {
 
 	HRESULT DebugManager::createDebugConsole(void)
 	{
+		if(console) 
+			return S_FALSE;
 		if(AllocConsole()){												// Allocate a console window under Windows.
 			_tfreopen_s(&console, __T("CONOUT$"), __T("wt"), stderr);	// Redirect standard output to console window.
 			SetConsoleTitle(NOVA3D_NAME);								// Set title.

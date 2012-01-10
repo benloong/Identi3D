@@ -10,12 +10,15 @@
 
 namespace Nova3D
 {
+	class DebugManager;
 
 	class RenderTarget
 	{
 	public:
-		RenderTarget(void) {};
+		RenderTarget(void) {}
 		virtual ~RenderTarget(void) {};
+
+		virtual HWND getWindowHandle(void) = 0;
 	};
 
 };

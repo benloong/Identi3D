@@ -268,11 +268,11 @@ namespace Nova3D
 	{
 	}
 
-	void SettingsEnumerator::enumerateSettings(const TCHAR *group_name, SettingsManager *manager)
+	void SettingsEnumerator::enumerateSettings(const TCHAR *group_name, SettingsManager &manager)
 	{
-		if(group_name == NULL || manager == NULL) return ;
+		if(group_name == NULL) return ;
 		ItemProperties *p;
-		manager->getGroupByName(group_name, &p);
+		manager.getGroupByName(group_name, &p);
 		if(p == NULL) return ;
 		while(p != NULL)
 		{

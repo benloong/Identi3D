@@ -11,10 +11,13 @@
 // Information	starts with	letter 'I'
 
 // General
-#define E_FATAL_ERROR						__T("System experienced a fatal error. Exiting...")
+#define E_FATAL_ERROR						__T("System encountered a fatal error. Exiting...")
 #define E_OUT_OF_MEMORY						__T("Memory insufficient.")
 #define E_INVALID_PARAMETERS				__T("Invalid parameters.")
 #define E_FILE_OPEN_FAILURE					__T("Unable to open \'%s\'.")
+
+// Debug Manager
+#define I_LOG_STARTED						__T("Nova3D Debugging System\nLog started.\n\n")
 
 // Renderer
 #define I_RENDERER_INITIALIZED				__T("Class Renderer initialized.")
@@ -38,5 +41,6 @@
 
 // Render Window
 #define E_CREATE_RENDER_WINDOW_FAILURE		__T("Failed to create render window.")
+#define I_WINDOW_CLASS_NAME_ALLOCATED		__T("New render window: \"%s\".")
 
 #endif

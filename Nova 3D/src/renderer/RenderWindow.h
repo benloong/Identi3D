@@ -8,20 +8,18 @@
 
 #include "src/nova-3d/NovaGeneral.h"
 #include "src/renderer/RenderTarget.h"
-
+#include "src/utils/KeyDefinition.h"
 
 namespace Nova3D
 {
 
 	class RenderDevice;
 
-	class DebugManager;
-
 	class RenderWindow : public RenderTarget
 	{
 	private:
 		HWND window;
-		DebugManager *debug_manager;
+		RenderDevice *render_device;
 		TCHAR class_name[256];
 
 	private:
@@ -30,12 +28,10 @@ namespace Nova3D
 		HRESULT createWindow(int width, int height, const TCHAR *title);
 
 	public:
-		RenderWindow(DebugManager *dbgmgr);
+		RenderWindow();
 		virtual ~RenderWindow(void);
 
-		HRESULT assign(HWND wnd);
-		HRESULT assign(int width, int height, const TCHAR *title);
-		HRESULT assign(const RenderDevice *device, const TCHAR *title);
+		HRESULT assign(RenderDevice *device, const TCHAR *title);
 		HRESULT release();
 
 		int		start(void);
@@ -43,7 +39,10 @@ namespace Nova3D
 		static	LRESULT WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
 		LRESULT dispatchWindowEvent(UINT msg, WPARAM wparam, LPARAM lparam);
 
-		inline const HWND getWindowHandle(void) const { return window; }
+		virtual void onKeyboardInput(KeyType key, UINT repeat_times, bool previous_key_pressed) {};
+
+		inline HWND getWindowHandle(void) { return window; }
+		inline RenderDevice *getRenderDevice(void) { return render_device; }
 	};
 
 };

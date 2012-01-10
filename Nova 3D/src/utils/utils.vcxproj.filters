@@ -24,6 +24,12 @@
     <ClInclude Include="SettingsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="KeyDefinition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DebugManager.cc">

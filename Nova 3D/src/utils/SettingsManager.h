@@ -11,6 +11,7 @@
 
 #include "src/nova-3d/NovaGeneral.h"
 #include "src/utils/JsonParser.h"
+#include "src/utils/Singleton.h"
 
 #define SETTINGS_MANAGER_HASH_TABLE_SIZE		37
 
@@ -24,7 +25,7 @@ namespace Nova3D
 		struct tagItemProperties *next;
 	}ItemProperties;
 
-	class SettingsManager : public JsonReaderListener
+	class SettingsManager : public JsonReaderListener, public Singleton<SettingsManager>
 	{
 	private:
 		typedef struct tagSettingsGroup
@@ -68,7 +69,7 @@ namespace Nova3D
 	public:
 		SettingsEnumerator(void);
 		virtual ~SettingsEnumerator(void);
-		void enumerateSettings(const TCHAR *group_name, SettingsManager *manager);
+		void enumerateSettings(const TCHAR *group_name, SettingsManager &manager);
 
 	protected:
 		virtual void processEntries(const TCHAR *name, TCHAR *value, UINT buffer_size) = 0;

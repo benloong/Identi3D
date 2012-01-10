@@ -1,14 +1,12 @@
 //
 // File: ModuleTest.h
 // ==================
+// Sample usage of Nova 3D Engine & Tests for modules.
 //
 
 #ifndef NOVA3D_MODULETEST_MODULETEST_H
 #define NOVA3D_MODULETEST_MODULETEST_H
 
-void registerClass(HINSTANCE hInstance);
-bool initInstance(HINSTANCE, int);
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+// TODO: Add essential test function declarations here.
 
 #endif

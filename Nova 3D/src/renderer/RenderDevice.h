@@ -11,21 +11,22 @@
 namespace Nova3D
 {
 	class DebugManager;
+	class RenderTarget;
 	class SettingsEnumerator;
 
 	class RenderDevice 
 	{
 	protected:
-		HWND render_window;				// Render window
-		HINSTANCE plugin_handle;		// Handle of plugins
+		RenderTarget *render_target;		// Render target
+		HINSTANCE plugin_handle;			// Handle of plugins
 
-		bool is_running;				// Is running or not
+		bool is_running;					// Is running or not
 
 	public:
 		RenderDevice(void) {};
 		virtual ~RenderDevice(void) {};
 
-		virtual HRESULT init(HWND window, UINT min_depth, UINT min_stencil) = 0;
+		virtual HRESULT init(RenderTarget *target, UINT min_depth, UINT min_stencil) = 0;
 		virtual void	release(void) = 0;
 		virtual bool	isRunning(void) = 0;
 

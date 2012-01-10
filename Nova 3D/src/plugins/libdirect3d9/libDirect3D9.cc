@@ -4,23 +4,23 @@
 //
 
 #include "src/plugins/libdirect3d9/libDirect3D9.h"
-
+#include "src/renderer/RenderTarget.h"
 #include "src/utils/DebugManager.h"
 
 namespace Nova3D
 {
 
-	PluginDirect3D9::PluginDirect3D9(HMODULE plugin, DebugManager *debugmgr)
+	PluginDirect3D9::PluginDirect3D9(HMODULE plugin, DebugManager *debug_manager)
 	{
-		render_window = NULL;
-		plugin_handle = plugin;
-		debug_manager = debugmgr;
+		this->render_target = NULL;
+		this->plugin_handle = plugin;
+		this->debug_manager = debug_manager;
 		is_running = false;
 
-		direct3d = NULL;
-		direct_device = NULL;
-		clear_color = RGB(0, 0, 0);
-		memset(&present_parameters, 0, sizeof(present_parameters));
+		this->direct3d = NULL;
+		this->direct_device = NULL;
+		this->clear_color = RGB(0, 0, 0);
+		memset(&(this->present_parameters), 0, sizeof(this->present_parameters));
 	}
 
 	PluginDirect3D9::~PluginDirect3D9(void)
@@ -28,16 +28,17 @@ namespace Nova3D
 		release();
 	}
 
-	HRESULT PluginDirect3D9::init(HWND window, UINT min_depth, UINT min_stencil)
+	HRESULT PluginDirect3D9::init(RenderTarget *target, UINT min_depth, UINT min_stencil)
 	{
 		if(min_stencil > 0) is_stencil_enabled = true;
 
 		direct3d = Direct3DCreate9(D3D_SDK_VERSION);
 		if(direct3d == NULL){
-			_DEBUGPRINT(debug_manager, E_DIRECT3D_INIT_FAILURE);
+			_DebugPrintS(debug_manager, E_DIRECT3D_INIT_FAILURE);
+			//debug_manager->print(__FILE__, __LINE__, E_DIRECT3D_INIT_FAILURE);
 			return E_FAIL;
 		}
-		render_window = window;
+		render_target = target;
 
 		if(!checkPrerequisite()) return E_FAIL;
 		return run();
@@ -51,29 +52,35 @@ namespace Nova3D
 
 		count = direct3d->GetAdapterModeCount(D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8);
 		if(0 == count){
-			_DEBUGPRINT(debug_manager, E_NO_DISPLAY_MODE_AVAILABLE);
+			_DebugPrintS(debug_manager, E_NO_DISPLAY_MODE_AVAILABLE);
+			//debug_manager->print(__FILE__, __LINE__, E_NO_DISPLAY_MODE_AVAILABLE);
 			return false;
 		}
 
-		_DEBUGPRINT(debug_manager, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
+		_DebugPrintSV(debug_manager, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
+		//debug_manager->print(__FILE__, __LINE__, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
 
 		for(i = 0; i < count; i++){
 			hr = direct3d->EnumAdapterModes(D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8, i, &mode);
 			if(FAILED(hr)){
-				_DEBUGPRINT(debug_manager, E_ENUMERATE_DISPLAY_MODE_FAILURE);
+				_DebugPrintS(debug_manager, E_ENUMERATE_DISPLAY_MODE_FAILURE);
+				//debug_manager->print(__FILE__, __LINE__, E_ENUMERATE_DISPLAY_MODE_FAILURE);
 				return false;
 			}
-			_DEBUGPRINT(debug_manager, I_DISPLAY_MODE_FORMAT, mode.Width, mode.Height, mode.RefreshRate);
+			_DebugPrintSV(debug_manager, I_DISPLAY_MODE_FORMAT, mode.Width, mode.Height, mode.RefreshRate);
+			//debug_manager->print(__FILE__, __LINE__, I_DISPLAY_MODE_FORMAT, mode.Width, mode.Height, mode.RefreshRate);
 			if(settings_enumerator.getWidth() == mode.Width && 
 				settings_enumerator.getHeight() == mode.Height &&
 				settings_enumerator.getRefreshRate() == mode.RefreshRate &&
 				mode.Format == D3DFMT_X8R8G8B8){
-					_DEBUGPRINT(debug_manager, I_DISPLAY_MODE_FOUND);
+					_DebugPrintS(debug_manager, I_DISPLAY_MODE_FOUND);
+					//debug_manager->print(__FILE__, __LINE__, I_DISPLAY_MODE_FOUND);
 					break;
 			}
 		}
 		if(i >= count){
-			_DEBUGPRINT(debug_manager, E_NO_SUITABLE_DISPLAY_MODE);
+			_DebugPrintS(debug_manager, E_NO_SUITABLE_DISPLAY_MODE);
+			//debug_manager->print(__FILE__, __LINE__, E_NO_SUITABLE_DISPLAY_MODE);
 			return false;
 		}
 
@@ -81,7 +88,8 @@ namespace Nova3D
 			(settings_enumerator.isHardwareAccelerated() ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
 			D3DFMT_X8R8G8B8, D3DFMT_X8R8G8B8, settings_enumerator.isWindowed());
 		if(FAILED(hr)){
-			_DEBUGPRINT(debug_manager, E_NOT_SUPPORTED_MODE);
+			_DebugPrintS(debug_manager, E_NOT_SUPPORTED_MODE);
+			//debug_manager->print(__FILE__, __LINE__, E_NOT_SUPPORTED_MODE);
 			return false;
 		}
 
@@ -98,7 +106,8 @@ namespace Nova3D
 			(settings_enumerator.isHardwareAccelerated() ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
 			&caps);
 		if(FAILED(hr)) {
-			_DEBUGPRINT(debug_manager, E_GET_DEVICE_CAPABILITIES_FAILURE);
+			_DebugPrintS(debug_manager, E_GET_DEVICE_CAPABILITIES_FAILURE);
+			//debug_manager->print(__FILE__, __LINE__, E_GET_DEVICE_CAPABILITIES_FAILURE);
 			return E_FAIL;
 		}
 		
@@ -118,7 +127,7 @@ namespace Nova3D
 			present_parameters.FullScreen_RefreshRateInHz = settings_enumerator.getRefreshRate();
 		}
 		present_parameters.BackBufferFormat = D3DFMT_X8R8G8B8;
-		present_parameters.hDeviceWindow = render_window;
+		present_parameters.hDeviceWindow = render_target->getWindowHandle();
 
 		// Enable FSAA ( TODO: Replace it by reading configuration. )
 		hr = direct3d->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT,
@@ -128,7 +137,8 @@ namespace Nova3D
 			D3DMULTISAMPLE_2_SAMPLES,
 			NULL);
 		if(FAILED(hr)) {
-			_DEBUGPRINT(debug_manager, E_FSAA_NOT_AVAILABLE);
+			_DebugPrintS(debug_manager, E_FSAA_NOT_AVAILABLE);
+			//debug_manager->print(__FILE__, __LINE__, E_FSAA_NOT_AVAILABLE);
 			present_parameters.MultiSampleType = D3DMULTISAMPLE_NONE;
 		} else {
 			present_parameters.MultiSampleType = D3DMULTISAMPLE_2_SAMPLES;
@@ -136,12 +146,13 @@ namespace Nova3D
 
 		hr = direct3d->CreateDevice(D3DADAPTER_DEFAULT,
 			(settings_enumerator.isHardwareAccelerated() ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
-			render_window,
+			render_target->getWindowHandle(),
 			flag,
 			&present_parameters,
 			&direct_device);
 		if(FAILED(hr)) {
-			_DEBUGPRINT(debug_manager, E_CREATE_DIRECT3D_DEVICE_FAILURE);
+			_DebugPrintS(debug_manager, E_CREATE_DIRECT3D_DEVICE_FAILURE);
+			//debug_manager->print(__FILE__, __LINE__, E_CREATE_DIRECT3D_DEVICE_FAILURE);
 			return E_FAIL;
 		}
 

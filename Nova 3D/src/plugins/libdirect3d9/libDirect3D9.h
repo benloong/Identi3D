@@ -1,6 +1,9 @@
 //
 // File: libDirect3D9.h
 // ====================
+// Direct3D 9 render plugin.
+//
+// Copyright (c) Sparkfire, 2011 - 2012.
 //
 
 #ifndef NOVA3D_SRC_PLUGINS_LIBDIRECT3D9_LIBDIRECT3D9_H
@@ -15,7 +18,13 @@
 namespace Nova3D
 {
 	class DebugManager;
+	class RenderTarget;
 
+	//
+	// Class: Direct3D9SettingsEnumerator <Inherits from SettingsEnumerator>
+	// =====================================================================
+	// Read graphics settings from SettingsManager, process and store Direct3D configuration.
+	//
 	class Direct3D9SettingsEnumerator : public SettingsEnumerator
 	{
 	private:
@@ -29,23 +38,94 @@ namespace Nova3D
 		void setDefaultValue(void);
 		
 	public:
+		
+		//
+		// Function: Direct3D9SettingsEnumerator(void)
+		// ===========================================
+		// Class default constructor.
+		//
 		Direct3D9SettingsEnumerator(void);
+
+		//
+		// Function: ~Direct3D9SettingsEnumerator(void)
+		// ============================================
+		// Class default destructor.
+		//
 		~Direct3D9SettingsEnumerator(void);
 
+		//
+		// Inline Function: reset(void)
+		// ============================
+		// Reset settings and do update to SettingsManager.
+		//
 		inline void reset(void) { setDefaultValue(), need_update = true; }
 
+		//
+		// Inline Function: getWidth(void)
+		// ===============================
+		// Get screen width.
+		//
 		inline const UINT getWidth(void) const { return width; }
+		
+		//
+		// Inline Function: getHeight(void)
+		// ================================
+		// Get screen height.
+		//
 		inline const UINT getHeight(void) const { return height; }
+		
+		//
+		// Inline Function: getRefreshRate(void)
+		// =====================================
+		// Get refresh rate.
+		//
 		inline const UINT getRefreshRate(void) const { return refresh_rate; }
+		
+		//
+		// Inline Function: isWindowed(void)
+		// =================================
+		// Is under windowed mode.
+		//
 		inline const bool isWindowed(void) const { return windowed; }
-		inline const bool isHardwareAccelerated(void) const { return hardware_accel; }
 
+		//
+		// Inline Function: isHardwareAccelerated(void)
+		// ============================================
+		// Is hardware acceleration enabled.
+		//
+		inline const bool isHardwareAccelerated(void) const { return hardware_accel; }
+		
+		//
+		// Function: setResolution(Width, Height, RefreshRate)
+		// ===================================================
+		// Sets display mode to Width x Height @ RefreshRate.
+		// Please update device to take effect.
+		//
 		void setResolution(UINT new_width, UINT new_height, UINT new_refresh_rate);
+
+		//
+		// Inline Function: setWindowed(isWindowed)
+		// ========================================
+		// Sets windowed mode to isWindowed.
+		// Please update device to take effect.
+		//
 		inline void setWindowed(bool is_windowed) { windowed = is_windowed, need_update = true; }
+		
+		//
+		// Inline Function: setHardwareAccelerated(isAccelerated)
+		// ======================================================
+		// Sets hardware mode to isAccelerated.
+		// Please update device to take effect.
+		//
 		inline void setHardwareAccelerated(bool is_accelerated) { hardware_accel = is_accelerated, need_update = true; }
 
 	};
 
+	//
+	// Class: PluginDirect3D9 <Inherits from RenderDevice>
+	// ===================================================
+	// Direct3D 9 render plugins.
+	//
 	class PluginDirect3D9 : public RenderDevice
 	{
 	private:
@@ -65,21 +145,90 @@ namespace Nova3D
 		bool	checkPrerequisite(void);
 
 	public:
-		PluginDirect3D9(HMODULE plugin, DebugManager *debugmgr = NULL);
+
+		//
+		// Function: PluginDirect3D9(DllHandle, DebugManager[optional])
+		// ============================================================
+		// Class default constructor, creates plugin by DllHandle.
+		//
+		PluginDirect3D9(HMODULE plugin, DebugManager *debug_manager = NULL);
+		
+		//
+		// Function: ~PluginDirect3D9(void)
+		// ================================
+		// Class default destructor.
+		//
 		~PluginDirect3D9(void);
 
-		HRESULT init(HWND window, UINT min_depth, UINT min_stencil);
+		//
+		// Function: init(RenderTarget, MinimumDepth, MinimumStencil)
+		// ==========================================================
+		// Initializes device on RenderTarget.
+		// Set MinimunStencil = 0 to disable stencil buffer.
+		//
+		HRESULT init(RenderTarget *target, UINT min_depth, UINT min_stencil);
+		
+		//
+		// Function: release(void)
+		// =======================
+		// Releases device. Calling destructor will eventually do this.
+		//
 		void	release(void);
+
+		//
+		// Function: isRunning(void)
+		// =========================
+		// Returns running state.
+		//
 		bool	isRunning(void);
 
+		//
+		// Function: startRendering(ClearPixelBuffer, ClearDepthBuffer, ClearStencilBuffer)
+		// ================================================================================
+		// Starts rendering procedure.
+		//
 		HRESULT startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil);
+
+		//
+		// Function: stopRendering(void)
+		// =============================
+		// Stops rendering procedure.
+		//
 		void	stopRendering(void);
+		
+		//
+		// Function: clear(ClearPixelBuffer, ClearDepthBuffer, ClearStencilBuffer)
+		// =======================================================================
+		// Clears buffers.
+		//
 		HRESULT	clear(bool clear_pixel, bool clear_depth, bool clear_stencil);
 
+		//
+		// Function: setClearColor(Red, Green, Blue)
+		// =========================================
+		// Sets clear color to RGB.
+		//
 		void	setClearColor(float red, float green, float blue);
 
+		//
+		// Function: getSettingsEnumerator(void)
+		// =====================================
+		// Returns handle to SettingsEnumerator.
+		//
 		SettingsEnumerator	&getSettingsEnumerator(void);
+		
+		//
+		// Inline Function: getWidth(void)
+		// ===============================
+		// Get screen width.
+		//
 		inline const UINT	getWidth(void) const { return settings_enumerator.getWidth(); }
+		
+		//
+		// Inline Function: getHeight(void)
+		// ================================
+		// Get screen height.
+		//
 		inline const UINT	getHeight(void) const { return settings_enumerator.getHeight(); }
 	};
 

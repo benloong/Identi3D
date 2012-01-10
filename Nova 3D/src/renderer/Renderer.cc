@@ -11,13 +11,6 @@
 
 #include <exception>
 
-#define _THROW_FATAL_ERROR(error_string) \
-	{\
-		char tmp[256];\
-		sprintf_s(tmp, "%ls", error_string);\
-		throw std::exception(tmp);\
-	}
-
 namespace Nova3D
 {
 
@@ -31,19 +24,12 @@ namespace Nova3D
 
 	const TCHAR *render_settings_group_name = __T("Graphics");
 
-	Renderer::Renderer(SettingsManager *settingsmgr, DebugManager *debugmgr)
+	Renderer::Renderer(void)
 	{
-		if(settingsmgr == NULL) {
-			_DEBUGPRINT(debugmgr, E_INVALID_PARAMETERS);
-			_THROW_FATAL_ERROR(E_INVALID_PARAMETERS);
-		}
-		settings_manager = settingsmgr;
-		debug_manager = debugmgr;
-
 		render_device = NULL;
 		plugin_handle = NULL;
 
-		_DEBUGPRINT(debug_manager, I_RENDERER_INITIALIZED);
+		_DebugPrint(I_RENDERER_INITIALIZED);
 	}
 
 	Renderer::~Renderer(void)
@@ -66,29 +52,29 @@ namespace Nova3D
 			path = render_plugin_path[1];
 			break;
 		default:
-			_DEBUGPRINT(debug_manager, E_INVALID_RENDER_PLUGIN_TYPE, type);
+			_DebugPrint(E_INVALID_RENDER_PLUGIN_TYPE, type);
 			return E_FAIL;
 		}
 		
 		plugin_handle = LoadLibrary(path);
 		if(plugin_handle == NULL) {
-			_DEBUGPRINT(debug_manager, E_FILE_OPEN_FAILURE, path);
+			_DebugPrint(E_FILE_OPEN_FAILURE, path);
 			return E_FAIL;
 		}
 
 		createRenderDevice = (CREATERENDERDEVICE)GetProcAddress(plugin_handle, "CreateRenderDevice");
 		if(createRenderDevice == NULL) {
-			_DEBUGPRINT(debug_manager, E_RENDER_PLUGIN_LOAD_FAILURE, path);
+			_DebugPrint(E_RENDER_PLUGIN_LOAD_FAILURE, path);
 			return E_FAIL;
 		}
 
-		hr = createRenderDevice(plugin_handle, &render_device, debug_manager);
+		hr = createRenderDevice(plugin_handle, &render_device, &(DebugManager::getInstance()));
 		if(FAILED(hr)) {
-			_DEBUGPRINT(debug_manager, E_RENDER_DEVICE_CREATE_FAILURE, path);
+			_DebugPrint(E_RENDER_DEVICE_CREATE_FAILURE, path);
 			return E_FAIL;
 		}
 
-		render_device->getSettingsEnumerator().enumerateSettings(render_settings_group_name, settings_manager);
+		render_device->getSettingsEnumerator().enumerateSettings(render_settings_group_name, SettingsManager::getInstance());
 		return S_OK;
 	}
 

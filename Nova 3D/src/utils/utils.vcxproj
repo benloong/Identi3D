@@ -13,7 +13,9 @@
   <ItemGroup>
     <ClInclude Include="DebugManager.h" />
     <ClInclude Include="JsonParser.h" />
+    <ClInclude Include="KeyDefinition.h" />
     <ClInclude Include="SettingsManager.h" />
+    <ClInclude Include="Singleton.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DebugManager.cc" />

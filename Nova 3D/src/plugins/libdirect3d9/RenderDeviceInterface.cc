@@ -4,7 +4,6 @@
 //
 
 #include "src/plugins/libdirect3d9/libDirect3D9.h"
-
 #include "src/utils/DebugManager.h"
 
 namespace Nova3D
@@ -17,7 +16,7 @@ namespace Nova3D
 
 		*device = new (std::nothrow) PluginDirect3D9(plugin, debugmgr);
 		if(*device == NULL) {
-			_DEBUGPRINT(debugmgr, E_OUT_OF_MEMORY);
+			_DebugPrintS(debugmgr, E_OUT_OF_MEMORY);
 			return E_FAIL;
 		}
 		return S_OK;

@@ -15,9 +15,8 @@ namespace Nova3D
 								WS_SYSMENU		| \
 								WS_MINIMIZEBOX);
 
-	RenderWindow::RenderWindow(DebugManager *dbgmgr)
+	RenderWindow::RenderWindow()
 	{
-		debug_manager = dbgmgr;
 		window = NULL;
 		generateClassName();
 	}
@@ -27,43 +26,22 @@ namespace Nova3D
 		release();
 	}
 
-	HRESULT RenderWindow::assign(HWND wnd)
-	{
-		release();
-		if(wnd == NULL) {
-			_DEBUGPRINT(debug_manager, E_INVALID_PARAMETERS);
-			return E_FAIL;
-		}
-
-		window = wnd;
-		return S_OK;
-	}
-
-	HRESULT RenderWindow::assign(int width, int height, const TCHAR *title)
+	HRESULT RenderWindow::assign(RenderDevice *device, const TCHAR *title)
 	{
 		HRESULT hr;
 
 		release();
+		if(device == NULL || title == NULL) {
+			_DebugPrint(E_INVALID_PARAMETERS);
+			return E_FAIL;
+		}
 		registerClass();
-		if(title == NULL) {
-			_DEBUGPRINT(debug_manager, E_INVALID_PARAMETERS);
+		hr = createWindow(device->getWidth(), device->getHeight(), title);
+		if(FAILED(hr))
 			return E_FAIL;
-		}
-		hr = createWindow(width, height, title);
-		if(FAILED(hr)) {
-			return E_FAIL;
-		}
+		render_device = device;
 
 		return S_OK;
-	}
-
-	HRESULT RenderWindow::assign(const RenderDevice *device, const TCHAR *title)
-	{
-		if(device == NULL) {
-			_DEBUGPRINT(debug_manager, E_INVALID_PARAMETERS);
-			return E_FAIL;
-		}
-		return assign(device->getWidth(), device->getHeight(), title);
 	}
 
 	HRESULT RenderWindow::release(void)
@@ -88,6 +66,8 @@ namespace Nova3D
 			p++;
 		}
 		*p = __T('\0');
+
+		return ;
 	}
 
 	void RenderWindow::registerClass(void)
@@ -107,8 +87,7 @@ namespace Nova3D
 		wcex.lpszClassName	= class_name;
 		wcex.hIconSm		= LoadIcon(NULL, IDI_APPLICATION);
 
-		if(!RegisterClassEx(&wcex))
-			while(true);
+		RegisterClassEx(&wcex);
 	}
 
 	HRESULT RenderWindow::createWindow(int width, int height, const TCHAR *title)
@@ -119,7 +98,7 @@ namespace Nova3D
 			NULL, NULL, GetModuleHandle(0), (LPVOID)this);
 		
 		if(window == NULL) {
-			_DEBUGPRINT(debug_manager, E_CREATE_RENDER_WINDOW_FAILURE);
+			_DebugPrint(E_CREATE_RENDER_WINDOW_FAILURE);
 			return E_FAIL;
 		}
 
@@ -166,6 +145,11 @@ namespace Nova3D
 
 		switch(msg)
 		{
+		case WM_KEYDOWN:
+			onKeyboardInput(static_cast<KeyType>(wparam), 
+				static_cast<UINT>(lparam & 0xFFFF), 
+				((lparam & (1 << 30)) == 0) ? false : true);
+			break;
 		case WM_PAINT:
 			hdc = BeginPaint(window, &ps);
 			EndPaint(window, &ps);

@@ -242,8 +242,13 @@ namespace Nova3D
 
 	void PluginDirect3D9::setClearColor(float red, float green, float blue)
 	{
-		clear_color = (D3DCOLOR)((((int)red & 0xFF) << 24) + (((int)green & 0xFF) << 16) +
-			((int)blue & 0xFF));
+		BYTE r, g, b;
+
+		r = static_cast<BYTE>(red * 255) & 0xFF;
+		g = static_cast<BYTE>(green * 255) & 0xFF;
+		b = static_cast<BYTE>(blue * 255) & 0xFF;
+		clear_color = static_cast<D3DCOLOR>((0xFF << 24) + (r << 16) + (g << 8) + b);
+		_DebugPrintSV(debug_manager, __T("Clear color set to (%d, %d, %d)."), r, g, b);
 	}
 
 	SettingsEnumerator &PluginDirect3D9::getSettingsEnumerator(void)

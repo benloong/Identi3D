@@ -12,15 +12,14 @@ namespace Nova3D
 	{
 		char *tmp_vendor = new char[MAX_CPU_VENDOR_STRING_LENGTH + 1];
 		char *tmp_brand = new char[MAX_CPU_BRAND_STRING_LENGTH + 1];
-		DWORD cpuinfo, edx_value, ecx_value;
+		DWORD cpuinfo, edx_value, ecx_value, ext_edx, ext_ecx;
 
 		memset(cpu_vendor, 0, sizeof(cpu_vendor));
 		memset(brand_string, 0, sizeof(brand_string));
 		memset(tmp_vendor, 0, sizeof(char) * MAX_CPU_VENDOR_STRING_LENGTH + 1);
 		memset(tmp_brand, 0, sizeof(char) * MAX_CPU_BRAND_STRING_LENGTH + 1);
-
 		__asm {
-			mov eax, 0h;
+			mov eax, 0h;			// Get CPU vendor
 			cpuid;
 
 			mov esi, tmp_vendor;
@@ -28,12 +27,18 @@ namespace Nova3D
 			mov [esi + 4], edx;
 			mov [esi + 8], ecx;
 
-			mov eax, 1h;
+			mov eax, 1h;			// Get CPU basic feature
 			cpuid;
 			
 			mov [cpuinfo], eax;
 			mov [edx_value], edx;
 			mov [ecx_value], ecx;
+
+			mov eax, 80000001h;		// Get CPU extended feature
+			cpuid;
+
+			mov [ext_edx], edx;
+			mov [ext_ecx], ecx;
 
 			mov eax, 80000000h;
 			cpuid;
@@ -91,33 +96,40 @@ namespace Nova3D
 			family = ((cpuinfo & 0x00000F00) >> 8) + ((cpuinfo & 0x0FF00000) >> 20);
 			model = ((cpuinfo & 0x000000F0) >> 4) + ((cpuinfo & 0x000F0000) >> 12);
 		}
-		edx_feature = edx_value;
-		ecx_feature = ecx_value;
+		basic_feature_edx = edx_value;
+		basic_feature_ecx = ecx_value;
+		ext_feature_edx = ext_edx;
+		ext_feature_ecx = ext_ecx;
 	}
 
 	bool CpuInfo::isOnboardFPUSupported(void) const
 	{
-		return ((edx_feature & 1) != 0) ? true : false;
+		return ((basic_feature_edx & 1) != 0) ? true : false;
 	}
 
 	bool CpuInfo::isSSESupported(void) const
 	{
-		return ((edx_feature & (1 << 25)) != 0) ? true : false;
+		return ((basic_feature_edx & (1 << 25)) != 0) ? true : false;
 	}
 
 	bool CpuInfo::isSSE2Supported(void) const
 	{
-		return ((edx_feature & (1 << 26)) != 0) ? true : false;
+		return ((basic_feature_edx & (1 << 26)) != 0) ? true : false;
 	}
 
 	bool CpuInfo::isSSE3Supported(void) const
 	{
-		return ((ecx_feature & 1) != 0) ? true : false;
+		return ((basic_feature_ecx & 1) != 0) ? true : false;
 	}
 
-	bool CpuInfo::isIA64(void) const
+	bool CpuInfo::is3DNowSupported(void) const
 	{
-		return ((edx_feature & (1 << 30)) != 0) ? true : false;
+		return ((ext_feature_edx & (1 << 31)) != 0) ? true : false;
+	}
+
+	bool CpuInfo::isMMXSupported(void) const
+	{
+		return ((basic_feature_edx & (1 << 23)) != 0) ? true : false;
 	}
 
 	CpuInfo::~CpuInfo(void)

@@ -26,7 +26,8 @@ namespace Nova3D
 		int stepping, processor_type;
 		DWORD family;
 		DWORD model;
-		DWORD edx_feature, ecx_feature;
+		DWORD basic_feature_edx, basic_feature_ecx;
+		DWORD ext_feature_edx, ext_feature_ecx;
 
 	public:
 		CpuInfo(void);
@@ -43,8 +44,8 @@ namespace Nova3D
 		bool isSSESupported(void) const;
 		bool isSSE2Supported(void) const;
 		bool isSSE3Supported(void) const;
-
-		bool isIA64(void) const;
+		bool is3DNowSupported(void) const;
+		bool isMMXSupported(void) const;
 	};
 
 };

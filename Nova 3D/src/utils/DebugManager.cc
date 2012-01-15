@@ -5,6 +5,8 @@
 
 #include "src/utils/DebugManager.h"
 
+#include <DbgHelp.h>
+
 namespace Nova3D {
 	
 	const TCHAR	*month_name[12]	= { __T("Jan."), __T("Feb."), __T("Mar."), 
@@ -110,7 +112,7 @@ namespace Nova3D {
 		connectString(buffer, msg_buffer);
 		connectString(buffer, __T("\n"));
 
-		if(output_flag & DebugFlag_ConsoleOutput && console != NULL)					// Write to console window (if any).
+		if(output_flag & DebugFlag_ConsoleOutput && console != NULL)	// Write to console window (if any).
 			_fputts(buffer, console);
 		
 		if(output_flag & DebugFlag_FileOutput){						// Write to log file.
@@ -158,5 +160,69 @@ namespace Nova3D {
 		}
 		return S_OK;
 	}
+
+	HRESULT DebugManager::dumpCallStack(void)
+	{
+		const UINT max_name_length = 256;
+
+		CONTEXT context;
+		STACKFRAME64 stackframe;
+		HANDLE process, thread;
+		PSYMBOL_INFO symbol;
+		IMAGEHLP_LINE64 source_info;
+		DWORD displacement;
+
+		symbol = (PSYMBOL_INFO)malloc(sizeof(SYMBOL_INFO) + (max_name_length - 1) * sizeof(TCHAR));
+		memset(symbol, 0, sizeof(SYMBOL_INFO) + (max_name_length - 1) * sizeof(TCHAR));
+		symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+		symbol->MaxNameLen = max_name_length;
+
+		memset(&source_info, 0, sizeof(IMAGEHLP_LINE64));
+		source_info.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+	
+		RtlCaptureContext(&context);
+		memset(&stackframe, 0, sizeof(STACKFRAME64));
+		stackframe.AddrPC.Offset = context.Eip;
+		stackframe.AddrPC.Mode = AddrModeFlat;
+		stackframe.AddrStack.Offset = context.Esp;
+		stackframe.AddrStack.Mode = AddrModeFlat;
+		stackframe.AddrFrame.Offset = context.Ebp;
+		stackframe.AddrFrame.Mode = AddrModeFlat;
+
+		process = GetCurrentProcess();
+		thread = GetCurrentThread();
+
+		if(!SymInitialize(process, NULL, TRUE))
+			return E_FAIL;
+
+		print(__FILE__, __LINE__, false, __T("Dumping call stack..."));
+
+		while(StackWalk64(IMAGE_FILE_MACHINE_I386, process, thread, &stackframe, 
+			&context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL))
+		{
+			if(stackframe.AddrFrame.Offset == 0)
+				break;
+		
+			if(SymFromAddr(process, stackframe.AddrPC.Offset, NULL, symbol))
+				print(__FILE__, __LINE__, false, __T("  Func %s"), symbol->Name);
+
+			if(SymGetLineFromAddr64(process, stackframe.AddrPC.Offset, 
+				&displacement, &source_info)) {
+					print(__FILE__, __LINE__, false, __T("    [%s:%d] at addr 0x%08LX"), 
+						source_info.FileName, 
+						source_info.LineNumber,
+						stackframe.AddrPC.Offset);
+			} else {
+				if(GetLastError() == 0x1E7) {
+					print(__FILE__, __LINE__, false, __T("    No debug symbol loaded for this function."));
+				}
+			}
+		}
+
+		SymCleanup(process);
+		free(symbol);
+		return S_OK;
+	}
+
 
 };

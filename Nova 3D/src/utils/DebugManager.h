@@ -12,6 +12,10 @@
 #include "src/nova-3d/NovaGeneral.h"
 #include "src/utils/Singleton.h"
 
+#ifndef DBGHELP_TRANSLATE_TCHAR
+ #define DBGHELP_TRANSLATE_TCHAR
+#endif
+
 namespace Nova3D {
 
 	// 
@@ -109,51 +113,58 @@ namespace Nova3D {
 	public:
 
 		//
-		// Method: DebugManager(void)
-		// ==========================
+		// Function: DebugManager(void)
+		// ============================
 		// Constructor of the class, initializes variables.
 		//
 		DebugManager(void);
 
 		//
-		// Method: ~DebugManager(void)
-		// ===========================
+		// Function: ~DebugManager(void)
+		// =============================
 		// Destructor of the class, closes log file and do some cleaning.
 		//
 		~DebugManager(void);
 
 		//
-		// Method: print(SourceFileName, LineNumber, isVerboseMessage, Message, ...)
-		// =========================================================================
+		// Function: print(SourceFileName, LineNumber, isVerboseMessage, Message, ...)
+		// ===========================================================================
 		// Prints debugging messages according to parameters.
 		//
 		HRESULT print(const char *src_filename, int line_number, bool verbose, const TCHAR *message, ...);
 
 		//
-		// Method: setOutputFileName(NewFileName)
-		// ======================================
+		// Function: setOutputFileName(NewFileName)
+		// ========================================
 		// Sets log file to NewFileName
 		//
 		HRESULT setOutputFileName(const TCHAR *new_filename = DEBUG_DEFAULT_FILENAME);
 
 		//
-		// Method: createDebugConsole(void)
-		// ================================
+		// Function: createDebugConsole(void)
+		// ==================================
 		// Creates a new console window.
 		//
 		HRESULT createDebugConsole(void);
 		
 		//
-		// Inline Method: setOutputFlag(NewFlag)
-		// =====================================
+		// Function: dumpCallStack(void)
+		// =============================
+		// Prints call stack.
+		//
+		HRESULT dumpCallStack(void);
+
+		//
+		// Inline Function: setOutputFlag(NewFlag)
+		// =======================================
 		// Sets output flag to NewFlag.
 		//
 		inline void	setOutputFlag(DWORD new_flag = DEBUGFLAG_DEFAULT) 
 			{ output_flag = new_flag; }
 
 		//
-		// Inline Method: getOutputFlag(void)
-		// ==================================
+		// Inline Function: getOutputFlag(void)
+		// ====================================
 		// Get output flag.
 		//
 		inline const DWORD	getOutputFlag(void) const 

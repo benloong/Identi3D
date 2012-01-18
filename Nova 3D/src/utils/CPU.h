@@ -33,6 +33,8 @@ namespace Nova3D
 		CpuInfo(void);
 		~CpuInfo(void);
 
+		inline static void init(void) { getInstance(); }
+
 		inline const TCHAR *getVendorName(void) const { return cpu_vendor; }
 		inline const TCHAR *getBrandString(void) const { return brand_string; }
 		inline int getStepping(void) const { return stepping; }
@@ -40,12 +42,12 @@ namespace Nova3D
 		inline DWORD getFamily(void) const { return family; }
 		inline DWORD getModel(void) const { return model; }
 
-		bool isOnboardFPUSupported(void) const;
-		bool isSSESupported(void) const;
-		bool isSSE2Supported(void) const;
-		bool isSSE3Supported(void) const;
-		bool is3DNowSupported(void) const;
-		bool isMMXSupported(void) const;
+		inline bool isOnboardFPUSupported(void) const { return ((basic_feature_edx & 1) != 0) ? true : false; }
+		inline bool isSSESupported(void) const { return ((basic_feature_edx & (1 << 25)) != 0) ? true : false; }
+		inline bool isSSE2Supported(void) const { return ((basic_feature_edx & (1 << 26)) != 0) ? true : false; }
+		inline bool isSSE3Supported(void) const { return ((basic_feature_ecx & 1) != 0) ? true : false; }
+		inline bool is3DNowSupported(void) const { return ((ext_feature_edx & (1 << 31)) != 0) ? true : false; }
+		inline bool isMMXSupported(void) const { return ((basic_feature_edx & (1 << 23)) != 0) ? true : false; }
 	};
 
 };

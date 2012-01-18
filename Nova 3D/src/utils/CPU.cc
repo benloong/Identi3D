@@ -102,36 +102,6 @@ namespace Nova3D
 		ext_feature_ecx = ext_ecx;
 	}
 
-	bool CpuInfo::isOnboardFPUSupported(void) const
-	{
-		return ((basic_feature_edx & 1) != 0) ? true : false;
-	}
-
-	bool CpuInfo::isSSESupported(void) const
-	{
-		return ((basic_feature_edx & (1 << 25)) != 0) ? true : false;
-	}
-
-	bool CpuInfo::isSSE2Supported(void) const
-	{
-		return ((basic_feature_edx & (1 << 26)) != 0) ? true : false;
-	}
-
-	bool CpuInfo::isSSE3Supported(void) const
-	{
-		return ((basic_feature_ecx & 1) != 0) ? true : false;
-	}
-
-	bool CpuInfo::is3DNowSupported(void) const
-	{
-		return ((ext_feature_edx & (1 << 31)) != 0) ? true : false;
-	}
-
-	bool CpuInfo::isMMXSupported(void) const
-	{
-		return ((basic_feature_edx & (1 << 23)) != 0) ? true : false;
-	}
-
 	CpuInfo::~CpuInfo(void)
 	{
 	}

@@ -10,14 +10,27 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nova-3d", "src\nova-3d\nova
 	ProjectSection(ProjectDependencies) = postProject
 		{625EA963-2DA5-43EF-9D86-E3191ABAF604} = {625EA963-2DA5-43EF-9D86-E3191ABAF604}
 		{FBE089BC-010B-43D1-A891-72E2079A85DC} = {FBE089BC-010B-43D1-A891-72E2079A85DC}
+		{9CB502D5-5BCA-4AB2-97FC-23E540005F60} = {9CB502D5-5BCA-4AB2-97FC-23E540005F60}
 		{D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B} = {D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utils", "src\utils\utils.vcxproj", "{625EA963-2DA5-43EF-9D86-E3191ABAF604}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libdirect3d9", "src\plugins\libdirect3d9\libdirect3d9.vcxproj", "{FBE089BC-010B-43D1-A891-72E2079A85DC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{625EA963-2DA5-43EF-9D86-E3191ABAF604} = {625EA963-2DA5-43EF-9D86-E3191ABAF604}
+		{D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B} = {D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "renderer", "src\renderer\renderer.vcxproj", "{D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{625EA963-2DA5-43EF-9D86-E3191ABAF604} = {625EA963-2DA5-43EF-9D86-E3191ABAF604}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math", "src\math\math.vcxproj", "{9CB502D5-5BCA-4AB2-97FC-23E540005F60}"
+	ProjectSection(ProjectDependencies) = postProject
+		{625EA963-2DA5-43EF-9D86-E3191ABAF604} = {625EA963-2DA5-43EF-9D86-E3191ABAF604}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +58,10 @@ Global
 		{D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B}.Debug|Win32.Build.0 = Debug|Win32
 		{D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B}.Release|Win32.ActiveCfg = Release|Win32
 		{D9A0C9F7-FF49-4D8D-9C36-0FC3062DDA9B}.Release|Win32.Build.0 = Release|Win32
+		{9CB502D5-5BCA-4AB2-97FC-23E540005F60}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9CB502D5-5BCA-4AB2-97FC-23E540005F60}.Debug|Win32.Build.0 = Debug|Win32
+		{9CB502D5-5BCA-4AB2-97FC-23E540005F60}.Release|Win32.ActiveCfg = Release|Win32
+		{9CB502D5-5BCA-4AB2-97FC-23E540005F60}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

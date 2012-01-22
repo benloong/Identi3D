@@ -14,6 +14,8 @@
 namespace Nova3D
 {
 
+	class Matrix;
+
 	class Vector3
 	{
 	public:
@@ -33,17 +35,20 @@ namespace Nova3D
 		~Vector3(void);
 
 		inline void set(float x, float y, float z, float w = 1.0f) { _x = x; _y = y; _z = z; _w = w; }
-
+		
+		bool operator ==(const Vector3 &vec);
 		Vector3 &operator =(const Vector3 &vec);
 
 		void operator +=(const Vector3 &vec);
 		void operator -=(const Vector3 &vec);
 		void operator *=(float f);
+		void operator *=(const Matrix &m);
 		void operator /=(float f);
 		
 		const Vector3 operator +(const Vector3 &vec) const;
 		const Vector3 operator -(const Vector3 &vec) const;
 		const Vector3 operator *(float f) const;
+		const Vector3 operator *(const Matrix &m) const;
 		float operator *(const Vector3 &vec) const;
 		const Vector3 operator /(float f) const;
 

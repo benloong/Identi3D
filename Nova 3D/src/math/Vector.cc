@@ -4,10 +4,19 @@
 //
 
 #include "src/math/Vector.h"
+#include "src/math/Matrix.h"
 #include "src/utils/CPU.h"
 
+#ifndef _FP_TOLERANCE
+#define _FP_TOLERANCE 1e-6
+#endif
+
+#ifndef _fcomp
+#define _fcomp(a, b) ((((a) - (b)) < _FP_TOLERANCE) ? true : false)
+#endif
+
 #ifndef _fzero
-#define _fzero(f) (((f - 0) < 1e-8) ? true : false)
+#define _fzero(f) (_fcomp(f, 0))
 #endif
 
 namespace Nova3D
@@ -25,6 +34,12 @@ namespace Nova3D
 
 	Vector3::~Vector3(void)
 	{
+	}
+
+	bool Vector3::operator ==(const Vector3 &vec)
+	{
+		register float k = _y / vec._y;
+		return (_fcomp(_x / vec._x, k) && _fcomp(k, _z / vec._z));
 	}
 
 	Vector3 &Vector3::operator =(const Vector3 &vec)
@@ -55,6 +70,11 @@ namespace Nova3D
 		_z *= f;
 	}
 
+	void Vector3::operator *=(const Matrix &m)
+	{
+		(*this) = (*this) * m;
+	}
+
 	void Vector3::operator /=(float f)
 	{
 		if(_fzero(f)) return ;
@@ -78,6 +98,52 @@ namespace Nova3D
 		return Vector3(_x * f, _y * f, _z * f);
 	}
 
+	const Vector3 Vector3::operator *(const Matrix &m) const
+	{
+		Vector3 vec;
+		if(!CpuInfo::getInstance().isSSESupported()) {
+			vec._x = _x * m._a1 + _y * m._b1 + _z * m._c1 + m._d1;
+			vec._y = _x * m._a2 + _y * m._b2 + _z * m._c2 + m._d2;
+			vec._z = _x * m._a3 + _y * m._b3 + _z * m._c3 + m._d3;
+			vec._w = _x * m._a4 + _y * m._b4 + _z * m._c4 + m._d4;
+
+			vec._x /= vec._w;
+			vec._y /= vec._w;
+			vec._z /= vec._w;
+			vec._w = 1.0f;
+			return vec;
+		}
+
+		float *_ptr = (float *)&vec;
+		__asm {
+			mov ecx, this;
+			mov eax, _ptr;
+			movss xmm0, [ecx];
+			mov edx, m;
+			movss xmm1, [ecx + 4];
+			shufps xmm0, xmm0, 0;
+			mulps xmm0, [edx];
+			movss xmm2, [ecx + 8];
+			shufps xmm1, xmm1, 0;
+			mulps xmm1, [edx + 16];
+			addps xmm0, xmm1;
+			movss xmm3, [ecx + 12];
+			shufps xmm2, xmm2, 0;
+			mulps xmm2, [edx + 32];
+			addps xmm0, xmm2;
+			shufps xmm3, xmm3, 0;
+			mulps xmm3, [edx + 48];
+			addps xmm0, xmm3;
+		
+			movaps xmm1, xmm0;
+			shufps xmm1, xmm1, 0xFF;
+			divps xmm0, xmm1;
+
+			movaps [eax], xmm0;
+		}
+		return vec;
+	}
+	
 	float Vector3::operator *(const Vector3 &vec) const
 	{
 		return (_x * vec._x + _y * vec._y + _z * vec._z);
@@ -167,6 +233,7 @@ namespace Nova3D
 			subps xmm0, xmm2;
 			movaps [esi], xmm0;
 		}
+		_w = 1.0f;
 	}
 
 };

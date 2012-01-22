@@ -17,37 +17,43 @@
 
 namespace Nova3D
 {
+	
+	enum CpuVendor
+	{
+		CpuVendor_Unknown,
+		CpuVendor_AMD,
+		CpuVendor_Intel,
+		
+		CpuVendor_ForceInt = 65535
+	};
 
 	class CpuInfo : public Singleton<CpuInfo>
 	{
 	private:
-		TCHAR cpu_vendor[MAX_CPU_VENDOR_STRING_LENGTH + 1];
-		TCHAR brand_string[MAX_CPU_BRAND_STRING_LENGTH + 1];
-		int stepping, processor_type;
-		DWORD family;
-		DWORD model;
+		CpuVendor vendor;
 		DWORD basic_feature_edx, basic_feature_ecx;
 		DWORD ext_feature_edx, ext_feature_ecx;
+
+		struct {
+			bool _sse_supported;
+			bool _sse2_supported;
+			bool _sse3_supported;
+			bool _3dnow_supported;
+			bool _mmx_supported;
+		};
 
 	public:
 		CpuInfo(void);
 		~CpuInfo(void);
 
-		inline static void init(void) { getInstance(); }
-
-		inline const TCHAR *getVendorName(void) const { return cpu_vendor; }
-		inline const TCHAR *getBrandString(void) const { return brand_string; }
-		inline int getStepping(void) const { return stepping; }
-		inline int getProcessorType(void) const { return processor_type; }
-		inline DWORD getFamily(void) const { return family; }
-		inline DWORD getModel(void) const { return model; }
+		inline CpuVendor getVendor(void) const { return vendor; }
 
 		inline bool isOnboardFPUSupported(void) const { return ((basic_feature_edx & 1) != 0) ? true : false; }
-		inline bool isSSESupported(void) const { return ((basic_feature_edx & (1 << 25)) != 0) ? true : false; }
-		inline bool isSSE2Supported(void) const { return ((basic_feature_edx & (1 << 26)) != 0) ? true : false; }
-		inline bool isSSE3Supported(void) const { return ((basic_feature_ecx & 1) != 0) ? true : false; }
-		inline bool is3DNowSupported(void) const { return ((ext_feature_edx & (1 << 31)) != 0) ? true : false; }
-		inline bool isMMXSupported(void) const { return ((basic_feature_edx & (1 << 23)) != 0) ? true : false; }
+		inline bool isSSESupported(void) const { return _sse_supported; }
+		inline bool isSSE2Supported(void) const { return _sse2_supported; }
+		inline bool isSSE3Supported(void) const { return _sse3_supported; }
+		inline bool is3DNowSupported(void) const { return _3dnow_supported; }
+		inline bool isMMXSupported(void) const { return _mmx_supported; }
 	};
 
 };

@@ -6,14 +6,16 @@
 #ifndef NOVA3D_SRC_RENDERER_RENDERDEVICE_H
 #define NOVA3D_SRC_RENDERER_RENDERDEVICE_H
 
-#include "src/nova-3d/NovaGeneral.h"
+#include <src/nova-3d/NovaGeneral.h>
 
 namespace Nova3D
 {
-	class DebugManager;
-	class RenderTarget;
-	class SettingsEnumerator;
 
+	//
+	// Class: RenderDevice
+	// ======
+	// Device context for rendering purpose.
+	//
 	class RenderDevice 
 	{
 	protected:

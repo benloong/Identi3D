@@ -7,7 +7,7 @@
 #ifndef NOVA3D_MODULETEST_APP_H
 #define NOVA3D_MODULETEST_APP_H
 
-#include "src/nova-3d/Nova.h"
+#include <src/nova-3d/Nova.h>
 
 class App : private Nova3D::RenderWindow
 {

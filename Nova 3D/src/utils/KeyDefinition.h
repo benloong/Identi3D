@@ -9,11 +9,19 @@
 #ifndef NOVA3D_UTILS_KEYDEFINITION_H
 #define NOVA3D_UTILS_KEYDEFINITION_H
 
-#include "src/nova-3d/NovaGeneral.h"
+#include <src/nova-3d/NovaGeneral.h>
 
 namespace Nova3D
 {
 
+	//
+	// Enum: KeyType
+	// =====
+	// Specify a more clear declaration for keyboard inputs.
+	//
+	// Value:
+	//	See the name of definition.
+	//
 	enum KeyType
 	{
 		KeyType_LeftMouseButton		= VK_LBUTTON,

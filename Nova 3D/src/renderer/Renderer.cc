@@ -3,13 +3,11 @@
 // =================
 //
 
-#include "src/renderer/Renderer.h"
-#include "src/renderer/RenderDevice.h"
+#include <src/renderer/Renderer.h>
+#include <src/renderer/RenderDevice.h>
 
-#include "src/utils/DebugManager.h"
-#include "src/utils/SettingsManager.h"
-
-#include <exception>
+#include <src/utils/DebugManager.h>
+#include <src/utils/SettingsManager.h>
 
 namespace Nova3D
 {

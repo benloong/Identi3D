@@ -3,4 +3,4 @@
 // =============
 //
 
-#include "Nova.h"
+#include <src/nova-3d/Nova.h>

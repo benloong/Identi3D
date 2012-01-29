@@ -9,13 +9,12 @@
 #ifndef NOVA3D_SRC_MATH_MATRIX_H
 #define NOVA3D_SRC_MATH_MATRIX_H
 
-#include "src/nova-3d/NovaGeneral.h"
-#include <cmath>
-#include <xmmintrin.h>
+#include <src/nova-3d/NovaGeneral.h>
+#include <src/math/Vector.h>
 
 namespace Nova3D
 {
-
+	
 	class Matrix
 	{
 	public:
@@ -30,6 +29,23 @@ namespace Nova3D
 				float _d1, _d2, _d3, _d4;
 			};
 		};
+
+		void clear(void) 
+			{ memset(data, 0, sizeof(data)); }
+		void identify(void) 
+			{ clear(); _a1 = _b2 = _c3 = _d4 = 1.0f; }
+
+		void rotateX(const Angle &a); 
+		void rotateY(const Angle &a);
+		void rotateZ(const Angle &a);
+		void rotateVector(Vector3 &vec, const Angle &a);
+		void translate(float dx, float dy, float dz) 
+			{ _d1 = dx, _d2 = dy, _d3 = dz; }
+		void transpose(const Matrix &m);
+		void inverse(const Matrix &m);
+		
+		const Matrix operator *(const Matrix &m) const;
+		const Vector3 operator *(const Vector3 &v) const;
 	};
 
 }

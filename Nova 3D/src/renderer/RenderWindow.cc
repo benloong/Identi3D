@@ -3,9 +3,9 @@
 // =====================
 //
 
-#include "src/renderer/RenderWindow.h"
-#include "src/renderer/RenderDevice.h"
-#include "src/utils/DebugManager.h"
+#include <src/renderer/RenderWindow.h>
+#include <src/renderer/RenderDevice.h>
+#include <src/utils/DebugManager.h>
 
 namespace Nova3D
 {

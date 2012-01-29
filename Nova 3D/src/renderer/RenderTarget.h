@@ -6,19 +6,28 @@
 #ifndef NOVA3D_SRC_RENDERER_RENDERTARGET_H
 #define NOVA3D_SRC_RENDERER_RENDERTARGET_H
 
-#include "src/nova-3d/NovaGeneral.h"
+#include <src/nova-3d/NovaGeneral.h>
 
 namespace Nova3D
 {
-	class DebugManager;
 
+	//
+	// Class: RenderTarget
+	// ======
+	// Target for rendering outputs.
+	//
 	class RenderTarget
 	{
 	public:
 		RenderTarget(void) {}
 		virtual ~RenderTarget(void) {};
 
-		virtual HWND getWindowHandle(void) = 0;
+		//
+		// Function: getHandle(void)
+		// =========
+		// Retrive handle of render target.
+		//
+		virtual HWND getHandle(void) = 0;
 	};
 
 };

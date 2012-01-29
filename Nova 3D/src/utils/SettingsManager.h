@@ -9,15 +9,20 @@
 #ifndef NOVA3D_SRC_UTILS_SETTINGSMANAGER_H
 #define NOVA3D_SRC_UTILS_SETTINGSMANAGER_H
 
-#include "src/nova-3d/NovaGeneral.h"
-#include "src/utils/JsonParser.h"
-#include "src/utils/Singleton.h"
+#include <src/nova-3d/NovaGeneral.h>
+#include <src/utils/JsonParser.h>
+#include <src/utils/Singleton.h>
 
 #define SETTINGS_MANAGER_HASH_TABLE_SIZE		37
 
 namespace Nova3D
 {
 	
+	//
+	// Struct: tagItemProperties
+	// =======
+	// Store a item of configuration.
+	//
 	typedef struct tagItemProperties
 	{
 		TCHAR *name;
@@ -25,6 +30,11 @@ namespace Nova3D
 		struct tagItemProperties *next;
 	}ItemProperties;
 
+	//
+	// class: SettingsManager <Inherited from JsonReaderListener, Singleton>
+	// ======
+	// Read & save global configuration.
+	//
 	class SettingsManager : public JsonReaderListener, public Singleton<SettingsManager>
 	{
 	private:
@@ -64,6 +74,11 @@ namespace Nova3D
 		void newString(const TCHAR *name, const TCHAR *value);
 	};
 
+	//
+	// Class: SettingsEnumerator
+	// ======
+	// Classes inherited from this can enumerate fields in specified settings.
+	//
 	class SettingsEnumerator
 	{
 	public:

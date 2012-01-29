@@ -9,13 +9,19 @@
 #ifndef NOVA3D_SRC_UTILS_JSONPARSER_H
 #define NOVA3D_SRC_UTILS_JSONPARSER_H
 
-#include "src/nova-3d/NovaGeneral.h"
+#include <src/nova-3d/NovaGeneral.h>
 
 #define JSON_ROOT_OBJECT_NAME	__T("_ROOT")
 
 namespace Nova3D
 {
 
+	//
+	// Class: JsonReaderListener
+	// ======
+	// Classes inherited from this class can receive
+	// notifications post from JsonReader.
+	//
 	class JsonReaderListener
 	{
 	public:
@@ -30,6 +36,11 @@ namespace Nova3D
 		virtual void newString(const TCHAR *name, const TCHAR *value) {};
 	};
 	
+	//
+	// Class: JsonReader
+	// ======
+	// Read a json-formatted file.
+	//
 	class JsonReader
 	{
 	private:
@@ -50,6 +61,11 @@ namespace Nova3D
 		HRESULT parse(void);
 	};
 
+	//
+	// Class: JsonWriter
+	// ======
+	// Write a json-formatted file.
+	//
 	class JsonWriter
 	{
 	private:

@@ -9,15 +9,22 @@
 #ifndef NOVA3D_SRC_UTILS_CPU_H
 #define NOVA3D_SRC_UTILS_CPU_H
 
-#include "src/nova-3d/NovaGeneral.h"
-#include "src/utils/Singleton.h"
-
-#define MAX_CPU_VENDOR_STRING_LENGTH	12
-#define MAX_CPU_BRAND_STRING_LENGTH		48
+#include <src/nova-3d/NovaGeneral.h>
+#include <src/utils/Singleton.h>
 
 namespace Nova3D
 {
 	
+	//
+	// Enum: CpuVendor
+	// =====
+	// Defines the vendor of CPU.
+	//
+	// Values:
+	//	CpuVendor_Unknown: Unknown vendor.
+	//	CpuVendor_AMD: Advanced Micro Devices(R).
+	//	CpuVendor_Intel: Intel(R).
+	//
 	enum CpuVendor
 	{
 		CpuVendor_Unknown,
@@ -27,12 +34,15 @@ namespace Nova3D
 		CpuVendor_ForceInt = 65535
 	};
 
+	//
+	// Class: CpuInfo
+	// ======
+	// Get and store CPU information.
+	//
 	class CpuInfo : public Singleton<CpuInfo>
 	{
 	private:
 		CpuVendor vendor;
-		DWORD basic_feature_edx, basic_feature_ecx;
-		DWORD ext_feature_edx, ext_feature_ecx;
 
 		struct {
 			bool _sse_supported;
@@ -48,7 +58,6 @@ namespace Nova3D
 
 		inline CpuVendor getVendor(void) const { return vendor; }
 
-		inline bool isOnboardFPUSupported(void) const { return ((basic_feature_edx & 1) != 0) ? true : false; }
 		inline bool isSSESupported(void) const { return _sse_supported; }
 		inline bool isSSE2Supported(void) const { return _sse2_supported; }
 		inline bool isSSE3Supported(void) const { return _sse3_supported; }

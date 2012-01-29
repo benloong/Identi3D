@@ -9,8 +9,8 @@
 #ifndef NOVA3D_SRC_UTILS_DEBUGMANAGER_H
 #define NOVA3D_SRC_UTILS_DEBUGMANAGER_H
 
-#include "src/nova-3d/NovaGeneral.h"
-#include "src/utils/Singleton.h"
+#include <src/nova-3d/NovaGeneral.h>
+#include <src/utils/Singleton.h>
 
 #ifndef DBGHELP_TRANSLATE_TCHAR
  #define DBGHELP_TRANSLATE_TCHAR
@@ -19,8 +19,8 @@
 namespace Nova3D {
 
 	// 
-	// Macro Function: _DebugPrint(Format, ...)
-	// ========================================
+	// Macro: _DebugPrint(Format, ...)
+	// ======
 	// Prints non-verbose debug messages according to the Format via global DebugManager.
 	// Do not call this function in DLL.
 	//
@@ -30,8 +30,8 @@ namespace Nova3D {
 	#endif
 	
 	// 
-	// Macro Function: _DebugPrintV(Format, ...)
-	// =========================================
+	// Macro: _DebugPrintV(Format, ...)
+	// ======
 	// Prints verbose debug messages according to the Format via global DebugManager.
 	// Do not call this function in DLL.
 	//
@@ -41,8 +41,8 @@ namespace Nova3D {
 	#endif
 	
 	// 
-	// Macro Function: _DebugPrintS(DebugManager, Format, ...)
-	// =======================================================
+	// Macro: _DebugPrintS(DebugManager, Format, ...)
+	// ======
 	// Prints non-verbose debug messages according to the Format via DebugManager specified.
 	//
 	#if !defined(_DebugPrintS)
@@ -51,8 +51,8 @@ namespace Nova3D {
 	#endif
 	
 	// 
-	// Macro Function: _DebugPrintSV(DebugManager, Format, ...)
-	// ========================================================
+	// Macro: _DebugPrintSV(DebugManager, Format, ...)
+	// ======
 	// Prints verbose debug messages according to the Format via DebugManager specified.
 	//
 	#if !defined(_DebugPrintSV)
@@ -62,7 +62,7 @@ namespace Nova3D {
 
 	//
 	// Enum: DebugFlag
-	// ===============
+	// =====
 	// Defines several flags used in debugging output.
 	// 
 	// Values:
@@ -88,7 +88,7 @@ namespace Nova3D {
 
 	//
 	// Macro: DEBUGFLAG_DEFAULT
-	// ========================
+	// ======
 	// A set of default debug flags.
 	//
 	#define DEBUGFLAG_DEFAULT		(DebugFlag_FileOutput	| \
@@ -98,76 +98,65 @@ namespace Nova3D {
 
 	//
 	// Macro: DEBUG_DEFAULT_FILENAME
-	// =============================
+	// ======
 	// The default log file global DebugManager uses.
 	//
 	#define DEBUG_DEFAULT_FILENAME	__T("nova.log")
 
 	//
 	// Class: DebugManager <Inherits from Singleton>
-	// =============================================
+	// ======
 	// Declares a global DebugManager used in Nova 3D.
 	//
 	class DebugManager : public Singleton<DebugManager>
 	{
 	public:
 
-		//
-		// Function: DebugManager(void)
-		// ============================
-		// Constructor of the class, initializes variables.
-		//
 		DebugManager(void);
-
-		//
-		// Function: ~DebugManager(void)
-		// =============================
-		// Destructor of the class, closes log file and do some cleaning.
-		//
 		~DebugManager(void);
 
 		//
 		// Function: print(SourceFileName, LineNumber, isVerboseMessage, Message, ...)
-		// ===========================================================================
+		// =========
 		// Prints debugging messages according to parameters.
 		//
-		HRESULT print(const char *src_filename, int line_number, bool verbose, const TCHAR *message, ...);
+		HRESULT		print(const char *src_filename, int line_number, bool verbose, const TCHAR *message, ...);
 
 		//
 		// Function: setOutputFileName(NewFileName)
-		// ========================================
+		// =========
 		// Sets log file to NewFileName
 		//
-		HRESULT setOutputFileName(const TCHAR *new_filename = DEBUG_DEFAULT_FILENAME);
+		HRESULT		setOutputFileName(const TCHAR *new_filename = DEBUG_DEFAULT_FILENAME);
 
 		//
 		// Function: createDebugConsole(void)
-		// ==================================
+		// =========
 		// Creates a new console window.
 		//
-		HRESULT createDebugConsole(void);
+		HRESULT		createDebugConsole(void);
 		
 		//
 		// Function: dumpCallStack(void)
-		// =============================
+		// =========
 		// Prints call stack.
 		//
-		HRESULT dumpCallStack(void);
+		HRESULT		dumpCallStack(void);
 
 		//
-		// Inline Function: setOutputFlag(NewFlag)
-		// =======================================
+		// Function: setOutputFlag(NewFlag)
+		// =========
 		// Sets output flag to NewFlag.
 		//
-		inline void	setOutputFlag(DWORD new_flag = DEBUGFLAG_DEFAULT) 
+		void		setOutputFlag(DWORD new_flag = DEBUGFLAG_DEFAULT) 
 			{ output_flag = new_flag; }
 
 		//
-		// Inline Function: getOutputFlag(void)
-		// ====================================
+		// Function: getOutputFlag(void)
+		// =========
 		// Get output flag.
 		//
-		inline const DWORD	getOutputFlag(void) const 
+		const DWORD	getOutputFlag(void) const 
 			{ return output_flag; }
 
 	private:

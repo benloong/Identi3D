@@ -3,8 +3,8 @@
 // ==============================
 //
 
-#include "src/plugins/libdirect3d9/libDirect3D9.h"
-#include "src/utils/DebugManager.h"
+#include <src/plugins/libdirect3d9/libDirect3D9.h>
+#include <src/utils/DebugManager.h>
 
 namespace Nova3D
 {

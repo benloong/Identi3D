@@ -3,9 +3,9 @@
 // =====================
 //
 
-#include "src/plugins/libdirect3d9/libDirect3D9.h"
-#include "src/renderer/RenderTarget.h"
-#include "src/utils/DebugManager.h"
+#include <src/plugins/libdirect3d9/libDirect3D9.h>
+#include <src/renderer/RenderTarget.h>
+#include <src/utils/DebugManager.h>
 
 namespace Nova3D
 {
@@ -113,7 +113,7 @@ namespace Nova3D
 		}
 		
 		memset(&present_parameters, 0, sizeof(present_parameters));
-		present_parameters.hDeviceWindow = render_target->getWindowHandle();
+		present_parameters.hDeviceWindow = render_target->getHandle();
 		present_parameters.Windowed = (settings_enumerator.isWindowed()) ? TRUE : FALSE;
 		present_parameters.BackBufferCount = 1;
 		present_parameters.BackBufferFormat = D3DFMT_X8R8G8B8;		// Temporarily set to D3DFMT_X8R8G8B8
@@ -147,7 +147,7 @@ namespace Nova3D
 
 		hr = direct3d->CreateDevice(D3DADAPTER_DEFAULT,
 			(settings_enumerator.isHardwareAccelerated() ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
-			render_target->getWindowHandle(),
+			render_target->getHandle(),
 			flag,
 			&present_parameters,
 			&direct_device);

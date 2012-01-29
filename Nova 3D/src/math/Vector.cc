@@ -3,39 +3,13 @@
 // ===============
 //
 
-#include "src/math/Vector.h"
-#include "src/math/Matrix.h"
-#include "src/utils/CPU.h"
-
-#ifndef _FP_TOLERANCE
-#define _FP_TOLERANCE 1e-6
-#endif
-
-#ifndef _fcomp
-#define _fcomp(a, b) ((((a) - (b)) < _FP_TOLERANCE) ? true : false)
-#endif
-
-#ifndef _fzero
-#define _fzero(f) (_fcomp(f, 0))
-#endif
+#include <src/math/Vector.h>
+#include <src/math/Matrix.h>
+#include <src/utils/CPU.h>
 
 namespace Nova3D
 {
 	
-	Vector3::Vector3(void)
-	{
-		set(0.0f, 0.0f, 0.0f);
-	}
-
-	Vector3::Vector3(float x, float y, float z)
-	{
-		set(x, y, z);
-	}
-
-	Vector3::~Vector3(void)
-	{
-	}
-
 	bool Vector3::operator ==(const Vector3 &vec)
 	{
 		register float k = _y / vec._y;
@@ -101,6 +75,8 @@ namespace Nova3D
 	const Vector3 Vector3::operator *(const Matrix &m) const
 	{
 		Vector3 vec;
+
+#ifndef _SSE_ONLY
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			vec._x = _x * m._a1 + _y * m._b1 + _z * m._c1 + m._d1;
 			vec._y = _x * m._a2 + _y * m._b2 + _z * m._c2 + m._d2;
@@ -113,34 +89,14 @@ namespace Nova3D
 			vec._w = 1.0f;
 			return vec;
 		}
+#endif
 
-		float *_ptr = (float *)&vec;
-		__asm {
-			mov ecx, this;
-			mov eax, _ptr;
-			movss xmm0, [ecx];
-			mov edx, m;
-			movss xmm1, [ecx + 4];
-			shufps xmm0, xmm0, 0;
-			mulps xmm0, [edx];
-			movss xmm2, [ecx + 8];
-			shufps xmm1, xmm1, 0;
-			mulps xmm1, [edx + 16];
-			addps xmm0, xmm1;
-			movss xmm3, [ecx + 12];
-			shufps xmm2, xmm2, 0;
-			mulps xmm2, [edx + 32];
-			addps xmm0, xmm2;
-			shufps xmm3, xmm3, 0;
-			mulps xmm3, [edx + 48];
-			addps xmm0, xmm3;
-		
-			movaps xmm1, xmm0;
-			shufps xmm1, xmm1, 0xFF;
-			divps xmm0, xmm1;
-
-			movaps [eax], xmm0;
-		}
+		vec.data = _mm_add_ps(_mm_add_ps(_mm_add_ps(
+			_mm_mul_ps(_mm_shuffle_ps(data, data, _MM_SHUFFLE(0, 0, 0, 0)), m.data[0]),
+			_mm_mul_ps(_mm_shuffle_ps(data, data, _MM_SHUFFLE(1, 1, 1, 1)), m.data[1])),
+			_mm_mul_ps(_mm_shuffle_ps(data, data, _MM_SHUFFLE(2, 2, 2, 2)), m.data[2])),
+			m.data[3]);
+		vec.data = _mm_div_ps(vec.data, _mm_shuffle_ps(vec.data, vec.data, _MM_SHUFFLE(3, 3, 3, 3)));
 		return vec;
 	}
 	
@@ -157,60 +113,49 @@ namespace Nova3D
 
 	float Vector3::getLength(void)
 	{
+		
+#ifndef _SSE_ONLY
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			return sqrt(_x * _x + _y * _y + _z * _z);
 		}
-		float result, *r;
-		r = &result;
+#endif
+		
+		__m128 s;
+		float result;
 		_w = 0.0f;
-		__asm {
-			mov ecx, r;
-			mov edx, this;			
-			movaps xmm0, [edx];
-			mulps xmm0, xmm0;
-			movaps xmm1, xmm0;
-			shufps xmm1, xmm1, 0B1h;
-			addps xmm0, xmm1;
-			movaps xmm1, xmm0; 
-			shufps xmm1, xmm1, 0Fh;
-			addps xmm0, xmm1;
-			sqrtss xmm0, xmm0;
-			movss [ecx], xmm0;
-		}
+		s = _mm_mul_ps(data, data);
+		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(2, 3, 0, 1)));
+		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(0, 0, 3, 3)));
+		result = _mm_sqrt_ss(s).m128_f32[0];
 		_w = 1.0f;
 		return result;
 	}
 
 	void Vector3::normalize(void)
 	{
+
+#ifndef _SSE_ONLY
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			float f = sqrt(_x * _x + _y * _y + _z * _z);
 			if(!_fzero(f)) _x /= f, _y /= f, _z /= f;
 			return ;
 		}
+#endif
+
+		__m128 s;
 		_w = 0.0f;
-		__asm {
-			mov esi, this;
-			movaps xmm0, [esi];
-			movaps xmm2, xmm0;
-			mulps xmm0, xmm0;
-			movaps xmm1, xmm0;
-			shufps xmm1, xmm1, 0B1h;
-			addps xmm0, xmm1;
-			movaps xmm1, xmm0; 
-			shufps xmm1, xmm1, 0Fh;
-			addps xmm0, xmm1;
-			rsqrtps xmm0, xmm0;
-			movaps [esi], xmm0;
-			movaps [esi], xmm2;
-			mulps xmm2, xmm0;
-			movaps [esi], xmm2;
-		}
+		s = _mm_mul_ps(data, data);
+		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(2, 3, 0, 1)));
+		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(0, 0, 3, 3)));
+		s = _mm_rsqrt_ps(s);
+		data = _mm_mul_ps(s, data);
 		_w = 1.0;
 	}
 
 	void Vector3::cross(const Vector3 &u, const Vector3 &v)
 	{
+
+#ifndef _SSE_ONLY
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			_x = u._y * v._z - u._z * v._y;
 			_y = u._z * v._x - u._x * v._z;
@@ -218,21 +163,14 @@ namespace Nova3D
 			_w = 1.0f;
 			return ;
 		}
-		__asm {
-			mov ecx, u;
-			mov edx, v;
-			mov esi, this;
-			movaps xmm0, [ecx];
-			movaps xmm1, [edx];
-			movaps xmm2, xmm0;
-			shufps xmm1, xmm1, 0C9h;
-			mulps xmm0, xmm1;
-			shufps xmm2, xmm2, 0D2h;
-			mulps xmm2, xmm1;
-			shufps xmm0, xmm0, 0C9h;
-			subps xmm0, xmm2;
-			movaps [esi], xmm0;
-		}
+#endif
+
+		__m128 s, t;
+		s = _mm_shuffle_ps(v.data, v.data, _MM_SHUFFLE(3, 0, 2, 1));
+		t = _mm_mul_ps(u.data, s);
+		data = _mm_sub_ps(
+			_mm_shuffle_ps(t, t, _MM_SHUFFLE(3, 0, 2, 1)), 
+			_mm_mul_ps(_mm_shuffle_ps(u.data, u.data, _MM_SHUFFLE(3, 1, 0, 2)), s));
 		_w = 1.0f;
 	}
 

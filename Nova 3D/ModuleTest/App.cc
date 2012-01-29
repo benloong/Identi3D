@@ -5,6 +5,7 @@
 
 #include "StdAfx.h"
 #include "App.h"
+#include <src/utils/CPU.h>
 
 using namespace Nova3D;
 
@@ -15,6 +16,8 @@ App::App(void)
 	DebugManager::getInstance().createDebugConsole();
 	DebugManager::getInstance().setOutputFlag(DebugManager::getInstance().getOutputFlag() | DebugFlag_ConsoleOutput);
 	_DebugPrint(__T("Application loaded."));
+
+	_DebugPrint(__T("SSE: %s"), (CpuInfo::getInstance().isSSESupported() ? __T("enabled") : __T("disabled")));
 }
 
 HRESULT App::init(void)

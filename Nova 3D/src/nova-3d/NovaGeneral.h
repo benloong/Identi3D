@@ -1,10 +1,18 @@
 //
 // File: NovaGeneral.h
 // ===================
+// General include file for Nova3D
+//
+// Copyright (c) Sparkfire, 2011 - 2012.
 //
 
 #ifndef NOVA3D_SRC_NOVA3D_NOVAGENERAL_H
 #define NOVA3D_SRC_NOVA3D_NOVAGENERAL_H
+
+// General name string for Nova3D
+#if !defined(NOVA3D_NAME)
+ #define NOVA3D_NAME	__T("Nova3D")
+#endif
 
 // Nova3D version 0.1
 #if !defined(NOVA_VERSION)
@@ -21,19 +29,42 @@
 
 // C++ runtime libraries.
 #include <cstdio>
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <tchar.h>
 #include <cstdarg>
-#include <sstream>
+#include <cmath>
+#include <xmmintrin.h>
+#include <intrin.h>
+#include <new>
 
+// Nova3D Internal Libraries
 #include "NovaNotification.h"
 
-// General name string for Nova3D
-#if !defined(NOVA3D_NAME)
- #define NOVA3D_NAME	__T("Nova3D")
-#endif
+// Forward Classes
+namespace Nova3D
+{
+	
+	// Math Classes
+	class Angle;
+	class Matrix;
+	class Vector3;
+
+	// Renderer Classes
+	class RenderDevice;
+	class Renderer;
+	class RenderTarget;
+	class RenderWindow;
+
+	// Utility Classes
+	class CpuInfo;
+	class DebugManager;
+	class JsonReader;
+	class JsonWriter;
+	class SettingsEnumerator;
+	class SettingsManager;
+
+};
 
 #endif

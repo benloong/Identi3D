@@ -6,15 +6,18 @@
 #ifndef NOVA3D_SRC_RENDERER_RENDERWINDOW_H
 #define NOVA3D_SRC_RENDERER_RENDERWINDOW_H
 
-#include "src/nova-3d/NovaGeneral.h"
-#include "src/renderer/RenderTarget.h"
-#include "src/utils/KeyDefinition.h"
+#include <src/nova-3d/NovaGeneral.h>
+#include <src/renderer/RenderTarget.h>
+#include <src/utils/KeyDefinition.h>
 
 namespace Nova3D
 {
 
-	class RenderDevice;
-
+	//
+	// Class: RenderWindow <Inherits from RenderTarget>
+	// ======
+	// A window handle wrapper for rendering.
+	//
 	class RenderWindow : public RenderTarget
 	{
 	private:
@@ -45,8 +48,8 @@ namespace Nova3D
 		virtual void onRendering(void) = 0;
 		virtual void onEndRendering(void);
 
-		inline HWND getWindowHandle(void) { return window; }
-		inline RenderDevice *getRenderDevice(void) { return render_device; }
+		HWND getHandle(void) { return window; }
+		RenderDevice *getRenderDevice(void) { return render_device; }
 	};
 
 };

@@ -24,6 +24,12 @@
     <ClInclude Include="Angle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vector.cc">
@@ -32,5 +38,11 @@
     <ClCompile Include="Matrix.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Ray.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

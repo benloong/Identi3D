@@ -32,6 +32,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math", "src\math\math.vcxpr
 		{625EA963-2DA5-43EF-9D86-E3191ABAF604} = {625EA963-2DA5-43EF-9D86-E3191ABAF604}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathTest", "UnitTests\MathTest\MathTest.vcxproj", "{3F490C84-0A29-4947-A864-93F857F8DCE4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9CB502D5-5BCA-4AB2-97FC-23E540005F60} = {9CB502D5-5BCA-4AB2-97FC-23E540005F60}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -62,6 +67,10 @@ Global
 		{9CB502D5-5BCA-4AB2-97FC-23E540005F60}.Debug|Win32.Build.0 = Debug|Win32
 		{9CB502D5-5BCA-4AB2-97FC-23E540005F60}.Release|Win32.ActiveCfg = Release|Win32
 		{9CB502D5-5BCA-4AB2-97FC-23E540005F60}.Release|Win32.Build.0 = Release|Win32
+		{3F490C84-0A29-4947-A864-93F857F8DCE4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3F490C84-0A29-4947-A864-93F857F8DCE4}.Debug|Win32.Build.0 = Debug|Win32
+		{3F490C84-0A29-4947-A864-93F857F8DCE4}.Release|Win32.ActiveCfg = Release|Win32
+		{3F490C84-0A29-4947-A864-93F857F8DCE4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

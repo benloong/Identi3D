@@ -15,13 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Nova.h">
+    <ClCompile Include="mathtest.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="vector_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NovaGeneral.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NovaNotification.h">
+    <ClInclude Include="ray_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -12,8 +12,7 @@ namespace Nova3D
 	
 	bool Vector3::operator ==(const Vector3 &vec)
 	{
-		register float k = _y / vec._y;
-		return (_fcomp(_x / vec._x, k) && _fcomp(k, _z / vec._z));
+		return (_fcomp(_x, vec._x) && _fcomp(_y, vec._y) && _fcomp(_z, vec._z));
 	}
 
 	Vector3 &Vector3::operator =(const Vector3 &vec)
@@ -146,10 +145,9 @@ namespace Nova3D
 		_w = 0.0f;
 		s = _mm_mul_ps(data, data);
 		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(2, 3, 0, 1)));
-		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(0, 0, 3, 3)));
-		s = _mm_rsqrt_ps(s);
-		data = _mm_mul_ps(s, data);
-		_w = 1.0;
+		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(1, 0, 3, 2)));
+		data = _mm_mul_ps(_mm_rsqrt_ps(s), data);
+		_w = 1.0f;
 	}
 
 	void Vector3::cross(const Vector3 &u, const Vector3 &v)

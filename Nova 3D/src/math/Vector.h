@@ -60,7 +60,7 @@ namespace Nova3D
 			{ _x = -_x, _y = -_y, _z = -_z; }
 		void diff(const Vector3 &u, const Vector3 &v) 
 			{ _x = u._x - v._x, _y = u._y - v._y, _z = u._z - v._z; }
-		const Angle angleWith(Vector3 &vec) 
+		const Angle getAngle(Vector3 &vec) 
 			{ return Angle((Radian)acos(((*this) * vec) / (getLength() * vec.getLength()))); }
 
 		float getX(void) const { return _x; }

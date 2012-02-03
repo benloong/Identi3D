@@ -44,6 +44,9 @@ namespace Nova3D
 		void transpose(const Matrix &m);
 		void inverse(const Matrix &m);
 		
+		Matrix &operator =(const Matrix &m);
+		float &operator ()(unsigned int i, unsigned int j) 
+			{ return data[i].m128_f32[j]; }
 		const Matrix operator *(const Matrix &m) const;
 		const Vector3 operator *(const Vector3 &v) const;
 	};

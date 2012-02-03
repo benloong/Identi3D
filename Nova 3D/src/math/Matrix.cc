@@ -16,11 +16,12 @@ namespace Nova3D
 		clear();
 		_b2 = fc, _b3 = fs, _c2 = -fs, _c3 = fc, _a1 = _d4 = 1.0f;
 	}
+
 	void Matrix::rotateY(const Angle &a)
 	{
 		float fc = cosf(a._rad), fs = sinf(a._rad);
 		clear();
-		_a1 = fc, _a3 = -fs, _c1 = fc, _c3 = fs; _b2 = _d4 = 1.0f;
+		_a1 = fc, _a3 = -fs, _c1 = fs, _c3 = fc; _b2 = _d4 = 1.0f;
 	}
 
 	void Matrix::rotateZ(const Angle &a)
@@ -61,6 +62,85 @@ namespace Nova3D
 		
 		memcpy(data, m.data, sizeof(data));
 		_MM_TRANSPOSE4_PS(data[0], data[1], data[2], data[3]);
+	}
+
+	template <typename T>
+	void swap(T &a, T &b)
+	{
+		register T s = a;
+		a = b;
+		b = s;
+	}
+
+	void Matrix::inverse(const Matrix &m)
+	{
+		short int dx[4], dy[4], i, j, k;
+
+		this->operator=(m);
+		for(k = 0; k < 4; k++) {
+			float fmax = 0.0f;
+			for(i = k; i < 4; i++) {
+				for(j = k; j < 4; j++) {
+					float f = abs(data[i].m128_f32[j]);
+					if(f > fmax) {
+						fmax = f;
+						dx[k] = i;
+						dy[k] = j;
+					}
+				}
+			}
+			if(_fzero(fmax)) return ;
+			if(dx[k] != k) {
+				swap<float>(data[k].m128_f32[0], data[dx[k]].m128_f32[0]);
+				swap<float>(data[k].m128_f32[1], data[dx[k]].m128_f32[1]);
+				swap<float>(data[k].m128_f32[2], data[dx[k]].m128_f32[2]);
+				swap<float>(data[k].m128_f32[3], data[dx[k]].m128_f32[3]);
+			}
+			if(dy[k] != k) {
+				swap<float>(data[0].m128_f32[k], data[0].m128_f32[dy[k]]);
+				swap<float>(data[1].m128_f32[k], data[1].m128_f32[dy[k]]);
+				swap<float>(data[2].m128_f32[k], data[2].m128_f32[dy[k]]);
+				swap<float>(data[3].m128_f32[k], data[3].m128_f32[dy[k]]);
+			}
+
+			data[k].m128_f32[k] = 1.0f / data[k].m128_f32[k];
+			for(j = 0; j < 4; j++) {
+				if(j != k) data[k].m128_f32[j] *= data[k].m128_f32[k];
+			}
+
+			for(i = 0; i < 4; i++) {
+				if(i != k) {
+					for(j = 0; j < 4; j++) {
+						if(j != k) data[i].m128_f32[j] -= data[i].m128_f32[k] * data[k].m128_f32[j];
+					}
+				}
+			}
+
+			for(i = 0; i < 4; i++) {
+				if(i != k) data[i].m128_f32[k] *= -data[k].m128_f32[k];
+			}
+		}
+
+		for(k = 3; k >= 0; k--){
+			if(dy[k] != k) {
+				swap<float>(data[k].m128_f32[0], data[dy[k]].m128_f32[0]);
+				swap<float>(data[k].m128_f32[1], data[dy[k]].m128_f32[1]);
+				swap<float>(data[k].m128_f32[2], data[dy[k]].m128_f32[2]);
+				swap<float>(data[k].m128_f32[3], data[dy[k]].m128_f32[3]);
+			}
+			if(dx[k] != k) {
+				swap<float>(data[0].m128_f32[k], data[0].m128_f32[dx[k]]);
+				swap<float>(data[1].m128_f32[k], data[1].m128_f32[dx[k]]);
+				swap<float>(data[2].m128_f32[k], data[2].m128_f32[dx[k]]);
+				swap<float>(data[3].m128_f32[k], data[3].m128_f32[dx[k]]);
+			}
+		}
+	}
+
+	Matrix &Matrix::operator =(const Matrix &m)
+	{
+		if(this != &m) for(int i = 0; i < 4; i++) data[i] = m.data[i];
+		return (*this);
 	}
 
 	const Matrix Matrix::operator *(const Matrix &m) const
@@ -113,30 +193,8 @@ namespace Nova3D
 
 	const Vector3 Matrix::operator *(const Vector3 &v) const
 	{
-		Vector3 vec;
-
-#ifndef _SSE_ONLY
-		if(!CpuInfo::getInstance().isSSESupported()) {
-			vec._x = v._x * _a1 + v._y * _b1 + v._z * _c1 + _d1;
-			vec._y = v._x * _a2 + v._y * _b2 + v._z * _c2 + _d2;
-			vec._z = v._x * _a3 + v._y * _b3 + v._z * _c3 + _d3;
-			vec._w = v._x * _a4 + v._y * _b4 + v._z * _c4 + _d4;
-
-			vec._x /= vec._w;
-			vec._y /= vec._w;
-			vec._z /= vec._w;
-			vec._w = 1.0f;
-			return vec;
-		}
-#endif
-
-		vec.data = _mm_add_ps(_mm_add_ps(_mm_add_ps(
-			_mm_mul_ps(_mm_shuffle_ps(v.data, v.data, _MM_SHUFFLE(0, 0, 0, 0)), data[0]),
-			_mm_mul_ps(_mm_shuffle_ps(v.data, v.data, _MM_SHUFFLE(1, 1, 1, 1)), data[1])),
-			_mm_mul_ps(_mm_shuffle_ps(v.data, v.data, _MM_SHUFFLE(2, 2, 2, 2)), data[2])),
-			data[3]);
-		vec.data = _mm_div_ps(vec.data, _mm_shuffle_ps(vec.data, vec.data, _MM_SHUFFLE(3, 3, 3, 3)));
-		return vec;
+		// Consider left/right multiply as the same thing.
+		return v * (*this);
 	}
 
 };

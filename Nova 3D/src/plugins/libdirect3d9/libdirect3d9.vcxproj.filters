@@ -34,5 +34,8 @@
     <None Include="libDirect3D9.def">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="libDirect3D9.release.def">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -11,19 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABB.h" />
     <ClInclude Include="Angle.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="OBB.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Polygon.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Matrix.cc" />
     <ClCompile Include="Ray.cc" />
     <ClCompile Include="Vector.cc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9CB502D5-5BCA-4AB2-97FC-23E540005F60}</ProjectGuid>

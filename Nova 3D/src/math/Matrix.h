@@ -3,8 +3,6 @@
 // ==============
 // Provides matrix computation abilities.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_MATH_MATRIX_H
 #define NOVA3D_SRC_MATH_MATRIX_H

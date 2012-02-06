@@ -3,8 +3,6 @@
 // ===================
 // General include file for Nova3D
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_NOVA3D_NOVAGENERAL_H
 #define NOVA3D_SRC_NOVA3D_NOVAGENERAL_H
@@ -48,7 +46,13 @@ namespace Nova3D
 	
 	// Math Classes
 	class Angle;
+	class AxisAlignedBoundingBox;
 	class Matrix;
+	class OrientedBoundingBox;
+	class Plane;
+	class Polygon;
+	class Quaternion;
+	class Ray;
 	class Vector3;
 
 	// Renderer Classes

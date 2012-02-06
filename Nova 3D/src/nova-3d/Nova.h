@@ -3,8 +3,6 @@
 // ============
 // Nova3D Libraries.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_NOVA3D_NOVA_H
 #define NOVA3D_SRC_NOVA3D_NOVA_H
@@ -12,9 +10,15 @@
 #include <src/nova-3d/NovaGeneral.h>
 #include <src/nova-3d/NovaNotification.h>
 
+#include <src/math/AABB.h>
 #include <src/math/Angle.h>
-#include <src/math/Vector.h>
 #include <src/math/Matrix.h>
+#include <src/math/OBB.h>
+#include <src/math/Plane.h>
+#include <src/math/Polygon.h>
+#include <src/math/Quaternion.h>
+#include <src/math/Ray.h>
+#include <src/math/Vector.h>
 
 #include <src/renderer/Renderer.h>
 #include <src/renderer/RenderDevice.h>

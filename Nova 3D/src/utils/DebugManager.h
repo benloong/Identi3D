@@ -3,8 +3,6 @@
 // ====================
 // Provides a debug system for Nova 3D.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_UTILS_DEBUGMANAGER_H
 #define NOVA3D_SRC_UTILS_DEBUGMANAGER_H

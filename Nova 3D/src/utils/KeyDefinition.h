@@ -3,8 +3,6 @@
 // =====================
 // Redefine virtual keys.
 //
-// Copyright (c) Sparkfire, 2011 - 2012
-//
 
 #ifndef NOVA3D_UTILS_KEYDEFINITION_H
 #define NOVA3D_UTILS_KEYDEFINITION_H

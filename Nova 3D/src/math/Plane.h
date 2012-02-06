@@ -3,8 +3,6 @@
 // =============
 // Class to construct a plane.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_MATH_PLANE_H
 #define NOVA3D_SRC_MATH_PLANE_H
@@ -37,7 +35,7 @@ namespace Nova3D
 			{ set(normal, point); }
 		Plane(const Vector3 &normal, const Vector3 &point, float distance)
 			{ set(normal, point, distance); }
-		Plane(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2);
+		Plane(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2)
 			{ set(v0, v1, v2); }
 
 		void	set(const Vector3 &normal, const Vector3 &point)
@@ -50,8 +48,8 @@ namespace Nova3D
 		PointPosition classify(const Vector3 &point)
 		{ 
 			float f = point * _normal + _distance;
-			if(f > _DEFAULT_EPILSON) return PointPosition_PlaneFront;
-			else if(f < -_DEFAULT_EPILSON) return PointPosition_PlaneBack;
+			if(f > _DEFAULT_EPSILON) return PointPosition_PlaneFront;
+			else if(f < -_DEFAULT_EPSILON) return PointPosition_PlaneBack;
 			return PointPosition_Planar;
 		}
 

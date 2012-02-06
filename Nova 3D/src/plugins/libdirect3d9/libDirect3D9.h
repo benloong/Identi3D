@@ -3,8 +3,6 @@
 // ====================
 // Direct3D 9 render plugin.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_PLUGINS_LIBDIRECT3D9_LIBDIRECT3D9_H
 #define NOVA3D_SRC_PLUGINS_LIBDIRECT3D9_LIBDIRECT3D9_H

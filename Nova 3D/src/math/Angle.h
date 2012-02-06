@@ -3,8 +3,6 @@
 // =============
 // Accessing to an angle via two types, radian & degree.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_MATH_ANGLE_H
 #define NOVA3D_SRC_MATH_ANGLE_H
@@ -20,7 +18,7 @@
 #endif
 
 #ifndef _DEFAULT_EPSILON
-#define _DEFAULT_EPSILON 1e-6
+#define _DEFAULT_EPSILON 1e-3
 #endif
 
 namespace Nova3D

@@ -9,7 +9,7 @@ using namespace Nova3D;
 
 int main()
 {
-	RayTest::triangle_intersection_test();
+	RayTest::aabb_intersection_test();
 	system("pause");
 	return 0;
 }

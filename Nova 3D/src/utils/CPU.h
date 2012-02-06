@@ -3,8 +3,6 @@
 // ===========
 // Retrive and store CPU information.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_UTILS_CPU_H
 #define NOVA3D_SRC_UTILS_CPU_H

@@ -3,8 +3,6 @@
 // ==================
 // Parse json file and retrive items.
 //
-// Copyright (c) Sparkfire, 2011 - 2012.
-//
 
 #ifndef NOVA3D_SRC_UTILS_JSONPARSER_H
 #define NOVA3D_SRC_UTILS_JSONPARSER_H

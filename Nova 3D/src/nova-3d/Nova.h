@@ -10,6 +10,8 @@
 #include <src/nova-3d/NovaGeneral.h>
 #include <src/nova-3d/NovaNotification.h>
 
+#include <src/base/Color.h>
+
 #include <src/math/AABB.h>
 #include <src/math/Angle.h>
 #include <src/math/Matrix.h>

@@ -37,6 +37,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathTest", "UnitTests\MathT
 		{9CB502D5-5BCA-4AB2-97FC-23E540005F60} = {9CB502D5-5BCA-4AB2-97FC-23E540005F60}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "src\base\base.vcxproj", "{0799814A-D756-49DB-B608-5A175452A618}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -71,6 +73,10 @@ Global
 		{3F490C84-0A29-4947-A864-93F857F8DCE4}.Debug|Win32.Build.0 = Debug|Win32
 		{3F490C84-0A29-4947-A864-93F857F8DCE4}.Release|Win32.ActiveCfg = Release|Win32
 		{3F490C84-0A29-4947-A864-93F857F8DCE4}.Release|Win32.Build.0 = Release|Win32
+		{0799814A-D756-49DB-B608-5A175452A618}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0799814A-D756-49DB-B608-5A175452A618}.Debug|Win32.Build.0 = Debug|Win32
+		{0799814A-D756-49DB-B608-5A175452A618}.Release|Win32.ActiveCfg = Release|Win32
+		{0799814A-D756-49DB-B608-5A175452A618}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

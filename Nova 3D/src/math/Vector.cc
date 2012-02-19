@@ -9,17 +9,13 @@
 
 namespace Nova3D
 {
-	
-	bool Vector3::operator ==(const Vector3 &vec)
+	 
+	void Vector3::set(float x, float y, float z, float w)
 	{
-		return (_fcomp(_x, vec._x) && _fcomp(_y, vec._y) && _fcomp(_z, vec._z));
-	}
-
-	Vector3 &Vector3::operator =(const Vector3 &vec)
-	{
-		if((&vec) == this) return (*this);
-		data = vec.data;
-		return (*this);
+		_x = x;
+		_y = y;
+		_z = z;
+		_w = w;
 	}
 
 	void Vector3::operator +=(const Vector3 &vec)
@@ -48,14 +44,6 @@ namespace Nova3D
 		(*this) = (*this) * m;
 	}
 
-	void Vector3::operator /=(float f)
-	{
-		if(_fzero(f)) return ;
-		_x /= f;
-		_y /= f;
-		_z /= f;
-	}
-
 	const Vector3 Vector3::operator +(const Vector3 &vec) const
 	{
 		return Vector3(_x + vec._x, _y + vec._y, _z + vec._z);
@@ -75,7 +63,7 @@ namespace Nova3D
 	{
 		Vector3 vec;
 
-#ifndef _SSE_ONLY
+#if !defined(_SSE_ONLY)
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			vec._x = _x * m._a1 + _y * m._b1 + _z * m._c1 + m._d1;
 			vec._y = _x * m._a2 + _y * m._b2 + _z * m._c2 + m._d2;
@@ -90,12 +78,12 @@ namespace Nova3D
 		}
 #endif
 
-		vec.data = _mm_add_ps(_mm_add_ps(_mm_add_ps(
-			_mm_mul_ps(_mm_shuffle_ps(data, data, _MM_SHUFFLE(0, 0, 0, 0)), m.data[0]),
-			_mm_mul_ps(_mm_shuffle_ps(data, data, _MM_SHUFFLE(1, 1, 1, 1)), m.data[1])),
-			_mm_mul_ps(_mm_shuffle_ps(data, data, _MM_SHUFFLE(2, 2, 2, 2)), m.data[2])),
-			m.data[3]);
-		vec.data = _mm_div_ps(vec.data, _mm_shuffle_ps(vec.data, vec.data, _MM_SHUFFLE(3, 3, 3, 3)));
+		vec._data = _mm_add_ps(_mm_add_ps(_mm_add_ps(
+			_mm_mul_ps(_mm_shuffle_ps(_data, _data, _MM_SHUFFLE(0, 0, 0, 0)), m._data[0]),
+			_mm_mul_ps(_mm_shuffle_ps(_data, _data, _MM_SHUFFLE(1, 1, 1, 1)), m._data[1])),
+			_mm_mul_ps(_mm_shuffle_ps(_data, _data, _MM_SHUFFLE(2, 2, 2, 2)), m._data[2])),
+			m._data[3]);
+		vec._data = _mm_div_ps(vec._data, _mm_shuffle_ps(vec._data, vec._data, _MM_SHUFFLE(3, 3, 3, 3)));
 		return vec;
 	}
 	
@@ -104,10 +92,26 @@ namespace Nova3D
 		return (_x * vec._x + _y * vec._y + _z * vec._z);
 	}
 	
-	const Vector3 Vector3::operator /(float f) const
+	float Vector3::getSquaredLength(void) const
 	{
-		if(_fzero(f)) return (*this);
-		return Vector3(_x / f, _y / f, _z / f);
+		return (_x * _x + _y * _y + _z * _z);
+	}
+
+	void Vector3::negate(void)
+	{
+		_x = -_x, _y = -_y, _z = -_z;
+	}
+
+	void Vector3::diff(const Vector3 &u, const Vector3 &v)
+	{
+		_x = u._x - v._x;
+		_y = u._y - v._y;
+		_z = u._z - v._z;
+	}
+
+	const Angle Vector3::getAngle(Vector3 &vec)
+	{
+		return Angle((Radian)acosf(((*this) * vec) / (getLength() * vec.getLength())));
 	}
 
 	float Vector3::getLength(void)
@@ -122,7 +126,7 @@ namespace Nova3D
 		__m128 s;
 		float result;
 		_w = 0.0f;
-		s = _mm_mul_ps(data, data);
+		s = _mm_mul_ps(_data, _data);
 		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(2, 3, 0, 1)));
 		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(0, 0, 3, 3)));
 		result = _mm_sqrt_ss(s).m128_f32[0];
@@ -143,10 +147,10 @@ namespace Nova3D
 
 		__m128 s;
 		_w = 0.0f;
-		s = _mm_mul_ps(data, data);
+		s = _mm_mul_ps(_data, _data);
 		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(2, 3, 0, 1)));
 		s = _mm_add_ps(s, _mm_shuffle_ps(s, s, _MM_SHUFFLE(1, 0, 3, 2)));
-		data = _mm_mul_ps(_mm_rsqrt_ps(s), data);
+		_data = _mm_mul_ps(_mm_rsqrt_ps(s), _data);
 		_w = 1.0f;
 	}
 
@@ -164,11 +168,11 @@ namespace Nova3D
 #endif
 
 		__m128 s, t;
-		s = _mm_shuffle_ps(v.data, v.data, _MM_SHUFFLE(3, 0, 2, 1));
-		t = _mm_mul_ps(u.data, s);
-		data = _mm_sub_ps(
+		s = _mm_shuffle_ps(v._data, v._data, _MM_SHUFFLE(3, 0, 2, 1));
+		t = _mm_mul_ps(u._data, s);
+		_data = _mm_sub_ps(
 			_mm_shuffle_ps(t, t, _MM_SHUFFLE(3, 0, 2, 1)), 
-			_mm_mul_ps(_mm_shuffle_ps(u.data, u.data, _MM_SHUFFLE(3, 1, 0, 2)), s));
+			_mm_mul_ps(_mm_shuffle_ps(u._data, u._data, _MM_SHUFFLE(3, 1, 0, 2)), s));
 		_w = 1.0f;
 	}
 

@@ -7,6 +7,7 @@
 
 #include <src/math/AABB.h>
 #include <src/math/Matrix.h>
+#include <src/math/OBB.h>
 #include <src/math/Plane.h>
 
 namespace Nova3D
@@ -131,4 +132,23 @@ namespace Nova3D
 		return true;
 	}
 
+	//bool Ray::intersect(const OrientedBoundingBox &obb, float *distance, Vector3 *hit) const
+	//{
+	//	Vector3 d = obb._center - _origin;
+	//	int parallel = 0;
+	//	float a[3], b[3], k, inv, tmin, tmax;
+	//	bool found = false;
+
+	//	for(int i = 0; i < 3; i++) {
+	//		a[i] = obb._axis[i] * _direction;
+	//		b[i] = d * _direction;
+
+	//		if(_fzero(a)) {
+	//			parallel |= 1 << i;
+	//		} else {
+	//			k = (a > 0.0f) ? obb._extent[i] : -obb._extent[i];
+	//			inv = 1.0f / a;
+
+	//			if(!found) {
+	//				b - 
 };

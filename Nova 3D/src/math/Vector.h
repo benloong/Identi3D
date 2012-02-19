@@ -15,59 +15,96 @@ namespace Nova3D
 
 	class Vector3
 	{
-	public:
-		__declspec(align(16)) union
-		{
-			__m128 data;
-			struct
-			{
-				float _x, _y, _z, _w;
-			};
-		};
+		friend class Matrix;
 
-		Vector3(void)
-			{ set(0.0f, 0.0f, 0.0f); }
-		Vector3(float x, float y, float z)
-			{ set(x, y, z); }
+	public:
+		Vector3(void) : 
+		  _x(0.0f), _y(0.0f), _z(0.0f), _w(1.0f) {} ;
+		Vector3(float x, float y, float z) :
+		  _x(x), _y(y), _z(z), _w(1.0f) {} ;
 		~Vector3(void) {} ;
 
-		void set(float x, float y, float z, float w = 1.0f) 
-			{ _x = x; _y = y; _z = z; _w = w; }
-		
-		bool operator ==(const Vector3 &vec);
-		Vector3 &operator =(const Vector3 &vec);
+		/*
+		 * Set values of vector.
+		 */
+		void set(float x, float y, float z, float w = 1.0f);
+		void setX(float x) { _x = x; } ;
+		void setY(float y) { _y = y; } ;
+		void setZ(float z) { _z = z; } ;
 
+		/*
+		 * Get values of vector.
+		 */
+		float getX(void) const { return _x; }
+		float getY(void) const { return _y; }
+		float getZ(void) const { return _z; }
+
+		/*
+		 * Copy vector data via __m128 '=' operator.
+		 */
+		Vector3 &operator =(const Vector3 &vec) { _data = vec._data; return *this; } ;
+
+		/*
+		 * Basic vector operation.
+		 */
 		void operator +=(const Vector3 &vec);
 		void operator -=(const Vector3 &vec);
 		void operator *=(float f);
 		void operator *=(const Matrix &m);
-		void operator /=(float f);
-		
+
 		const Vector3 operator +(const Vector3 &vec) const;
 		const Vector3 operator -(const Vector3 &vec) const;
 		const Vector3 operator *(float f) const;
 		const Vector3 operator *(const Matrix &m) const;
 		float operator *(const Vector3 &vec) const;
-		const Vector3 operator /(float f) const;
 
+		/*
+		 * Get length of vector.
+		 */
 		float getLength(void);
+
+		/*
+		 * Normalize the vector (x, y, z < 1.0f).
+		 */
 		void normalize(void);
+
+		/*
+		 * Calculate the cross product of two vectors.
+		 * New vector is perpendicular to u, v.
+		 */
 		void cross(const Vector3 &u, const Vector3 &v);
 
-		float getSquaredLength(void) const 
-			{ return (_x * _x + _y * _y + _z * _z); }
-		void negate(void) 
-			{ _x = -_x, _y = -_y, _z = -_z; }
-		void diff(const Vector3 &u, const Vector3 &v) 
-			{ _x = u._x - v._x, _y = u._y - v._y, _z = u._z - v._z; }
-		const Angle getAngle(Vector3 &vec) 
-			{ return Angle((Radian)acos(((*this) * vec) / (getLength() * vec.getLength()))); }
+		/*
+		 * Get squared length (len^2).
+		 */
+		float getSquaredLength(void) const;
 
-		float getX(void) const { return _x; }
-		float getY(void) const { return _y; }
-		float getZ(void) const { return _z; }
+		/*
+		 * Negate the vector (x,y,z -> -x,-y,-z).
+		 */
+		void negate(void);
+
+		/*
+		 * Calculate difference between u, v.
+		 */
+		void diff(const Vector3 &u, const Vector3 &v);
+
+		/*
+		 * Get the angle between this & vec.
+		 */
+		const Angle getAngle(Vector3 &vec);
+
+	private:
+		/*
+		 * Data should be aligned to 16 bit for fast SSE computation.
+		 */
+		_DATA_ALIGN union
+		{
+			struct { float _x, _y, _z, _w; };
+			__m128 _data;
+		};
 	};
 
 }
 
-#endif
+#endif // NOVA3D_SRC_MATH_VECTOR_H

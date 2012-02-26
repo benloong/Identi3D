@@ -29,10 +29,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	}
 
 	//retval = my_app->run();
-	Matrix m = {1, 0, 0, 0,
-				1, 2, 0, 0,
-				1, 3, 2, 0,
-				2, 4, 1, 2};
+	Matrix m(1, 0, 0, 0,
+			 1, 2, 0, 0,
+			 1, 3, 2, 0,
+			 2, 4, 1, 2);
 	m.inverse(m);
 	_DebugPrint(L"\n%.2f\t%.2f\t%.2f\t%.2f\n%.2f\t%.2f\t%.2f\t%.2f\n%.2f\t%.2f\t%.2f\t%.2f\n%.2f\t%.2f\t%.2f\t%.2f", 
 		m(0,0), m(0,1), m(0,2), m(0,3),

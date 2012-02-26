@@ -63,6 +63,11 @@ namespace Nova3D
 	{
 		Vector3 vec;
 
+		/*
+		 * Left multiply implemented.
+		 * [x', y', z'] = [x, y, z] * M.
+		 */
+
 #if !defined(_SSE_ONLY)
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			vec._x = _x * m._a1 + _y * m._b1 + _z * m._c1 + m._d1;
@@ -76,14 +81,15 @@ namespace Nova3D
 			vec._w = 1.0f;
 			return vec;
 		}
-#endif
+#endif // !defined(_SSE_ONLY)
 
 		vec._data = _mm_add_ps(_mm_add_ps(_mm_add_ps(
 			_mm_mul_ps(_mm_shuffle_ps(_data, _data, _MM_SHUFFLE(0, 0, 0, 0)), m._data[0]),
 			_mm_mul_ps(_mm_shuffle_ps(_data, _data, _MM_SHUFFLE(1, 1, 1, 1)), m._data[1])),
 			_mm_mul_ps(_mm_shuffle_ps(_data, _data, _MM_SHUFFLE(2, 2, 2, 2)), m._data[2])),
 			m._data[3]);
-		vec._data = _mm_div_ps(vec._data, _mm_shuffle_ps(vec._data, vec._data, _MM_SHUFFLE(3, 3, 3, 3)));
+		vec._data = _mm_mul_ps(vec._data, _mm_rcp_ps(_mm_shuffle_ps(vec._data, vec._data, _MM_SHUFFLE(3, 3, 3, 3))));
+		//vec._data = _mm_div_ps(vec._data, _mm_shuffle_ps(vec._data, vec._data, _MM_SHUFFLE(3, 3, 3, 3)));
 		return vec;
 	}
 	
@@ -92,6 +98,12 @@ namespace Nova3D
 		return (_x * vec._x + _y * vec._y + _z * vec._z);
 	}
 	
+	std::ostream &operator <<(std::ostream &out, const Vector3 &vec)
+	{
+		out << "(" << vec._x << ", " << vec._y << ", " << vec._z << ")";
+		return out;
+	}
+
 	float Vector3::getSquaredLength(void) const
 	{
 		return (_x * _x + _y * _y + _z * _z);
@@ -99,6 +111,8 @@ namespace Nova3D
 
 	void Vector3::negate(void)
 	{
+		static const __m128 neg_vec = _mm_set_ps(-0.0f, -0.0f, -0.0f, 1.0f);
+		_mm_or_ps(_data, neg_vec);
 		_x = -_x, _y = -_y, _z = -_z;
 	}
 
@@ -117,11 +131,11 @@ namespace Nova3D
 	float Vector3::getLength(void)
 	{
 		
-#ifndef _SSE_ONLY
+#if !defined(_SSE_ONLY)
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			return sqrt(_x * _x + _y * _y + _z * _z);
 		}
-#endif
+#endif // !defined(_SSE_ONLY)
 		
 		__m128 s;
 		float result;
@@ -137,13 +151,13 @@ namespace Nova3D
 	void Vector3::normalize(void)
 	{
 
-#ifndef _SSE_ONLY
+#if !defined(_SSE_ONLY)
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			float f = sqrt(_x * _x + _y * _y + _z * _z);
 			if(!_fzero(f)) _x /= f, _y /= f, _z /= f;
 			return ;
 		}
-#endif
+#endif // !defined(_SSE_ONLY)
 
 		__m128 s;
 		_w = 0.0f;
@@ -157,7 +171,7 @@ namespace Nova3D
 	void Vector3::cross(const Vector3 &u, const Vector3 &v)
 	{
 
-#ifndef _SSE_ONLY
+#if !defined(_SSE_ONLY)
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			_x = u._y * v._z - u._z * v._y;
 			_y = u._z * v._x - u._x * v._z;
@@ -165,7 +179,7 @@ namespace Nova3D
 			_w = 1.0f;
 			return ;
 		}
-#endif
+#endif // !defined(_SSE_ONLY)
 
 		__m128 s, t;
 		s = _mm_shuffle_ps(v._data, v._data, _MM_SHUFFLE(3, 0, 2, 1));

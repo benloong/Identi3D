@@ -18,12 +18,27 @@
     <ClCompile Include="mathtest.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="vector_test.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="matrix_test.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ray_test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix_test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

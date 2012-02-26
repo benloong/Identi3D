@@ -51,6 +51,7 @@
 #include <xmmintrin.h>
 #include <intrin.h>
 #include <new>
+#include <fstream>
 
 // Nova3D Internal Libraries
 #include "NovaNotification.h"

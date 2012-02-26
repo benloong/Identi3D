@@ -3,13 +3,17 @@
 // =================
 //
 
-#include "ray_test.h"
+#include "vector_test.h"
+#include "matrix_test.h"
 
 using namespace Nova3D;
 
 int main()
 {
-	RayTest::aabb_intersection_test();
+	VectorTest::runAllTest();
+	MatrixTest::runAllTest();
+	VMMTimerTest vmmtt;
+	//vmmtt.runTest();
 	system("pause");
 	return 0;
 }

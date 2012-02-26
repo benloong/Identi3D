@@ -35,6 +35,7 @@ namespace Nova3D
 		/*
 		 * Get values of vector.
 		 */
+		const __m128 &getData(void) const { return _data; }
 		float getX(void) const { return _x; }
 		float getY(void) const { return _y; }
 		float getZ(void) const { return _z; }
@@ -57,6 +58,8 @@ namespace Nova3D
 		const Vector3 operator *(float f) const;
 		const Vector3 operator *(const Matrix &m) const;
 		float operator *(const Vector3 &vec) const;
+
+		friend std::ostream &operator <<(std::ostream &out, const Vector3 &vec);
 
 		/*
 		 * Get length of vector.

@@ -10,6 +10,53 @@
 namespace Nova3D
 {
 
+	Matrix::Matrix(void)
+	{
+		_data[0] = _mm_setzero_ps();
+		_data[1] = _mm_setzero_ps();
+		_data[2] = _mm_setzero_ps();
+		_data[3] = _mm_setzero_ps();
+	}
+
+	Matrix::Matrix(float a1, float a2, float a3, float a4,
+				   float b1, float b2, float b3, float b4,
+				   float c1, float c2, float c3, float c4,
+				   float d1, float d2, float d3, float d4)
+	{
+		_data[0] = _mm_set_ps(a1, a2, a3, a4);
+		_data[1] = _mm_set_ps(b1, b2, b3, b4);
+		_data[2] = _mm_set_ps(c1, c2, c3, c4);
+		_data[3] = _mm_set_ps(d1, d2, d3, d4);
+	}
+
+	void Matrix::set(float a1, float a2, float a3, float a4,
+					 float b1, float b2, float b3, float b4,
+					 float c1, float c2, float c3, float c4,
+					 float d1, float d2, float d3, float d4)
+	{
+		_data[0] = _mm_set_ps(a1, a2, a3, a4);
+		_data[1] = _mm_set_ps(b1, b2, b3, b4);
+		_data[2] = _mm_set_ps(c1, c2, c3, c4);
+		_data[3] = _mm_set_ps(d1, d2, d3, d4);
+	}
+
+	void Matrix::setRow(int n, float n1, float n2, float n3, float n4)
+	{
+		if(n >= 0 && n < 4) {
+			_data[n] = _mm_set_ps(n1, n2, n3, n4);
+		}
+	}
+
+	void Matrix::setColumn(int n, float an, float bn, float cn, float dn)
+	{
+		if(n >= 0 && n < 4) {
+			_data[0].m128_f32[n] = an;
+			_data[1].m128_f32[n] = bn;
+			_data[2].m128_f32[n] = cn;
+			_data[3].m128_f32[n] = dn;
+		}
+	}
+
 	void Matrix::identify(void)
 	{
 		/*
@@ -18,6 +65,7 @@ namespace Nova3D
 		 *	0		0		1		0
 		 *	0		0		0		1
 		 */
+
 		_a1 = _b2 = _c3 = _d4 = 1.0f;
 		_a2 = _a3 = _a4 = 
 			_b1 = _b3 = _b4 = 
@@ -35,6 +83,7 @@ namespace Nova3D
 		 *	0		-sin(a)	cos(a)	0
 		 *	0		0		0		1
 		 */
+
 		_b2 = fc, _b3 = fs;
 		_c2 = -fs, _c3 = fc;
 		_a1 = _d4 = 1.0f;
@@ -54,6 +103,7 @@ namespace Nova3D
 		 *	sin(a)	0		cos(a)	0
 		 *	0		0		0		1
 		 */
+
 		_a1 = fc, _a3 = -fs, _c1 = fs, _c3 = fc; 
 		_b2 = _d4 = 1.0f;
 		_a2 = _a4 = 
@@ -72,6 +122,7 @@ namespace Nova3D
 		 *	0		0		1		0
 		 *	0		0		0		1
 		 */
+
 		clear();
 		_a1 = fc, _a2 = fs, _b1 = -fs, _b2 = fc; 
 		_c3 = _d4 = 1.0f;
@@ -81,7 +132,7 @@ namespace Nova3D
 			_d1 = _d2 = _d3 = 0.0f;
 	}
 
-	void Matrix::rotateVector(Vector3 &vec, const Angle &a)
+	void Matrix::rotateVector(const Vector3 &vec, const Angle &a)
 	{
 		float fc = cosf(a._rad), fs = sinf(a._rad), delta = 1.0f - fc;
 		float fsx = vec._z * fs, fsy = vec._y * fs, fsz = vec._z * fs;
@@ -93,6 +144,7 @@ namespace Nova3D
 		 *	z*x*d-y*sin(a)	z*y*d+x*sin(a)	z*z*d+cos(a)	0
 		 *	0				0				0				1
 		 */
+
 #if !defined(_SSE_ONLY)
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			_a1 = (vec._x * vec._x) * delta + fc;
@@ -128,10 +180,24 @@ namespace Nova3D
 		_a4 = _b4 = _c4 = _d1 = _d2 = _d3 = 0.0f;
 	}
 
+	void Matrix::translate(float dx, float dy, float dz)
+	{
+		/*
+		 *	0	0	0	dx
+		 *	0	0	0	dy
+		 *	0	0	0	dz
+		 *	0	0	0	0
+		 */
+		_d1 = dx, _d2 = dy, _d3 = dz;
+	}
+
 	void Matrix::transpose(const Matrix &m)
 	{
+		/*
+		 * Reflect the matrix over its main diagonal.
+		 */
 
-#ifndef _SSE_ONLY
+#if !defined(_SSE_ONLY)
 		if(!CpuInfo::getInstance().isSSESupported()) {
 			for(int i = 0; i < 4; i++)
 				for(int j = 0; j < 4; j++)
@@ -139,11 +205,14 @@ namespace Nova3D
 			return ;
 		}
 #endif // !defined(_SSE_ONLY)
-		
+
 		memcpy(_data, m._data, sizeof(_data));
-		_MM_TRANSPOSE4_PS(_data[0], _data[1], _data[2], _data[3]);
+		_MM_TRANSPOSE4_PS(_data[0], _data[1], _data[2], _data[3]); // Use SSE macro to get result directly.
 	}
 
+	/*
+	 * Assistant function: Swap a & b.
+	 */
 	template <typename T>
 	void swap(T &a, T &b)
 	{
@@ -154,67 +223,162 @@ namespace Nova3D
 
 	void Matrix::inverse(const Matrix &m)
 	{
-		short int dx[4], dy[4], i, j, k;
+		Matrix cof;
 
-		this->operator=(m);
-		for(k = 0; k < 4; k++) {
-			float fmax = 0.0f;
-			for(i = k; i < 4; i++) {
-				for(j = k; j < 4; j++) {
-					float f = abs(_data[i].m128_f32[j]);
-					if(f > fmax) {
-						fmax = f;
-						dx[k] = i;
-						dy[k] = j;
-					}
-				}
-			}
-			if(_fzero(fmax)) return ;
-			if(dx[k] != k) {
-				swap<float>(_data[k].m128_f32[0], _data[dx[k]].m128_f32[0]);
-				swap<float>(_data[k].m128_f32[1], _data[dx[k]].m128_f32[1]);
-				swap<float>(_data[k].m128_f32[2], _data[dx[k]].m128_f32[2]);
-				swap<float>(_data[k].m128_f32[3], _data[dx[k]].m128_f32[3]);
-			}
-			if(dy[k] != k) {
-				swap<float>(_data[0].m128_f32[k], _data[0].m128_f32[dy[k]]);
-				swap<float>(_data[1].m128_f32[k], _data[1].m128_f32[dy[k]]);
-				swap<float>(_data[2].m128_f32[k], _data[2].m128_f32[dy[k]]);
-				swap<float>(_data[3].m128_f32[k], _data[3].m128_f32[dy[k]]);
-			}
+		/*
+		 * Calculate M^-1 where M * M^-1 = I
+		 * by Cramer's Rule: M^-1 = cof(M)^T / det(M).
+		 */
+		
+#if !defined(_SSE_ONLY)
+		if(!CpuInfo::getInstance().isSSESupported()) {
+			float factor[6];
+			cof.transpose(m);
 
-			_data[k].m128_f32[k] = 1.0f / _data[k].m128_f32[k];
-			for(j = 0; j < 4; j++) {
-				if(j != k) _data[k].m128_f32[j] *= _data[k].m128_f32[k];
-			}
+			factor[0] = cof._c3 * cof._d4 - cof._c4 * cof._d3;
+			factor[1] = cof._c2 * cof._d4 - cof._c4 * cof._d2;
+			factor[2] = cof._c2 * cof._d3 - cof._c3 * cof._d2;
+			factor[3] = cof._c1 * cof._d4 - cof._c4 * cof._d1;
+			factor[4] = cof._c3 * cof._d1 - cof._c1 * cof._d3;
+			factor[5] = cof._c1 * cof._d2 - cof._c2 * cof._d1;
+		
+			_a1	 = cof._b2 * factor[0] - cof._b3 * factor[1] + cof._b4 * factor[2];
+			_a2  = -cof._b1 * factor[0] + cof._b3 * factor[3] + cof._b4 * factor[4];
+			_a3  = cof._b1 * factor[1] - cof._b2 * factor[3] + cof._b4 * factor[5];
+			_a4  = -cof._b1 * factor[2] - cof._b2 * factor[4] - cof._b3 * factor[5];
+		
+			_b1  = -cof._a2 * factor[0] + cof._a3 * factor[1] - cof._a4 * factor[2];
+			_b2  = cof._a1 * factor[0] - cof._a3 * factor[3] - cof._a4 * factor[4];
+			_b3  = -cof._a1 * factor[1] + cof._a2 * factor[3] - cof._a4 * factor[5];
+			_b4  = cof._a1 * factor[2] + cof._a2 * factor[4] + cof._a3 * factor[5];
+		
+			factor[0] = cof._a3 * cof._b4 - cof._a4 * cof._b3;
+			factor[1] = cof._a2 * cof._b4 - cof._a4 * cof._b2;
+			factor[2] = cof._a2 * cof._b3 - cof._a3 * cof._b2;
+			factor[3] = cof._a1 * cof._b4 - cof._a4 * cof._b1;
+			factor[4] = cof._a3 * cof._b1 - cof._a1 * cof._b3;
+			factor[5] = cof._a1 * cof._b2 - cof._a2 * cof._b1;
+		
+			_c1	 = factor[0] * cof._d2 - factor[1] * cof._d3 + factor[2] * cof._d4;
+			_c2  = -factor[0] * cof._d1 + factor[3] * cof._d3 + factor[4] * cof._d4;
+			_c3  = factor[1] * cof._d1 - factor[3] * cof._d2 + factor[5] * cof._d4;
+			_c4  = -factor[2] * cof._d1 - factor[4] * cof._d2 - factor[5] * cof._d3;
+		
+			_d1  = -factor[0] * cof._c2 + factor[1] * cof._c3 - factor[2] * cof._c4;
+			_d2  = factor[0] * cof._c1 - factor[3] * cof._c3 - factor[4] * cof._c4;
+			_d3  = -factor[1] * cof._c1 + factor[3] * cof._c2 - factor[5] * cof._c4;
+			_d4  = factor[2] * cof._c1 + factor[4] * cof._c2 + factor[5] * cof._c3;
 
-			for(i = 0; i < 4; i++) {
-				if(i != k) {
-					for(j = 0; j < 4; j++) {
-						if(j != k) _data[i].m128_f32[j] -= _data[i].m128_f32[k] * _data[k].m128_f32[j];
-					}
-				}
-			}
+			float inv_det = 1.0f / (_a1 * cof._a1 + _a2 * cof._a2 + _a3 * cof._a3 + _a4 * cof._a4);
+			_a1 *= inv_det, _a2 *= inv_det, _a3 *= inv_det, _a4 *= inv_det;
+			_b1 *= inv_det, _b2 *= inv_det, _b3 *= inv_det, _b4 *= inv_det;
+			_c1 *= inv_det, _c2 *= inv_det, _c3 *= inv_det, _c4 *= inv_det;
+			_d1 *= inv_det, _d2 *= inv_det, _d3 *= inv_det, _d4 *= inv_det;
 
-			for(i = 0; i < 4; i++) {
-				if(i != k) _data[i].m128_f32[k] *= -_data[k].m128_f32[k];
-			}
+			return ;
 		}
+#endif // !defined(_SSE_ONLY)
 
-		for(k = 3; k >= 0; k--){
-			if(dy[k] != k) {
-				swap<float>(_data[k].m128_f32[0], _data[dy[k]].m128_f32[0]);
-				swap<float>(_data[k].m128_f32[1], _data[dy[k]].m128_f32[1]);
-				swap<float>(_data[k].m128_f32[2], _data[dy[k]].m128_f32[2]);
-				swap<float>(_data[k].m128_f32[3], _data[dy[k]].m128_f32[3]);
-			}
-			if(dx[k] != k) {
-				swap<float>(_data[0].m128_f32[k], _data[0].m128_f32[dx[k]]);
-				swap<float>(_data[1].m128_f32[k], _data[1].m128_f32[dx[k]]);
-				swap<float>(_data[2].m128_f32[k], _data[2].m128_f32[dx[k]]);
-				swap<float>(_data[3].m128_f32[k], _data[3].m128_f32[dx[k]]);
-			}
-		}
+		// SSE Accelerated code from Intel documentation.
+		__m128 det, tmp;
+		float *p = (float*)&m;
+
+		tmp = _mm_setzero_ps();
+
+		tmp = _mm_loadh_pi(_mm_loadl_pi(tmp, (__m64*)p), (__m64*)(p + 4));
+		cof._data[1] = _mm_loadh_pi(_mm_loadl_pi(cof._data[1], (__m64*)(p+8)), (__m64*)(p+12));
+
+		cof._data[0] = _mm_shuffle_ps(tmp, cof._data[1], 0x88);
+		cof._data[1] = _mm_shuffle_ps(cof._data[1], tmp, 0xDD);
+
+		tmp = _mm_loadh_pi(_mm_loadl_pi(tmp, (__m64*)(p+2)), (__m64*)(p+6));
+		cof._data[3] = _mm_loadh_pi(_mm_loadl_pi(tmp, (__m64*)(p+10)), (__m64*)(p+14));
+
+		cof._data[2] = _mm_shuffle_ps(tmp, cof._data[3], 0x88);
+		cof._data[3] = _mm_shuffle_ps(cof._data[3], tmp, 0xDD);
+
+		tmp = _mm_mul_ps(cof._data[2], cof._data[3]);
+		tmp = _mm_shuffle_ps(tmp, tmp, 0xB1);
+
+		_data[0] = _mm_mul_ps(cof._data[1], tmp);
+		_data[1] = _mm_mul_ps(cof._data[0], tmp);
+		
+		tmp = _mm_shuffle_ps(tmp, tmp, 0x4E);
+
+		_data[0] = _mm_sub_ps(_mm_mul_ps(cof._data[1], tmp), _data[0]);
+		_data[1] = _mm_sub_ps(_mm_mul_ps(cof._data[0], tmp), _data[1]);
+		_data[1] = _mm_shuffle_ps(_data[1], _data[1], 0x4E);
+
+		tmp = _mm_mul_ps(cof._data[1], cof._data[2]);
+		tmp = _mm_shuffle_ps(tmp, tmp, 0xB1);
+
+		_data[0] = _mm_add_ps(_mm_mul_ps(cof._data[3], tmp), _data[0]);
+		_data[3] = _mm_mul_ps(cof._data[0], tmp);
+
+		tmp = _mm_shuffle_ps(tmp, tmp, 0x4E);
+
+		_data[0] = _mm_sub_ps(_data[0], _mm_mul_ps(cof._data[3], tmp));
+		_data[3] = _mm_sub_ps(_mm_mul_ps(cof._data[0], tmp), _data[3]);
+		_data[3] = _mm_shuffle_ps(_data[3], _data[3], 0x4E);
+
+		tmp = _mm_mul_ps(_mm_shuffle_ps(cof._data[1], cof._data[1], 0x4E), cof._data[3]);
+		tmp = _mm_shuffle_ps(tmp, tmp, 0xB1);
+		cof._data[2] = _mm_shuffle_ps(cof._data[2], cof._data[2], 0x4E);
+
+		_data[0] = _mm_add_ps(_mm_mul_ps(cof._data[2], tmp), _data[0]);
+		_data[2] = _mm_mul_ps(cof._data[0], tmp);
+
+		tmp = _mm_shuffle_ps(tmp, tmp, 0x4E);
+
+		_data[0] = _mm_sub_ps(_data[0], _mm_mul_ps(cof._data[2], tmp));
+		_data[2] = _mm_sub_ps(_mm_mul_ps(cof._data[0], tmp), _data[2]);
+		_data[2] = _mm_shuffle_ps(_data[2], _data[2], 0x4E);
+
+		tmp = _mm_mul_ps(cof._data[0], cof._data[1]);
+		tmp = _mm_shuffle_ps(tmp, tmp, 0xB1);
+
+		_data[2] = _mm_add_ps(_mm_mul_ps(cof._data[3], tmp), _data[2]);
+		_data[3] = _mm_sub_ps(_mm_mul_ps(cof._data[2], tmp), _data[3]);
+
+		tmp = _mm_shuffle_ps(tmp, tmp, 0x4E);
+
+		_data[2] = _mm_sub_ps(_mm_mul_ps(cof._data[3], tmp), _data[2]);
+		_data[3] = _mm_sub_ps(_data[3], _mm_mul_ps(cof._data[2], tmp));
+
+		tmp = _mm_mul_ps(cof._data[0], cof._data[3]);
+		tmp = _mm_shuffle_ps(tmp, tmp, 0xB1);
+
+		_data[1] = _mm_sub_ps(_data[1], _mm_mul_ps(cof._data[2], tmp));
+		_data[2] = _mm_add_ps(_mm_mul_ps(cof._data[1], tmp), _data[2]);
+
+		tmp = _mm_shuffle_ps(tmp, tmp, 0x4E);
+
+		_data[1] = _mm_add_ps(_mm_mul_ps(cof._data[2], tmp), _data[1]);
+		_data[2] = _mm_sub_ps(_data[2], _mm_mul_ps(cof._data[1], tmp));
+
+		tmp = _mm_mul_ps(cof._data[0], cof._data[2]);
+		tmp = _mm_shuffle_ps(tmp, tmp, 0xB1);
+
+		_data[1] = _mm_add_ps(_mm_mul_ps(cof._data[3], tmp), _data[1]);
+		_data[3] = _mm_sub_ps(_data[3], _mm_mul_ps(cof._data[1], tmp));
+
+		tmp = _mm_shuffle_ps(tmp, tmp, 0x4E);
+
+		_data[1] = _mm_sub_ps(_data[1], _mm_mul_ps(cof._data[3], tmp));
+		_data[3] = _mm_add_ps(_mm_mul_ps(cof._data[1], tmp), _data[3]);
+
+		det = _mm_mul_ps(cof._data[0], _data[0]);
+		det = _mm_add_ps(_mm_shuffle_ps(det, det, 0x4E), det);
+		det = _mm_add_ss(_mm_shuffle_ps(det, det, 0xB1), det);
+		tmp = _mm_rcp_ss(det);
+
+		det = _mm_sub_ss(_mm_add_ss(tmp, tmp), _mm_mul_ss(det, _mm_mul_ss(tmp, tmp)));
+		det = _mm_shuffle_ps(det, det , 0x00);
+
+		_data[0] = _mm_mul_ps(det, _data[0]);
+		_data[1] = _mm_mul_ps(det, _data[1]);
+		_data[2] = _mm_mul_ps(det, _data[2]);
+		_data[3] = _mm_mul_ps(det, _data[3]);
 	}
 
 	Matrix &Matrix::operator =(const Matrix &m)
@@ -274,9 +438,21 @@ namespace Nova3D
 	const Vector3 Matrix::operator *(const Vector3 &v) const
 	{
 		/*
-		 * Consider left/right multiply as the same thing.
+		 * Call vector operator to do this.
 		 */
-		return v * (*this);
+		return v.operator*(*this);
+	}
+
+	std::ostream &operator <<(std::ostream &out, const Matrix &m)
+	{
+		out.setf(std::ios::fixed);
+		out.precision(4);
+		for(int i = 0; i < 4; i++) {
+			for(int j = 0; j < 4; j++)
+				out << m._data[i].m128_f32[j] << "\t";
+			out << std::endl;
+		}
+		return out;
 	}
 
 };

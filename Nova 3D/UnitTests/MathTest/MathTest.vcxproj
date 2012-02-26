@@ -82,9 +82,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mathtest.cc" />
+    <ClCompile Include="matrix_test.cc" />
+    <ClCompile Include="timer.cc" />
+    <ClCompile Include="vector_test.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="matrix_test.h" />
     <ClInclude Include="ray_test.h" />
+    <ClInclude Include="timer.h" />
     <ClInclude Include="vector_test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

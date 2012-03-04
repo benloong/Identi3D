@@ -1,0 +1,97 @@
+//
+// File: PluginDirect3D9.h
+// =======================
+// Direct3D 9 renderer for Corn3D.
+//
+
+#ifndef CORN3D_SRC_PLUGINS_DIRECT3D9_PLUGINDIRECT3D9_H
+#define CORN3D_SRC_PLUGINS_DIRECT3D9_PLUGINDIRECT3D9_H
+
+#include <src/plugins/direct3d9/Settings.h>
+
+#include <src/corn3d/General.h>
+#include <src/renderer/RenderDevice.h>
+#include <src/utils/OptionTree.h>
+
+#include <d3d9.h>
+
+namespace Corn3D
+{
+
+	class PluginDirect3D9 : public RenderDevice
+	{
+	private:
+		RenderTarget			*_render_target;
+		HINSTANCE				_plugin_handle;
+
+		LPDIRECT3D9				_direct3d;
+		LPDIRECT3DDEVICE9		_direct_device;
+		D3DPRESENT_PARAMETERS	_present_parameters;
+		D3DCOLOR				_clear_color;
+
+		DebugManager			*_debugger;
+		Direct3D9SettingsManager _settings;
+		
+		bool	_is_running;
+		bool	_is_scene_running;
+
+
+	private:
+		HRESULT run(void);
+		bool	checkPrerequisite(void);
+
+	public:
+
+		PluginDirect3D9(HMODULE plugin, DebugManager *debugger = NULL);
+		~PluginDirect3D9(void);
+
+		/*
+		 * Initialize the render device.
+		 */
+		HRESULT init(RenderTarget *target, OptionTree *option = NULL);
+
+		/*
+		 * Release the render device.
+		 */
+		void release(void);
+
+		/*
+		 * Is device online.
+		 */
+		bool isRunning(void);
+
+		/*
+		 * Start the rendering procedure.
+		 */
+		HRESULT startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil);
+
+		/*
+		 * End the rendering procedure.
+		 */
+		void endRendering(void);
+
+		/*
+		 * Clear screen buffer.
+		 */
+		HRESULT	clear(bool clear_pixel, bool clear_depth, bool clear_stencil);
+
+		/*
+		 * Set clear color.
+		 */
+		void setClearColor(float red, float green, float blue);
+
+		/*
+		 * Get screen width.
+		 */
+		const UINT getWidth(void) const { return _settings._screen_width; }
+
+		/*
+		 * Get screen height.
+		 */
+		const UINT getHeight(void) const { return _settings._screen_height; }
+
+	};
+
+};
+
+#endif // CORN3D_SRC_PLUGINS_DIRECT3D9_PLUGINDIRECT3D9_H

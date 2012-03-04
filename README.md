@@ -1,12 +1,13 @@
-Nova 3D
--------
+Corn3D
+------
 
-[Nova 3D](https://github.com/skies457/Nova-3D) is a simple 3D game engine
+[Corn3D](http://code.google.com/p/corn3d/) is a simple 3D game engine
 designed for Windows/DirectX platform. More information will be added later.
 
 ### Development
 
-*	Repo: [skies457/nova-3d](https://github.com/skies457/Nova-3D)
+*	Main Repo: [Hosted on Google Code](http://code.google.com/p/corn3d/)
+*	Backup Repo: [Hosted on Github](https://github.com/skies457/Corn3D)
 
 ### License
 

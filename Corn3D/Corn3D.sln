@@ -23,6 +23,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "direct3d9", "src\plugins\di
 		{8EFC94E1-C041-49B7-9AAA-6990E539EC39} = {8EFC94E1-C041-49B7-9AAA-6990E539EC39}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math", "src\math\math.vcxproj", "{1992210E-6253-4735-8E3D-CC641250B393}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math_test", "unittests\math_test\math_test.vcxproj", "{623D55D3-62A2-4F58-9877-DC0045AE0A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1992210E-6253-4735-8E3D-CC641250B393} = {1992210E-6253-4735-8E3D-CC641250B393}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{EE83817B-9F7C-4C63-9229-B371E1380DCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -49,8 +58,20 @@ Global
 		{A97EE09F-E29F-494B-BAE5-0B66265EAC94}.Debug|Win32.Build.0 = Debug|Win32
 		{A97EE09F-E29F-494B-BAE5-0B66265EAC94}.Release|Win32.ActiveCfg = Release|Win32
 		{A97EE09F-E29F-494B-BAE5-0B66265EAC94}.Release|Win32.Build.0 = Release|Win32
+		{1992210E-6253-4735-8E3D-CC641250B393}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1992210E-6253-4735-8E3D-CC641250B393}.Debug|Win32.Build.0 = Debug|Win32
+		{1992210E-6253-4735-8E3D-CC641250B393}.Release|Win32.ActiveCfg = Release|Win32
+		{1992210E-6253-4735-8E3D-CC641250B393}.Release|Win32.Build.0 = Release|Win32
+		{623D55D3-62A2-4F58-9877-DC0045AE0A66}.Debug|Win32.ActiveCfg = Debug|Win32
+		{623D55D3-62A2-4F58-9877-DC0045AE0A66}.Debug|Win32.Build.0 = Debug|Win32
+		{623D55D3-62A2-4F58-9877-DC0045AE0A66}.Release|Win32.ActiveCfg = Release|Win32
+		{623D55D3-62A2-4F58-9877-DC0045AE0A66}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CE8F88A7-2895-478E-BECC-90BC3C8A5944} = {EE83817B-9F7C-4C63-9229-B371E1380DCD}
+		{623D55D3-62A2-4F58-9877-DC0045AE0A66} = {EE83817B-9F7C-4C63-9229-B371E1380DCD}
 	EndGlobalSection
 EndGlobal

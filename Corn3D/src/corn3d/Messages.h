@@ -20,12 +20,28 @@
 // Debug Manager
 #define I_LOG_STARTED						__T("Corn3D Debugging System\nLog started.\n\n")
 
+// Settings Manager
+#define I_SETTINGS_LOAD_COMPLETED			__T("Settings load complete. Source: %s, %d/%d accepted.")
+
+// OptionTree
+#define W_OPTION_ELEMENT_ALREADY_EXISTS		__T("Element \"%s\" already exists in OptionTree. Value will be overwritten.")
+#define I_NEW_OPTION_ELEMENT_ADDED			__T("New element has been added: Name [%s], Value [%s].")
+#define I_OPTION_ELEMENT_REMOVAL_SCHEDULED	__T("Will now remove: Name [%s].")
+#define I_REMOVING_ENTIRE_OPTION_TREE		__T("Removing the entire option tree...")
+#define E_OPTION_ELEMENT_STACK_OVERFLOW		__T("Layers of location exceeded %d ; aborting...")
+#define I_OPTION_ELEMENT_LOCATION			__T("Location result: %s")
+#define I_OPTION_VALUE_MODIFIED				__T("Element \"%s\" value modified: New value = [%s].")
+
 // Renderer
 #define I_RENDERER_INITIALIZED				__T("Class Renderer initialized.")
 
 #define E_RENDER_DEVICE_CREATE_FAILURE		__T("Failed to create render device \"%s\".")
 #define E_INVALID_RENDER_PLUGIN_TYPE		__T("Invalid render plugin type: \"%d\".")
 #define E_RENDER_PLUGIN_LOAD_FAILURE		__T("Render plugin \"%s\" failed to load.")
+
+// Direct3D9 Settings Manager
+#define E_D3D9_OPTION_GROUP_CREATE_FAILED	__T("Failed to create option group \"%s\"")
+#define E_D3D9_OPTION_WRITE_FAILED			__T("Failed to write one or more options.")
 
 // Direct3D9 Render Plugin
 #define E_DIRECT3D_INIT_FAILURE				__T("Failed to initialize Direct3D. Please make sure you have installed the latest Direct3D SDK.")

@@ -8,6 +8,9 @@
 
 #Visual Studio files
 *.[Oo]bj
+*.manifest
+*.manifest.res
+*manifest.rc
 *.user
 *.aps
 *.pch
@@ -27,6 +30,7 @@
 *.sbr
 *.sdf
 *.opensdf
+*.ipch
 *.unsuccessfulbuild
 Nova\ 3D/ipch/
 obj/

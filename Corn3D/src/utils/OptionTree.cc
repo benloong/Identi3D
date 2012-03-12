@@ -4,226 +4,255 @@
 //
 
 #include <src/utils/OptionTree.h>
+#include <src/utils/DebugManager.h>
 
 namespace Corn3D
 {
 
-	HRESULT OptionTree::addElement(OptionElement *father, const TCHAR *name, OptionType type, OptionElement **dest)
+	ULONG OptionTree::hashString(const TCHAR *str)
 	{
-		if(name == NULL) return E_FAIL;
-		unsigned int length = _tcslen(name) + 1;
-		OptionElement *p;
-		
-		p = new (std::nothrow) OptionElement;
-		if(p == NULL) return E_FAIL;				// Memory insufficient.
-		p->type = type;
-		p->name = new (std::nothrow) TCHAR[length];
-		if(p->name == NULL) {						// Memory insufficient.
-			delete p;
-			return E_FAIL;
+		const ULONG seed = 13131;
+		ULONG hash = 0;
+
+		while(*str) {
+			hash = hash * seed + (*str++);
 		}
-		memcpy(p->name, name, sizeof(TCHAR) * length);
-		p->value = NULL;
+		return hash;
+	}
 
-		if(father == NULL) {
-			p->next = root;
-			if(p->next) p->next->prev = p;
-			root = p;
-			p->prev = NULL;
+	OptionElement *OptionTree::checkExistence(OptionElement *father, const TCHAR *name)
+	{
+		if(name == NULL) {
+			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+			return NULL;
+		}
+
+		ULONG hash;
+		OptionIterator iter((father == NULL) ? _root : father->child);
+
+		hash = hashString(name);
+		while(!iter.end()) {
+			if((*iter).hash == hash && _tcscmp((*iter).name, name) == 0) {
+				return iter.get();
+			}
+			++iter;
+		}
+		return NULL;
+	}
+		
+	OptionElement *OptionTree::addElement(OptionElement *father, const TCHAR *name, const TCHAR *value)
+	{
+		// Check parameters.
+		if(name == NULL || _tcslen(name) > OPTIONTREE_NAME_MAXLEN ||
+			(value != NULL && _tcslen(value) > OPTIONTREE_VALUE_MAXLEN)){
+				_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+				return NULL;
+		}
+
+		OptionElement *p;						// Temporary node.
+		
+		p = checkExistence(father, name);		// If already exists, assign the value and return.
+		if(p) {
+			_DebugPrintV(_debugger, W_OPTION_ELEMENT_ALREADY_EXISTS, name);
+			if(value) {
+				_tcscpy_s(p->value, OPTIONTREE_VALUE_MAXLEN, value);
+			} else {
+				p->value[0] = __T('\0');
+			}
+			return p;
+		}
+
+		p = new (std::nothrow) OptionElement;
+		if(p == NULL) {
+			_DebugPrint(_debugger, E_OUT_OF_MEMORY, name);
+			return NULL;
+		}
+
+		_tcscpy_s(p->name, OPTIONTREE_NAME_MAXLEN + 1, name);
+		p->hash = hashString(name);
+		p->child = NULL;
+		if(value) {
+			_tcscpy_s(p->value, OPTIONTREE_VALUE_MAXLEN + 1, value);
+		} else {
+			p->value[0] = __T('\0');
+		}
+
+		// Attach child node to father.
+		if(father == NULL) {					// Null father specify the root node.
+			p->next = _root;
+			_root = p;
 			p->father = NULL;
-		} else if(father->type == OptionType_Group) {
-			p->next = static_cast<OptionElement *>(father->value);
-			if(p->next) p->next->prev = p;
-			father->value = static_cast<void *>(p);
+		} else {
+			p->next = father->child;
+			father->child = p;
 			p->father = father;
-			p->prev = NULL;
-		} else return E_FAIL;
+		}
 
-		if(dest != NULL) *dest = p;
-		return S_OK;
+		_DebugPrintV(_debugger, I_NEW_OPTION_ELEMENT_ADDED, p->name, p->value);
+		return p;
+	}
+	
+	OptionElement *OptionTree::addElement(const TCHAR *location, const TCHAR *value)
+	{
+		if(location == NULL) {
+			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+			return NULL;
+		}
+		OptionElement *dest, *p;
+		TCHAR tmploc[OPTIONTREE_LOCATION_MAXLEN + 1];
+		int s, t, len;
+		bool need_create = false;
+		
+		_tcsncpy_s(tmploc, location, OPTIONTREE_LOCATION_MAXLEN);
+		len = _tcslen(tmploc);
+		dest = NULL;
+		s = 0;
+		
+		for(t = 0; t < len; t++) {
+			if(tmploc[t] == __T('.')) {
+				tmploc[t] = __T('\0');
+				if(need_create) {
+					addElement(dest, tmploc + s, __T(""));
+				} else {
+					p = checkExistence(dest, tmploc + s);
+					if(p == NULL) {
+						dest = addElement(dest, tmploc + s, __T(""));
+						need_create = true;
+					} else {
+						dest = p;
+					}
+				}
+				s = t + 1;
+			}
+		}
+		return addElement(dest, tmploc + s, value);
 	}
 
 	void OptionTree::removeElement(OptionElement *elem)
 	{
-		if(elem->type == OptionType_Group && elem->value != NULL) {
-			removeElement(static_cast<OptionElement *>(elem->value));
+		if(elem == NULL) {
+			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+			return ;
 		}
-		if(elem->father && elem->father->value == static_cast<void *>(elem)) {
-			elem->father->value = static_cast<void *>(elem->next);
-		}
-		if(elem->prev) elem->prev->next = elem->next;
-		if(elem->next) elem->next->prev = elem->prev;
 		
-		switch(elem->type)
-		{
-		case OptionType_String:
-			delete[] static_cast<TCHAR *>(elem->value);
-			break;
-		case OptionType_Bool:
-			delete static_cast<bool *>(elem->value);
-			break;
-		case OptionType_Int:
-			delete static_cast<int *>(elem->value);
-			break;
-		}
-		delete[] elem->name;
+		_DebugPrintV(_debugger, I_OPTION_ELEMENT_REMOVAL_SCHEDULED, elem->name);
 
-		elem->name = NULL;
-		elem->value = NULL;
+		if(elem->child) {		// Remove children.
+			OptionIterator iter(elem->child);
+			while(!iter.end()) removeElement((iter++).get());
+		}
+
+		if(elem->father && elem->father->child == elem) {		// Delete the first node in a layer.
+			elem->father->child = elem->next;
+		}
 		delete elem;
 	}
-
+	
 	void OptionTree::clean(void)
 	{
-		OptionElement *t = root;
+		OptionIterator iter = getRootIterator();
 
-		while(t->next) {
-			t = t->next;
-			removeElement(t->prev);
-		}
-		removeElement(t);
+		_DebugPrintV(_debugger, I_REMOVING_ENTIRE_OPTION_TREE);
+		while(!iter.end()) removeElement((iter++).get());
+		_root = NULL;
 	}
-
-	HRESULT OptionTree::getElementLocation(OptionElement *src, TCHAR *location, UINT buffer_size)
+	
+	HRESULT OptionTree::getLocation(OptionElement *elem, TCHAR *location, UINT buffer_size)
 	{
-		if(location == NULL || src == NULL) return E_FAIL;
-		OptionElement *stack[10], *p;	// Trace up to 10 layers.
-		unsigned int i = 0, k = 0;
-		int s = 0;
-
-		stack[s++] = p = src;
-		while(p->father && s < 10) {
-			p = p->father;
-			stack[s++] = p;
-		}
-		if(s == 10) return E_FAIL;		// Buffer overflow.
-		s--;
-
-		while(i < buffer_size - 1 && s >= 0) {
-			if(stack[s]->name[k] != '\0') {
-				*(location + (i++)) = stack[s]->name[k++];
-			} else {
-				if((--s) >= 0) *(location + (i++)) = __T('.');
-				k = 0;
-			}
-		}
-		if(s >= 0) return E_FAIL;		// Buffer size not enough.
-		*(location + i) = '\0';
-
-		return S_OK;
-	}
-
-	HRESULT OptionTree::getSpecifiedElement(const TCHAR *location, OptionElement **dest)
-	{
-		if(location == NULL || dest == NULL) return E_FAIL;
-
-		OptionElement *p, *parent;
-		TCHAR tmp[256];
-		HRESULT hr;
-		unsigned int i, s, length;
-
-		length = _tcslen(location);
-		p = root;
-		parent = NULL;
-		for(i = 0, s = 0; i < length; i++) {
-			if(*(location + i) == __T('.')) {							// Discover a group and expand it.
-				while(p) {
-					if(_tcsncmp(location + s, p->name, i - s) == 0) {	// If group exists.
-						if(p->type != OptionType_Group) return E_FAIL;	// Type not match.
-
-						// Sort tree to the most visited order.
-						if(parent == NULL && root != p) {
-							p->next = root;
-							if(root) root->prev = p;
-							root = p;
-						} else if(parent != NULL && parent->value != (void *)p) {
-							if(p->prev) p->prev->next = p->next;
-							if(p->next) p->next->prev = p->prev;
-							p->prev = NULL;
-							p->next = (OptionElement *)parent->value;
-							parent->value = (void *)p;
-						}
-
-						parent = p;
-						p = (OptionElement *)(p->value);
-						break;
-					} else {
-						p = p->next;
-					}
-				}
-				if(p == NULL) {
-					if(i - s > 255) return E_FAIL;
-					_tcsncpy_s(tmp, location + s, i - s);
-					hr = addElement(parent, tmp, OptionType_Group, &p);
-					if(FAILED(hr)) return E_FAIL;
-					parent = p;
-					p = (OptionElement *)(p->value);
-				}
-				s = i + 1;
-			}
-		}
-
-		while(p) {
-			if(_tcsncmp(location + s, p->name, i - s) == 0) {
-				*dest = p;
-				break;
-			} else {
-				p = p->next;
-			}
-		}
-
-		if(p) return S_OK;
-		return E_FAIL;
-	}
-
-	HRESULT OptionTree::setKey(const TCHAR *location, const TCHAR *value)
-	{
-		OptionElement *elem;
-		unsigned int length;
-
-		if(value == NULL || FAILED(getSpecifiedElement(location, &elem))) return E_FAIL;
-		length = _tcslen(value) + 1;
-		switch(elem->type)
-		{
-		case OptionType_String:
-			if(elem->value != NULL) delete[] static_cast<TCHAR *>(elem->value);
-			elem->value = new (std::nothrow) TCHAR[length];
-			if(elem->value == NULL) return E_FAIL;			// Memory insufficient.
-			memcpy(elem->value, value, length * sizeof(TCHAR));
-			break;
-		case OptionType_Bool:
-			elem->value = new (std::nothrow) bool;
-			if(elem->value == NULL) return E_FAIL;			// Memory insufficient.
-			if(length >= 5 && _totlower(value[0]) == __T('t') && _totlower(value[1]) == __T('r') && 
-				_totlower(value[2]) == __T('u') && _totlower(value[3]) == __T('e')) {
-					*((bool *)elem->value) = true;
-			} else if(length >= 6 && _totlower(value[0]) == __T('f') && _totlower(value[1]) == __T('a') && 
-				_totlower(value[2]) == __T('l') && _totlower(value[3]) == __T('s') && _totlower(value[4]) == __T('e')) {
-					*((bool *)elem->value) = false;
-			} else {
-				elem->value = false;
-				return S_FALSE;
-			}
-			break;
-		case OptionType_Int:
-			elem->value = new (std::nothrow) int;
-			if(elem->value == NULL) return E_FAIL;			// Memory insufficient.
-			*((int *)elem->value) = _tstoi(value);
-			break;
-		default:
+		if(elem == NULL || location == NULL) {
+			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
 			return E_FAIL;
 		}
 
-		return S_OK;
+		int i, length, k;
+		OptionElement *stack[OPTIONTREE_MAX_DEPTH];
+
+		stack[0] = elem;
+		for(i = 1; i < OPTIONTREE_MAX_DEPTH; i++) {
+			if(stack[i - 1]->father) stack[i] = stack[i - 1]->father;
+			else break;
+		}
+		if(i >= OPTIONTREE_MAX_DEPTH) {
+			_DebugPrint(_debugger, E_OPTION_ELEMENT_STACK_OVERFLOW, OPTIONTREE_MAX_DEPTH);
+			return E_FAIL;			// Too many layers: Stack overflow.
+		}
+
+		length = 0;
+		*location = __T('\0');
+		for(--i; i >= 0; i--) {
+			k = _tcslen(stack[i]->name);
+			if(length + k + 1 > (int)buffer_size) break;
+			length += k;
+			_tcscat_s(location, buffer_size, stack[i]->name);
+			*(location + length++) = __T('.');
+			*(location + length) = __T('\0');
+		}
+		if(i >= 0) {
+			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+			return E_FAIL;		// Space not enough.
+		}
+		
+		*(location + length - 1) = __T('\0');
+		_DebugPrintV(_debugger, I_OPTION_ELEMENT_LOCATION, location);
+		return S_OK;			
 	}
 
-	HRESULT OptionTree::getKey(const TCHAR *location, OptionType expected_type, void **value)
+	OptionElement *OptionTree::getElement(const TCHAR *location)
+	{
+		if(location == NULL) {
+			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+			return NULL;
+		}
+
+		OptionElement *dest;
+		TCHAR tmploc[OPTIONTREE_LOCATION_MAXLEN + 1];
+		int s, t, len;
+
+		_tcsncpy_s(tmploc, location, OPTIONTREE_LOCATION_MAXLEN);
+		len = _tcslen(tmploc);
+		dest = NULL;
+		s = 0;
+
+		for(t = 0; t < len; t++) {
+			if(tmploc[t] == __T('.')) {
+				tmploc[t] = __T('\0');
+				dest = checkExistence(dest, tmploc + s);
+				if(dest == NULL) return NULL;
+				s = t + 1;
+			}
+		}
+
+		dest = checkExistence(dest, tmploc + s);
+		return dest;
+	}
+	
+	HRESULT OptionTree::setValue(const TCHAR *location, const TCHAR *value)
 	{
 		OptionElement *elem;
 
-		if(value == NULL || FAILED(getSpecifiedElement(location, &elem))) return E_FAIL;
-		if(elem->type != expected_type) return E_FAIL;
-		*value = elem->value;
+		elem = getElement(location);
+		if(elem == NULL || 
+			value == NULL || _tcslen(value) > OPTIONTREE_VALUE_MAXLEN) {
+				_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+				return E_FAIL;
+		}
+		_tcscpy_s(elem->value, value);
+		_DebugPrintV(_debugger, I_OPTION_VALUE_MODIFIED, elem->name, value);
+		return S_OK;
+	}
+
+	HRESULT OptionTree::getValue(const TCHAR *location, TCHAR *value, UINT buffer_size)
+	{
+		OptionElement *elem;
+		
+		elem = getElement(location);
+		if(elem == NULL ||
+			value == NULL || buffer_size < _tcslen(elem->value)) {
+				_DebugPrint(_debugger, E_INVALID_PARAMETERS);
+				return E_FAIL;
+		}
+
+		_tcscpy_s(value, buffer_size, elem->value);
 		return S_OK;
 	}
 

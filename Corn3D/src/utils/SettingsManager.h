@@ -15,17 +15,35 @@ namespace Corn3D
 	class __declspec(dllexport) SettingsManager
 	{
 	private:
-		OptionTree *tree;
+		OptionTree *_tree;
+		DebugManager *_debugger;
+
+	private:
+		void saveOptionElement(OptionElement *elem, FILE *fp);
 
 	public:
-
-		SettingsManager(void);
+		SettingsManager(void) : _tree(NULL), _debugger(NULL) {} ;
 		~SettingsManager(void);
 
+		/*
+		 * Load configuration from file.
+		 */
 		HRESULT load(const TCHAR *filename);
+
+		/*
+		 * Write configuration to file.
+		 */
 		HRESULT save(const TCHAR *filename);
 
-		OptionTree *getOptionTree(void) const { return tree; }
+		/*
+		 * Get the handle of global OptionTree.
+		 */
+		OptionTree *getOptionTree(void) { return _tree; }
+
+		/*
+		 * Set a debug manager.
+		 */
+		void setDebugManager(DebugManager *new_debugger = NULL);
 	};
 
 };

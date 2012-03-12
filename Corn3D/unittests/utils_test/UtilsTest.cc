@@ -8,13 +8,11 @@
 #include <src/utils/CPU.h>
 #include <src/utils/DebugManager.h>
 #include <src/utils/OptionTree.h>
+#include <src/utils/SettingsManager.h>
 using namespace Corn3D;
 
 #include <iostream>
 using namespace std;
-
-void recursive_print_optiontree(OptionElement *root, int tab = 0);
-const TCHAR *optiontype_to_string(OptionType type);
 
 int main()
 {
@@ -37,21 +35,29 @@ int main()
 	delete cinfo;
 
 	OptionTree *option = new OptionTree();
+	option->setDebugManager(dbgmgr);
+
 	OptionElement *graphics, *directx, *opengl, *spec;
 
-	option->addElement(NULL, __T("Graphics"), OptionType_Group, &graphics);
-	option->addElement(graphics, __T("DirectX"), OptionType_Group, &directx);
-	option->addElement(directx, __T("bool_item1"), OptionType_Bool);
-	option->addElement(directx, __T("int_item2"), OptionType_Int, &spec);
-	option->addElement(directx, __T("string_item3"), OptionType_String);
-	option->addElement(graphics, __T("OpenGL"), OptionType_Group, &opengl);
-	option->addElement(opengl, __T("just_another_bool"), OptionType_Bool);
-	option->addElement(opengl, __T("just_another_string"), OptionType_String);
+	graphics = option->addElement(NULL, __T("Graphics"), OPTIONELEMENT_GROUPVALUE);
+	if(graphics) {
+		directx = option->addElement(graphics, __T("DirectX"), OPTIONELEMENT_GROUPVALUE);
+		if(directx) {
+			option->addElement(directx, __T("item1"), __T("true"));
+			option->addElement(directx, __T("item2"), __T("123"));
+			option->addElement(directx, __T("item3"), __T("string"));
+		}
+		opengl = option->addElement(graphics, __T("OpenGL"), OPTIONELEMENT_GROUPVALUE);
+		if(opengl) {
+			option->addElement(opengl, __T("item1"), __T("fuckin hell"));
+			spec = option->addElement(opengl, __T("item2"), __T("awesome"));
+		}
+	}
 
-	TCHAR location[256], *value;
+	TCHAR location[256], value[256];
 	HRESULT hr;
 	
-	hr = option->getElementLocation(spec, location, 256);
+	hr = option->getLocation(spec, location, 256);
 	if(FAILED(hr)) {
 		cout << "OptionTree: Failed to get element location." << endl;
 	} else {
@@ -59,58 +65,29 @@ int main()
 		_putts(location);
 	}
 
-	hr = option->setKey(__T("Graphics.DirectX.bool_item1"), __T("TRUE"));
-	hr |= option->setKey(__T("Graphics.OpenGL.just_another_string"), __T("string_value_here"));
-	hr |= option->setKey(__T("Graphics.DirectX.int_item2"), __T("123"));
+	hr = option->setValue(__T("Graphics.OpenGL.item2"), __T("string_value_here"));
 	if(FAILED(hr)) {
 		cout << "OptionTree: Failed to set keys." << endl;
 	}
 	
-	hr = option->getKey(__T("Graphics.OpenGL.just_another_string"), OptionType_String, (void **)&value);
+	hr = option->getValue(__T("Graphics.OpenGL.item1"), value, 256);
 	if(FAILED(hr)) {
 		cout << "OptionTree: Failed to get keys." << endl;
 	} else {
 		_putts(value);
 	}
 
-	recursive_print_optiontree(graphics);
 	delete option;
+
+	SettingsManager *conf = new SettingsManager();
+	conf->setDebugManager(dbgmgr);
+	conf->load(__T("default.conf"));
+	conf->save(__T("secondary.conf"));
+	delete conf;
 
 	_DebugPrint(dbgmgr, __T("Bye."));
 
 	system("pause");
 	delete dbgmgr;
 	return 0;
-}
-
-void recursive_print_optiontree(OptionElement *root, int tab)
-{
-	OptionElement *p = root;
-	
-	while(p->prev) p = p->prev;
-	while(p) {
-		for(int i = 0; i < tab; i++) _tprintf(__T("\t"));
-		_tprintf(__T("%s"), p->name);
-		if(p->type == OptionType_Group && p->value != NULL) {
-			puts(" [GROUP]");
-			recursive_print_optiontree((OptionElement *)p->value, tab + 1);
-		} else {
-			switch(p->type)
-			{
-			case OptionType_Bool:
-				if(p->value == NULL) _tprintf(__T(" [BOOL] : empty\n"));
-				else _tprintf(__T(" [BOOL] : %s\n"), (*((bool *)p->value)) ? __T("true") : __T("false"));
-				break;
-			case OptionType_String:
-				if(p->value == NULL) _tprintf(__T(" [STRING] : empty\n"));
-				else _tprintf(__T(" [STRING] : %s\n"), (TCHAR *)p->value);
-				break;
-			case OptionType_Int:
-				if(p->value == NULL) _tprintf(__T(" [INT] : empty\n"));
-				else _tprintf(__T(" [INT] : %d\n"), *((int *)p->value));
-				break;
-			}
-		}
-		p = p->next;
-	}
 }

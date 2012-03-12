@@ -73,12 +73,11 @@ namespace Corn3D
 	
 	enum CpuVendor;
 	enum DebugFlag;
-	enum OptionType;
 
 	enum RenderBackendType;
 
 	// Structures
-	struct tagOptionElement;
+	struct OptionElement;
 
 	// Classes
 	class Color;
@@ -104,6 +103,7 @@ namespace Corn3D
 	class CpuInfo;
 	class DebugManager;
 	class OptionTree;
+	class SettingsManager;
 
 };
 

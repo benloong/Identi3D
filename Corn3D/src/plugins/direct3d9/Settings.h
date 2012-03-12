@@ -14,6 +14,13 @@ namespace Corn3D
 	
 	class Direct3D9SettingsManager
 	{
+	private:
+		DebugManager *_debugger;
+
+	private:
+		bool convStringToBool(const TCHAR *str);
+		const TCHAR *convBoolToString(bool value);
+
 	public:
 		bool _is_windowed;
 		bool _is_hardware_accelerated;
@@ -24,8 +31,8 @@ namespace Corn3D
 		UINT _color_depth;
 
 	public:
-
-		Direct3D9SettingsManager(void) { reset(); }
+		
+		Direct3D9SettingsManager(void);
 		~Direct3D9SettingsManager(void) {} ;
 
 		/*
@@ -42,6 +49,11 @@ namespace Corn3D
 		 * Write configuration to OptionTree.
 		 */
 		HRESULT write(OptionTree *tree);
+
+		/*
+		 * Set a debug manager.
+		 */
+		void setDebugManager(DebugManager *new_debugger = NULL) { _debugger = new_debugger; }
 	};
 
 };

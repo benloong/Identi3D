@@ -1,21 +1,24 @@
-Corn3D
+Identi3D
 ------
 
-[Corn3D](http://code.google.com/p/corn3d/) is a simple 3D game engine
-designed for Windows/DirectX platform. More information will be added later.
+[Identi3D](https://github.com/skies457/Identi3D) is a 3D engine designed for Windows(R)/DirectX(R) platform.
+Intended for both simplicity and flexibility, Identi3D provides a set of APIs with which you can easily create your own 3D games.
+Currently the project is under development and no release version is available yet. 
 
 ### Development
 
-*	Main Repo: [Hosted on Google Code](http://code.google.com/p/corn3d/)
-*	Backup Repo: [Hosted on Github](https://github.com/skies457/Corn3D)
+*	Repository: Hosted on [Github](https://github.com/skies457/Identi3D)
+*	Collaborators are welcomed. Please contact me via email address below.
 
 ### License
 
-Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
+Unless otherwise specified, all source code, as well as materials and other stuffs, is licensed under GPLv3 license. 
+Refer to LICENSE file for more details.
 
 ### Contact us
 
-Please feel free to submit a bug using GitHub bug tracker if you found one.
-Also if you have any question, please send a email to: mystery.wd#gmail.com
+Feel free to fill a bug tracker on [Github](https://github.com/skies457/Identi3D/issues).
+If you have any question, please send a email to mystery.wd#gmail.com.
 
 Copyleft (c) Sparkfire, 2011 - 2012.
+Some rights reserved.

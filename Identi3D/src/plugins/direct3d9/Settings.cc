@@ -57,7 +57,7 @@ namespace Identi3D
 			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
 			return E_FAIL;
 		}
-		OptionIterator iter(tree->getElement(__T("Graphics")));
+		OptionIterator iter(tree->getElement(__T("Graphics"))->child);
 
 		while(!iter.end()) {
 			for(int i = 0; i < max_hash_item; i++) {

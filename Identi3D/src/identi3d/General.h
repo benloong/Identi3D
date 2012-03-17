@@ -81,6 +81,7 @@ namespace Identi3D
 
 	// Classes
 	class Color;
+	class System;
 
 	class Angle;
 	class AxisAlignedBoundingBox;

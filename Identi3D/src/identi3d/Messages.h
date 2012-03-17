@@ -17,6 +17,18 @@
 #define E_INVALID_PARAMETERS				__T("Invalid parameters.")
 #define E_FILE_OPEN_FAILURE					__T("Unable to open \'%s\'.")
 
+// System
+#define E_SYSTEM_INITIALIZED				__T("System has already initialized.")
+#define I_SYSTEM_LOAD_CONFIGURATION			__T("Loading configuration from %s...")
+#define I_SYSTEM_CONFIGURATION_LOAD_SUCCESS __T("Configuration load completed.")
+#define E_SYSTEM_CONFIGURATION_LOAD_FAIL	__T("Failed to load configuration.")
+#define I_SYSTEM_CREATE_SUCCESS				__T("System has been initialized successfully.")
+#define I_SYSTEM_RELEASE_SCHEDULED			__T("System is going to be released.")
+#define E_SYSTEM_NO_RENDERER_AVAILABLE		__T("No available renderer.")
+#define E_SYSTEM_NO_DEVICE_AVAILABLE		__T("No available render device.")
+#define E_SYSTEM_ASSIGN_FAIL				__T("Failed to assign render target.")
+#define E_SYSTEM_ASSIGN_SUCCESS				__T("Successfully assigned render target.")
+
 // Debug Manager
 #define I_LOG_STARTED						__T("Identi3D Debugging System\nLog started.\n\n")
 

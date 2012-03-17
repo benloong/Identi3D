@@ -29,16 +29,19 @@ namespace Identi3D
 
 	class Renderer
 	{
-	private:
-		RenderDevice	*render_device;
-		HMODULE			plugin_handle;
-		DebugManager	*debugger;
+		friend class System;
 
-	public:
-		
-		Renderer(void) : render_device(NULL), plugin_handle(NULL), debugger(NULL) {} ;
+	private:
+		RenderDevice	*_render_device;
+		HMODULE			_plugin_handle;
+		DebugManager	*_debugger;
+
+	private:
+		Renderer(DebugManager *debugger) : _render_device(NULL), _plugin_handle(NULL), _debugger(debugger) {} ;
+		Renderer(Renderer &r);
 		~Renderer(void) { releaseDevice(); }
 
+	public:
 		/*
 		 * Create a render device.
 		 */
@@ -52,17 +55,13 @@ namespace Identi3D
 		/*
 		 * Get current render device.
 		 */
-		RenderDevice *getDevice(void) { return render_device; }
+		RenderDevice *getDevice(void) { return _render_device; }
 		
 		/*
 		 * Get the handle of plugin file.
 		 */
-		HMODULE getPluginsHandle(void) { return plugin_handle; }
+		HMODULE getPluginsHandle(void) { return _plugin_handle; }
 
-		/*
-		 * Set DebugManager handle.
-		 */
-		void setDebugManager(DebugManager *new_debugger = NULL) { debugger = new_debugger; }
 	};
 
 };

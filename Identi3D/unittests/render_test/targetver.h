@@ -1,0 +1,11 @@
+//
+// File: targetver.h
+// =================
+//
+
+#ifndef IDENTI3D_UNITTESTS_RENDERTEST_TARGETVER_H
+#define IDENTI3D_UNITTESTS_RENDERTEST_TARGETVER_H
+
+#include <SDKDDKVer.h>
+
+#endif // IDENTI3D_UNITTESTS_RENDERTEST_TARGETVER_H

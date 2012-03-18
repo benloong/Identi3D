@@ -16,6 +16,7 @@ namespace Identi3D
 	class __declspec(dllexport) Matrix
 	{
 		friend class Vector3;
+		friend class Ray;
 
 	public:
 

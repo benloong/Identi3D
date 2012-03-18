@@ -98,6 +98,11 @@ namespace Identi3D
 		return (_x * vec._x + _y * vec._y + _z * vec._z);
 	}
 	
+	Vector3 operator *(float f, const Vector3 &vec)
+	{
+		return vec * f;
+	}
+
 	std::ostream &operator <<(std::ostream &out, const Vector3 &vec)
 	{
 		out << "(" << vec._x << ", " << vec._y << ", " << vec._z << ")";

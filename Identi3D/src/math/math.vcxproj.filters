@@ -53,5 +53,14 @@
     <ClCompile Include="Vector.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AABB.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OBB.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -13,6 +13,14 @@
 namespace Identi3D
 {
 
+	template <typename T>
+	void swap(T &a, T &b)
+	{
+		T s = a;
+		a = b;
+		b = a;
+	}
+
 	Ray::Ray(const Vector3 &origin, const Vector3 &direction)
 	{ 
 		set(origin, direction);
@@ -92,7 +100,7 @@ namespace Identi3D
 	{
 		float f = p._normal * _direction;
 		if(f > -_DEFAULT_EPSILON && (f < _DEFAULT_EPSILON || cull_backside)) return false;
-		float t = (-(p._normal * _origin) + p._distance) / f;
+		float t = (-(p._normal * _origin) + p._dist) / f;
 		if(t < 0.0f) return false;
 
 		if(distance) *distance = t;
@@ -121,34 +129,52 @@ namespace Identi3D
 		if(tzmax < tmax) tmax = tymax;
 
 		if(tmax < 0) return false;
-		if(hit) {
-			if(tmin < 0) {
-				*hit = _origin;
-			} else {
-				*hit = _origin + _direction * tmin;
-			}
+		if(tmin > 0) {
+			if(hit) *hit = _origin + _direction * tmin;
+			if(distance) *distance = tmin;
+			return true;
 		}
-		if(distance) *distance = (tmin > 0) ? tmin : 0;
+		if(hit) *hit = _origin + _direction * tmax;
+		if(distance) *distance = tmax;
 		return true;
 	}
 
-	//bool Ray::intersect(const OrientedBoundingBox &obb, float *distance, Vector3 *hit) const
-	//{
-	//	Vector3 d = obb._center - _origin;
-	//	int parallel = 0;
-	//	float a[3], b[3], k, inv, tmin, tmax;
-	//	bool found = false;
+	bool Ray::intersect(const OrientedBoundingBox &obb, float *distance, Vector3 *hit) const
+	{
+		Vector3 p = obb._center - _origin;
+		float a, b, tmin, tmax, t1, t2;
 
-	//	for(int i = 0; i < 3; i++) {
-	//		a[i] = obb._axis[i] * _direction;
-	//		b[i] = d * _direction;
+		tmin = -99999.9f;
+		tmax = 99999.9f;
+		for(int i = 0; i < 3; i++) {
+			a = obb._axis[i] * p;
+			b = obb._axis[i] * _direction;
 
-	//		if(_fzero(a)) {
-	//			parallel |= 1 << i;
-	//		} else {
-	//			k = (a > 0.0f) ? obb._extent[i] : -obb._extent[i];
-	//			inv = 1.0f / a;
+			if(_fzero(b)) {
+				if((-a - obb._extent[i]) > 0.0f ||
+					(-a + obb._extent[i]) < 0.0f) {
+						return false;
+				}
+			} else {
+				t1 = (a - obb._extent[i]) / b;
+				t2 = (a + obb._extent[i]) / b;
 
-	//			if(!found) {
-	//				b - 
+				if(t1 > t2) swap<float>(t1, t2);
+				if(t1 > tmin) tmin = t1;
+				if(t2 < tmax) tmax = t2;
+				if(tmin > tmax) return false;
+				if(tmax < 0.0f) return false;
+			}
+		}
+		if(tmin > 0.0f)
+		{
+			if(distance) *distance = tmin;
+			if(hit) *hit = _origin + _direction * tmin;
+			return true;
+		}
+		if(distance) *distance = tmax;
+		if(hit) *hit = _origin + _direction * tmax;
+		return true;
+	}
+
 };

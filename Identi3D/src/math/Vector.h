@@ -16,6 +16,9 @@ namespace Identi3D
 	class __declspec(dllexport) Vector3
 	{
 		friend class Matrix;
+		friend class Ray;
+		friend class Plane;
+		friend class AxisAlignedBoundingBox;
 
 	public:
 		Vector3(void) : 
@@ -59,6 +62,7 @@ namespace Identi3D
 		const Vector3 operator *(const Matrix &m) const;
 		float operator *(const Vector3 &vec) const;
 
+		friend Vector3 __declspec(dllexport) operator *(float f, const Vector3 &vec);
 		friend std::ostream __declspec(dllexport) &operator <<(std::ostream &out, const Vector3 &vec);
 
 		/*

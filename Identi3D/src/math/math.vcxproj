@@ -92,7 +92,10 @@
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AABB.cc" />
     <ClCompile Include="Matrix.cc" />
+    <ClCompile Include="OBB.cc" />
+    <ClCompile Include="Plane.cc" />
     <ClCompile Include="Ray.cc" />
     <ClCompile Include="Vector.cc" />
   </ItemGroup>

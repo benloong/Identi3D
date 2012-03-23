@@ -5,7 +5,7 @@
 
 #include <src/plugins/direct3d9/PluginDirect3D9.h>
 
-#include <src/renderer/RenderTarget.h>
+#include <src/renderer/RenderWindow.h>
 #include <src/utils/DebugManager.h>
 #include <src/utils/OptionTree.h>
 
@@ -32,7 +32,7 @@ namespace Identi3D
 		release();
 	}
 
-	HRESULT PluginDirect3D9::init(RenderTarget *target, OptionTree *option)
+	HRESULT PluginDirect3D9::init(RenderWindow *target, OptionTree *option)
 	{
 		_settings.read(option);
 

@@ -24,10 +24,20 @@ namespace Identi3D
 		SystemFlag_ForceDword			= 0xFFFFFFFF
 	};
 
+	enum SystemState
+	{
+		SystemState_NotInitialized		= 0,
+		SystemState_Idle				= 1,
+		SystemState_Listening			= 2,
+
+		SystemState_ForceInt			= 0xFFFF
+	};
+
 	class System : public Singleton<System>
 	{
 	protected:
 		bool _isload;
+		SystemState _state;
 
 		DebugManager *_debugger;
 		SettingsManager *_confmgr;
@@ -58,15 +68,6 @@ namespace Identi3D
 		HRESULT release(bool save_config = true);
 
 		/*
-		 * Assign a render target for the render device.
-		 * Acceptable Flag: 
-		 *		SystemFlag_DisableDebugManager
-		 *		SystemFlag_CreateRenderer
-		 *		SystemFlag_CreateDefaultDevice
-		 */
-		HRESULT assignRenderWindow(RenderWindow *window, DWORD flag = NULL, const TCHAR *window_title = __T("Identi3D"));
-
-		/*
 		 * Create a renderer.
 		 * Acceptable Flag:
 		 *		SystemFlag_DisableDebugManager
@@ -78,6 +79,11 @@ namespace Identi3D
 		 * Release the allocated renderer.
 		 */
 		void releaseRenderer(void);
+		
+		/*
+		 * Start event listening.
+		 */
+		int		start(void);
 
 		/*
 		 * Get Renderer handle.
@@ -88,6 +94,12 @@ namespace Identi3D
 		 * Get DebugManager handle.
 		 */
 		DebugManager *getDebugManager(void) const { return _debugger; }
+
+		/*
+		 * Get system state.
+		 */
+		SystemState getState(void);
+
 	};
 
 };

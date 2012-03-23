@@ -21,7 +21,7 @@ namespace Identi3D
 	class PluginDirect3D9 : public RenderDevice
 	{
 	private:
-		RenderTarget			*_render_target;
+		RenderWindow			*_render_target;
 		HINSTANCE				_plugin_handle;
 
 		LPDIRECT3D9				_direct3d;
@@ -48,7 +48,7 @@ namespace Identi3D
 		/*
 		 * Initialize the render device.
 		 */
-		HRESULT init(RenderTarget *target, OptionTree *option = NULL);
+		HRESULT init(RenderWindow *target, OptionTree *option = NULL);
 
 		/*
 		 * Release the render device.

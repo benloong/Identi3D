@@ -24,7 +24,6 @@
 
 #include <src/renderer/Renderer.h>
 #include <src/renderer/RenderDevice.h>
-#include <src/renderer/RenderTarget.h>
 #include <src/renderer/RenderWindow.h>
 
 #include <src/utils/CPU.h>

@@ -75,6 +75,8 @@ namespace Identi3D
 	enum DebugFlag;
 
 	enum RenderBackendType;
+	enum SystemFlag;
+	enum SystemState;
 
 	// Structures
 	struct OptionElement;
@@ -95,7 +97,7 @@ namespace Identi3D
 
 	class RenderDevice;
 	class Renderer;
-	class RenderTarget;
+	class RenderWindow;
 	class RenderWindow;
 
 	class Direct3D9SettingsManager;

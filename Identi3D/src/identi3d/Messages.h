@@ -25,9 +25,6 @@
 #define I_SYSTEM_CREATE_SUCCESS				__T("System has been initialized successfully.")
 #define I_SYSTEM_RELEASE_SCHEDULED			__T("System is going to be released.")
 #define E_SYSTEM_NO_RENDERER_AVAILABLE		__T("No available renderer.")
-#define E_SYSTEM_NO_DEVICE_AVAILABLE		__T("No available render device.")
-#define E_SYSTEM_ASSIGN_FAIL				__T("Failed to assign render target.")
-#define E_SYSTEM_ASSIGN_SUCCESS				__T("Successfully assigned render target.")
 
 // Debug Manager
 #define I_LOG_STARTED						__T("Identi3D Debugging System\nLog started.\n\n")
@@ -46,8 +43,10 @@
 
 // Renderer
 #define I_RENDERER_INITIALIZED				__T("Class Renderer initialized.")
-
+#define E_RENDER_WINDOW_ASSIGN_FAIL			__T("Failed to assign render target.")
+#define E_RENDER_WINDOW_ASSIGN_SUCCESS		__T("Successfully assigned render target.")
 #define E_RENDER_DEVICE_CREATE_FAILURE		__T("Failed to create render device \"%s\".")
+#define E_NO_RENDER_DEVICE_AVAILABLE		__T("No available render device.")
 #define E_INVALID_RENDER_PLUGIN_TYPE		__T("Invalid render plugin type: \"%d\".")
 #define E_RENDER_PLUGIN_LOAD_FAILURE		__T("Render plugin \"%s\" failed to load.")
 

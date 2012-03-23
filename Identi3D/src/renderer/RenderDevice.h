@@ -20,7 +20,7 @@ namespace Identi3D
 		/*
 		 * Initialize specified device.
 		 */
-		virtual HRESULT init(RenderTarget *target, OptionTree *option = NULL) = 0;
+		virtual HRESULT init(RenderWindow *target, OptionTree *option = NULL) = 0;
 
 		/*
 		 * Release specified device.

@@ -9,12 +9,11 @@
 
 #include <src/identi3d/General.h>
 #include <src/identi3d/Basetypes.h>
-#include <src/renderer/RenderTarget.h>
 
 namespace Identi3D
 {
 
-	class RenderWindow : public RenderTarget
+	class RenderWindow
 	{
 	private:
 		HWND			window;
@@ -58,11 +57,6 @@ namespace Identi3D
 		 * Release the window and clean up.
 		 */
 		HRESULT release();
-
-		/*
-		 * Occupy the thread and listen Windows messages.
-		 */
-		int		start(void);
 
 		/*
 		 * Message processor.

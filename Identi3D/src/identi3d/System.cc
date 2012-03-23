@@ -105,63 +105,6 @@ namespace Identi3D
 		return S_OK;
 	}
 
-	HRESULT System::assignRenderWindow(RenderWindow *window, DWORD flag, const TCHAR *window_title)
-	{
-		HRESULT hr;
-		DebugManager *backup;
-
-		if(!_isload) return E_FAIL;
-		
-		backup = _debugger;
-		if(flag & SystemFlag_DisableDebugManager) {
-			_debugger = NULL;
-		}
-
-		if(window == NULL || window_title == NULL) {
-			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
-			_debugger = backup;
-			return E_FAIL;
-		}
-
-		if(!_renderer) {
-			if(flag & SystemFlag_CreateRenderer) {
-				if(NULL == createRenderer(flag & SystemFlag_CreateDefaultDevice)) {
-					_DebugPrint(_debugger, E_SYSTEM_NO_RENDERER_AVAILABLE);
-					_debugger = backup;
-					return E_FAIL;
-				}
-			} else {
-				_DebugPrint(_debugger, E_SYSTEM_NO_RENDERER_AVAILABLE);
-				_debugger = backup;
-				return E_FAIL;
-			}
-		}
-
-		if(NULL == _renderer->getDevice()) {
-			_DebugPrint(_debugger, E_SYSTEM_NO_DEVICE_AVAILABLE);
-			_debugger = backup;
-			return E_FAIL;
-		}
-
-		hr = window->assign(_renderer->getDevice(), window_title);
-		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_SYSTEM_ASSIGN_FAIL);
-			_debugger = backup;
-			return E_FAIL;
-		}
-
-		_renderer->getDevice()->init(window, _confmgr->getOptionTree());
-		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_SYSTEM_ASSIGN_FAIL);
-			_debugger = backup;
-			return E_FAIL;
-		}
-
-		_DebugPrint(_debugger, E_SYSTEM_ASSIGN_SUCCESS);
-		_debugger = backup;
-		return S_OK;
-	}
-
 	Renderer *System::createRenderer(DWORD flag)
 	{
 		TCHAR value[64];
@@ -212,5 +155,20 @@ namespace Identi3D
 		delete _renderer;
 		_renderer = NULL;
 	}
+	
+	int System::start(void)
+	{
+		MSG msg;
 
+		while(true) 
+		{
+			while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+			if(msg.message == WM_QUIT) break;
+		}
+
+		return static_cast<int>(msg.wParam);
+	}
 };

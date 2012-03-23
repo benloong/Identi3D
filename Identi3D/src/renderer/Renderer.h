@@ -51,6 +51,11 @@ namespace Identi3D
 		 * Release the device and do some cleaning.
 		 */
 		void releaseDevice(void);
+		
+		/*
+		 * Assign a render target for the render device.
+		 */
+		HRESULT assignRenderWindow(RenderWindow *window, const TCHAR *window_title = IDENTI3D_NAME);
 
 		/*
 		 * Get current render device.

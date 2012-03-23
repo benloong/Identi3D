@@ -108,25 +108,6 @@ namespace Identi3D
 		UpdateWindow(window);
 		return S_OK;
 	}
-	
-	int RenderWindow::start(void)
-	{
-		MSG msg;
-
-		while(true) 
-		{
-			while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			if(msg.message == WM_QUIT) break;
-			onStartRendering();
-			onRendering();
-			onEndRendering();
-		}
-
-		return static_cast<int>(msg.wParam);
-	}
 
 	LRESULT RenderWindow::WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{

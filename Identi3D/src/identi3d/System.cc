@@ -4,18 +4,20 @@
 //
 
 #include <src/identi3d/System.h>
+#include <src/identi3d/EventDispatcher.h>
 
 namespace Identi3D
 {
 
 	System::System(void)
 	{
-		_isload = false;
-
 		_debugger = NULL;
 		_confmgr = NULL;
+		_dispatcher = NULL;
 
 		_renderer = NULL;
+
+		_state = SystemState_NotInitialized;
 	}
 
 	System::~System(void)
@@ -27,7 +29,7 @@ namespace Identi3D
 	{
 		HRESULT hr;
 
-		if(_isload) {
+		if(_state != SystemState_NotInitialized) {
 			_DebugPrint(_debugger, E_SYSTEM_INITIALIZED);
 			return E_FAIL;
 		}
@@ -42,8 +44,17 @@ namespace Identi3D
 			_debugger = NULL;
 		}
 
-		_confmgr = new (std::nothrow) SettingsManager;
+		_dispatcher = new (std::nothrow) EventDispatcher;
+		if(_dispatcher == NULL) {
+			delete _debugger;
+			_debugger = NULL;
+			_DebugPrint(_debugger, E_OUT_OF_MEMORY);
+		}
+
+		_confmgr = new (std::nothrow) SettingsManager(_debugger);
 		if(_confmgr == NULL) {
+			delete _dispatcher;
+			_dispatcher = NULL;
 			delete _debugger;
 			_debugger = NULL;
 			_DebugPrint(_debugger, E_OUT_OF_MEMORY);
@@ -51,107 +62,92 @@ namespace Identi3D
 		}
 
 		if(config_name != NULL) {
-			if(_tcslen(config_name) >= 260) goto LOADFAIL;
-			_DebugPrintV(_debugger, I_SYSTEM_LOAD_CONFIGURATION, config_name);
-			hr = _confmgr->load(config_name);
-			if(SUCCEEDED(hr)) {
-				_DebugPrintV(_debugger, I_SYSTEM_CONFIGURATION_LOAD_SUCCESS);
-				_tcscpy_s(_conf_path, config_name);
+			if(_tcslen(config_name) < 260) {
+				_DebugPrintV(_debugger, I_SYSTEM_LOAD_CONFIGURATION, config_name);
+				hr = _confmgr->load(config_name);
+				if(SUCCEEDED(hr)) {
+					_DebugPrintV(_debugger, I_SYSTEM_CONFIGURATION_LOAD_SUCCESS);
+					_tcscpy_s(_conf_path, config_name);
+				} else {
+					_DebugPrint(_debugger, E_SYSTEM_CONFIGURATION_LOAD_FAIL);
+					if((flag & SystemFlag_AllowFallbackConfig) == NULL) {
+						delete _confmgr;
+						_confmgr = NULL;
+						delete _dispatcher;
+						_dispatcher = NULL;
+						delete _debugger;
+						_debugger = NULL;
+						return E_FAIL;
+					}
+				}
 			} else {
-	LOADFAIL:
-			{
 				_DebugPrint(_debugger, E_SYSTEM_CONFIGURATION_LOAD_FAIL);
 				if((flag & SystemFlag_AllowFallbackConfig) == NULL) {
-					delete _debugger;
-					_debugger = NULL;
 					delete _confmgr;
 					_confmgr = NULL;
+					delete _dispatcher;
+					_dispatcher = NULL;
+					delete _debugger;
+					_debugger = NULL;
 					return E_FAIL;
 				}
 			}
-
-			}
 		}
 
-		if(flag & SystemFlag_CreateRenderer) {
-			createRenderer(flag & SystemFlag_CreateDefaultDevice);
-		} else {
-			_renderer = NULL;
+		if(NULL == createRenderer()) {
+			delete _confmgr;
+			_confmgr = NULL;
+			delete _dispatcher;
+			_dispatcher = NULL;
+			delete _debugger;
+			_debugger = NULL;
+			_DebugPrint(_debugger, E_SYSTEM_RENDERER_CREATE_FAILED);
+			return E_FAIL;
 		}
 
-		_isload = true;
+		_state = SystemState_Idle;
 		_DebugPrintV(_debugger, I_SYSTEM_CREATE_SUCCESS);
 		return S_OK;
 	}
 
 	HRESULT System::release(bool save_config)
 	{
-		if(!_isload) return S_FALSE;
+		if(_state == SystemState_NotInitialized) return S_FALSE;
+
+		releaseRenderer();
 
 		if(save_config)
 		{
 			_confmgr->save(_conf_path);
 		}
-
-		releaseRenderer();
 		delete _confmgr;
 		_confmgr = NULL;
+
+		delete _dispatcher;
 
 		_DebugPrintV(_debugger, I_SYSTEM_RELEASE_SCHEDULED);
 		delete _debugger;
 		_debugger = NULL;
 
-		_isload = false;
+		_state = SystemState_NotInitialized;
 		return S_OK;
 	}
 
-	Renderer *System::createRenderer(DWORD flag)
+	Renderer *System::createRenderer(void)
 	{
-		TCHAR value[64];
-		HRESULT hr;
-		DebugManager *backup;
+		if(_renderer) delete _renderer;
 
-		if(!_isload) return NULL;
-		
-		backup = _debugger;
-		if(flag & SystemFlag_DisableDebugManager) {
-			_debugger = NULL;
-		}
-
-		_renderer = new (std::nothrow) Renderer(backup);
+		_renderer = new (std::nothrow) Renderer(_debugger);
 		if(_renderer == NULL) {
 			_DebugPrint(_debugger, E_OUT_OF_MEMORY);
-			_debugger = backup;
 			return NULL;
 		}
 
-		if(flag & SystemFlag_CreateDefaultDevice) {
-			hr = _confmgr->getOptionTree()->getValue(__T("System.DefaultRenderDevice"), value, 64);
-			if(FAILED(hr)) goto LOAD_DEFAULT_DEVICE;
-			if(_tcscmp(value, __T("opengl")) == 0) {
-				hr = _renderer->createDevice(RenderBackendType_OpenGL);
-				if(FAILED(hr)) goto LOAD_DEFAULT_DEVICE;
-			} else {
-	LOAD_DEFAULT_DEVICE:
-			{
-				hr = _renderer->createDevice(RenderBackendType_Direct3D9);
-				if(FAILED(hr)) {
-					_DebugPrint(_debugger, E_SYSTEM_NO_DEVICE_AVAILABLE);
-				}
-			}
-
-			}
-		} else {
-			_DebugPrint(_debugger, E_SYSTEM_NO_DEVICE_AVAILABLE);
-		}
-
-		_debugger = backup;
 		return _renderer;
 	}
 
 	void System::releaseRenderer(void)
 	{
-		_renderer->releaseDevice();
 		delete _renderer;
 		_renderer = NULL;
 	}
@@ -159,6 +155,11 @@ namespace Identi3D
 	int System::start(void)
 	{
 		MSG msg;
+		HRESULT hr;
+
+		if(_state != SystemState_Idle) return -255;
+
+		_state = SystemState_Listening;
 
 		while(true) 
 		{
@@ -167,8 +168,25 @@ namespace Identi3D
 				DispatchMessage(&msg);
 			}
 			if(msg.message == WM_QUIT) break;
-		}
 
+			if(_renderer->_render_device->isRunning()) {
+				hr = _renderer->_render_device->startRendering(true, true, true);
+				if(FAILED(hr)) {
+					_DebugPrint(_debugger, E_START_RENDERING_FAILURE);
+				}
+				_dispatcher->postEvent(Event_Rendering);
+				_renderer->_render_device->endRendering();
+			}
+		}
+		
+		_state = SystemState_Idle;
 		return static_cast<int>(msg.wParam);
 	}
+
+	void System::kill(void)
+	{
+		if(_renderer->_render_window)
+			DestroyWindow(_renderer->_render_window->getHandle());
+	}
+
 };

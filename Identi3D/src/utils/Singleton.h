@@ -15,7 +15,7 @@ namespace Identi3D
 	template <typename T>
 	struct Singleton{
 		struct object_creator{
-			object_creator(){ Singleton<T>::getInstance(); }
+			object_creator(){ Singleton<T>::instance(); }
 			inline void do_nothing()const {}
 		};
 
@@ -23,7 +23,7 @@ namespace Identi3D
 
 	public:
 		typedef T object_type;
-		static object_type& getInstance(){
+		static object_type& instance(){
 			static object_type obj;
 			create_object.do_nothing();
 			return obj;

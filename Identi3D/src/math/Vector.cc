@@ -69,7 +69,7 @@ namespace Identi3D
 		 */
 
 #if !defined(_SSE_ONLY)
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			vec._x = _x * m._a1 + _y * m._b1 + _z * m._c1 + m._d1;
 			vec._y = _x * m._a2 + _y * m._b2 + _z * m._c2 + m._d2;
 			vec._z = _x * m._a3 + _y * m._b3 + _z * m._c3 + m._d3;
@@ -137,7 +137,7 @@ namespace Identi3D
 	{
 		
 #if !defined(_SSE_ONLY)
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			return sqrt(_x * _x + _y * _y + _z * _z);
 		}
 #endif // !defined(_SSE_ONLY)
@@ -157,7 +157,7 @@ namespace Identi3D
 	{
 
 #if !defined(_SSE_ONLY)
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			float f = sqrt(_x * _x + _y * _y + _z * _z);
 			if(!_fzero(f)) _x /= f, _y /= f, _z /= f;
 			return ;
@@ -177,7 +177,7 @@ namespace Identi3D
 	{
 
 #if !defined(_SSE_ONLY)
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			_x = u._y * v._z - u._z * v._y;
 			_y = u._z * v._x - u._x * v._z;
 			_z = u._x * v._y - u._y * v._x;

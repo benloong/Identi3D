@@ -38,6 +38,7 @@ namespace Identi3D
 		item_hash[2] = OptionTree::hashString(__T("StencilBuffer"));
 		item_hash[3] = OptionTree::hashString(__T("ScreenResolution"));
 		reset();
+		_tree = NULL;
 	}
 
 	void Direct3D9SettingsManager::reset()
@@ -46,9 +47,10 @@ namespace Identi3D
 		_is_hardware_accelerated = true;
 		_is_stencil_buffer_enabled = true;
 
-		_screen_width = 800;
-		_screen_height = 600;
-		_refresh_rate = 60;
+		_screen_width	= 800;
+		_screen_height	= 600;
+		_color_depth	= 32;
+		_refresh_rate	= 60;
 	}
 
 	HRESULT Direct3D9SettingsManager::read(OptionTree *tree)
@@ -57,7 +59,13 @@ namespace Identi3D
 			_DebugPrint(_debugger, E_INVALID_PARAMETERS);
 			return E_FAIL;
 		}
-		OptionIterator iter(tree->getElement(__T("Graphics"))->child);
+		_tree = tree;
+
+		OptionElement *elem;
+		elem = tree->getElement(__T("Graphics"));
+		if(elem == NULL) return E_FAIL;
+
+		OptionIterator iter(elem->child);
 
 		while(!iter.end()) {
 			for(int i = 0; i < max_hash_item; i++) {
@@ -85,15 +93,17 @@ namespace Identi3D
 		return S_OK;
 	}
 
-	HRESULT Direct3D9SettingsManager::write(OptionTree *tree)
+	HRESULT Direct3D9SettingsManager::write(void)
 	{
 		OptionElement *p;
 		TCHAR tmpstr[256];
 		long s;
 
-		p = tree->getElement(__T("Graphics"));
+		if(_tree == NULL) return E_FAIL;
+
+		p = _tree->getElement(__T("Graphics"));
 		if(p == NULL) {
-			p = tree->addElement(NULL, __T("Graphics"));
+			p = _tree->addElement(NULL, __T("Graphics"), OPTIONELEMENT_GROUPVALUE);
 			if(p == NULL) {
 				_DebugPrint(_debugger, E_D3D9_OPTION_GROUP_CREATE_FAILED, __T("Graphics"));
 				return E_FAIL;
@@ -101,13 +111,13 @@ namespace Identi3D
 		}
 		_stprintf_s(tmpstr, __T("%dx%dx%d@%d"), 
 			_screen_width, _screen_height, _color_depth, _refresh_rate);
-		s  = (long)tree->addElement(p, __T("Windowed"), 
+		s  = (long)_tree->addElement(p, __T("Windowed"), 
 			convBoolToString(_is_windowed));
-		s &= (long)tree->addElement(p, __T("HardwareAcceleration"), 
+		s &= (long)_tree->addElement(p, __T("HardwareAcceleration"), 
 			convBoolToString(_is_hardware_accelerated));
-		s &= (long)tree->addElement(p, __T("StencilBuffer"), 
+		s &= (long)_tree->addElement(p, __T("StencilBuffer"), 
 			convBoolToString(_is_stencil_buffer_enabled));
-		s &= (long)tree->addElement(p, __T("ScreenResolution"), tmpstr);
+		s &= (long)_tree->addElement(p, __T("ScreenResolution"), tmpstr);
 
 		if(s == NULL) {
 			_DebugPrint(_debugger, E_D3D9_OPTION_WRITE_FAILED);

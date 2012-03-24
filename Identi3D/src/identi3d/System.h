@@ -18,9 +18,6 @@ namespace Identi3D
 		SystemFlag_AllowFallbackConfig	= 0x00000001,
 		SystemFlag_DisableDebugManager	= 0x00000002,
 
-		SystemFlag_CreateRenderer		= 0x00000010,
-		SystemFlag_CreateDefaultDevice	= 0x00000020,
-
 		SystemFlag_ForceDword			= 0xFFFFFFFF
 	};
 
@@ -35,12 +32,15 @@ namespace Identi3D
 
 	class System : public Singleton<System>
 	{
-	protected:
-		bool _isload;
+	private:
+		System(System &s);
+
+	private:
 		SystemState _state;
 
 		DebugManager *_debugger;
 		SettingsManager *_confmgr;
+		EventDispatcher	*_dispatcher;
 
 		Renderer *_renderer;
 
@@ -49,7 +49,6 @@ namespace Identi3D
 	public:
 
 		System(void);
-		System(System &s);
 		~System(void);
 		
 		/*
@@ -57,8 +56,6 @@ namespace Identi3D
 		 * Acceptable Flag:
 		 *		SystemFlag_AllowFallbackConfig
 		 *		SystemFlag_DisableDebugManager
-		 *		SystemFlag_CreateRenderer
-		 *		SystemFlag_CreateDefaultDevice
 		 */
 		HRESULT init(DWORD flag = NULL, const TCHAR *config_name = NULL);
 
@@ -69,11 +66,8 @@ namespace Identi3D
 
 		/*
 		 * Create a renderer.
-		 * Acceptable Flag:
-		 *		SystemFlag_DisableDebugManager
-		 *		SystemFlag_CreateDefaultDevice	(will fail SILENTLY)
 		 */
-		Renderer *createRenderer(DWORD flag = NULL);
+		Renderer *createRenderer(void);
 
 		/*
 		 * Release the allocated renderer.
@@ -83,7 +77,12 @@ namespace Identi3D
 		/*
 		 * Start event listening.
 		 */
-		int		start(void);
+		int	start(void);
+
+		/*
+		 * Kill listening process.
+		 */
+		void kill(void);
 
 		/*
 		 * Get Renderer handle.
@@ -96,9 +95,19 @@ namespace Identi3D
 		DebugManager *getDebugManager(void) const { return _debugger; }
 
 		/*
+		 * Get SettingsManager handle.
+		 */
+		SettingsManager *getSettingsManager(void) const { return _confmgr; }
+
+		/*
+		 * Get EventDispatcher handle.
+		 */
+		EventDispatcher *getEventDispatcher(void) const { return _dispatcher; }
+
+		/*
 		 * Get system state.
 		 */
-		SystemState getState(void);
+		SystemState getState(void) const { return _state; }
 
 	};
 

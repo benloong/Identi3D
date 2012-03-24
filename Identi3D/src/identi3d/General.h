@@ -77,13 +77,17 @@ namespace Identi3D
 	enum RenderBackendType;
 	enum SystemFlag;
 	enum SystemState;
+	enum Event;
 
 	// Structures
 	struct OptionElement;
+	struct EventPacket;
 
 	// Classes
 	class Color;
 	class System;
+	class EventDispatcher;
+	class EventListener;
 
 	class Angle;
 	class AxisAlignedBoundingBox;

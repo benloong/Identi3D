@@ -39,7 +39,6 @@ namespace Identi3D
 		_direct3d = Direct3DCreate9(D3D_SDK_VERSION);
 		if(_direct3d == NULL){
 			_DebugPrint(_debugger, E_DIRECT3D_INIT_FAILURE);
-			//_debugger->print(__FILE__, __LINE__, E_DIRECT3D_INIT_FAILURE);
 			return E_FAIL;
 		}
 		_render_target = target;
@@ -169,6 +168,7 @@ namespace Identi3D
 			_direct_device->Release();
 		if(_direct3d != NULL)
 			_direct3d->Release();
+		_settings.write();
 	}
 
 	bool PluginDirect3D9::isRunning(void)

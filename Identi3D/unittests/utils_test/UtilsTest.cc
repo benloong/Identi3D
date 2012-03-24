@@ -79,12 +79,6 @@ int main()
 
 	delete option;
 
-	SettingsManager *conf = new SettingsManager();
-	conf->setDebugManager(dbgmgr);
-	conf->load(__T("default.conf"));
-	conf->save(__T("secondary.conf"));
-	delete conf;
-
 	_DebugPrint(dbgmgr, __T("Bye."));
 
 	system("pause");

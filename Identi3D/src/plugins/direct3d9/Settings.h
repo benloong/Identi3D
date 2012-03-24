@@ -15,7 +15,8 @@ namespace Identi3D
 	class Direct3D9SettingsManager
 	{
 	private:
-		DebugManager *_debugger;
+		DebugManager	*_debugger;
+		OptionTree		*_tree;
 
 	private:
 		bool convStringToBool(const TCHAR *str);
@@ -48,7 +49,7 @@ namespace Identi3D
 		/*
 		 * Write configuration to OptionTree.
 		 */
-		HRESULT write(OptionTree *tree);
+		HRESULT write(void);
 
 		/*
 		 * Set a debug manager.

@@ -27,6 +27,9 @@
     <ClInclude Include="RenderTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Listener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cc">
@@ -36,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderTest.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Listener.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

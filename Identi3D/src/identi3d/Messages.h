@@ -24,7 +24,7 @@
 #define E_SYSTEM_CONFIGURATION_LOAD_FAIL	__T("Failed to load configuration.")
 #define I_SYSTEM_CREATE_SUCCESS				__T("System has been initialized successfully.")
 #define I_SYSTEM_RELEASE_SCHEDULED			__T("System is going to be released.")
-#define E_SYSTEM_NO_RENDERER_AVAILABLE		__T("No available renderer.")
+#define E_SYSTEM_RENDERER_CREATE_FAILED		__T("Failed to create a renderer.")
 
 // Debug Manager
 #define I_LOG_STARTED						__T("Identi3D Debugging System\nLog started.\n\n")

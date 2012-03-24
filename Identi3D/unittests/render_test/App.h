@@ -8,12 +8,19 @@
 #define IDENTI3D_UNITTESTS_RENDERTEST_APP_H
 
 #include <src/identi3d/Identi3D.h>
+#include <src/identi3d/EventListener.h>
 
-class App : private Identi3D::RenderWindow
+#include "Listener.h"
+
+class App
 {
 private:
 	Identi3D::DebugManager	*_debugger;
 	Identi3D::RenderDevice	*_device;
+	Identi3D::Renderer		*_renderer;
+	Identi3D::RenderWindow	*_window;
+
+	Listener *listener;
 
 public:
 	App(void);
@@ -21,9 +28,6 @@ public:
 
 	HRESULT	init(void);
 	int		run(void);
-
-	void onKeyboardInput(Identi3D::KeyType key, UINT repeat_times, bool previous_key_pressed);
-	void onRendering(void);
 };
 
 #endif // IDENTI3D_UNITTESTS_RENDERTEST_APP_H

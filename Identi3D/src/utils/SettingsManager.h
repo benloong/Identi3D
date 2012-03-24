@@ -8,22 +8,27 @@
 #define IDENTI3D_SRC_UTILS_SETTINGSMANAGER_H
 
 #include <src/identi3d/General.h>
+#include <src/utils/OptionTree.h>
 
 namespace Identi3D
 {
 
 	class __declspec(dllexport) SettingsManager
 	{
+		friend class System;
+
 	private:
-		OptionTree *_tree;
+		OptionTree _tree;
 		DebugManager *_debugger;
 
 	private:
+		SettingsManager(DebugManager *debugger);
+		SettingsManager(SettingsManager &mgr);
+		~SettingsManager(void);
+
 		void saveOptionElement(OptionElement *elem, FILE *fp);
 
 	public:
-		SettingsManager(void) : _tree(NULL), _debugger(NULL) {} ;
-		~SettingsManager(void);
 
 		/*
 		 * Load configuration from file.
@@ -38,7 +43,7 @@ namespace Identi3D
 		/*
 		 * Get the handle of global OptionTree.
 		 */
-		OptionTree *getOptionTree(void) { return _tree; }
+		OptionTree *getOptionTree(void) { return &_tree; }
 
 		/*
 		 * Set a debug manager.

@@ -146,7 +146,7 @@ namespace Identi3D
 		 */
 
 #if !defined(_SSE_ONLY)
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			_a1 = (vec._x * vec._x) * delta + fc;
 			_a2 = (vec._x * vec._y) * delta - fsz;
 			_a3 = (vec._x * vec._z) * delta + fsy;
@@ -198,7 +198,7 @@ namespace Identi3D
 		 */
 
 #if !defined(_SSE_ONLY)
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			for(int i = 0; i < 4; i++)
 				for(int j = 0; j < 4; j++)
 					_data[i].m128_f32[j] = m._data[j].m128_f32[i];
@@ -231,7 +231,7 @@ namespace Identi3D
 		 */
 		
 #if !defined(_SSE_ONLY)
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			float factor[6];
 			cof.transpose(m);
 
@@ -392,7 +392,7 @@ namespace Identi3D
 		Matrix result;
 
 #ifndef _SSE_ONLY
-		if(!CpuInfo::getInstance().isSSESupported()) {
+		if(!CpuInfo::instance().isSSESupported()) {
 			result._a1 = _a1 * m._a1 + _a2 * m._b1 + _a3 * m._c1 + _a4 * m._d1;
 			result._a2 = _a1 * m._a2 + _a2 * m._b2 + _a3 * m._c2 + _a4 * m._d2;
 			result._a3 = _a1 * m._a3 + _a2 * m._b3 + _a3 * m._c3 + _a4 * m._d3;

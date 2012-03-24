@@ -5,7 +5,8 @@
 
 #include <src/renderer/RenderWindow.h>
 #include <src/renderer/RenderDevice.h>
-
+#include <src/identi3d/System.h>
+#include <src/identi3d/EventDispatcher.h>
 #include <src/utils/DebugManager.h>
 
 namespace Identi3D
@@ -111,60 +112,7 @@ namespace Identi3D
 
 	LRESULT RenderWindow::WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
-		static RenderWindow *rw = NULL;
-		CREATESTRUCT *cs;
-
-		if(msg == WM_CREATE) {
-			cs = reinterpret_cast<CREATESTRUCT *>(lparam);
-			rw = static_cast<RenderWindow *>(cs->lpCreateParams);
-		}
-		if(rw != NULL)
-			return rw->dispatchWindowEvent(msg, wparam, lparam);
-		else
-			return DefWindowProc(wnd, msg, wparam, lparam);
+		return System::instance().getEventDispatcher()->postWindowMessage(wnd, msg, wparam, lparam);
 	}
 
-	LRESULT RenderWindow::dispatchWindowEvent(UINT msg, WPARAM wparam, LPARAM lparam)
-	{
-		PAINTSTRUCT ps;
-		HDC hdc;
-
-		switch(msg)
-		{
-		case WM_KEYDOWN:
-			onKeyboardInput(static_cast<KeyType>(wparam), 
-				static_cast<UINT>(lparam & 0xFFFF), 
-				((lparam & (1 << 30)) == 0) ? false : true);
-			break;
-		case WM_PAINT:
-			hdc = BeginPaint(window, &ps);
-			EndPaint(window, &ps);
-			break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			break;
-		default:
-			return DefWindowProc(window, msg, wparam, lparam);
-		}
-
-		return 0;
-	}
-
-	void RenderWindow::onStartRendering(void)
-	{
-		HRESULT hr;
-
-		if(render_device->isRunning()) {
-			hr = render_device->startRendering(true, true, true);
-			if(FAILED(hr)) {
-				_DebugPrint(debugger, E_START_RENDERING_FAILURE);
-			}
-		}
-	}
-
-	void RenderWindow::onEndRendering(void)
-	{
-		if(render_device->isRunning())
-			render_device->endRendering();
-	}
 };

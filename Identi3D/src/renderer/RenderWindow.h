@@ -15,6 +15,8 @@ namespace Identi3D
 
 	class RenderWindow
 	{
+		friend class Renderer;
+
 	private:
 		HWND			window;
 		RenderDevice	*render_device;
@@ -37,21 +39,16 @@ namespace Identi3D
 		 * Create window with specified attributes.
 		 */
 		HRESULT createWindow(int width, int height, const TCHAR *title);
-
-		/*
-		 * Send events to inherited processors.
-		 */
-		LRESULT dispatchWindowEvent(UINT msg, WPARAM wparam, LPARAM lparam);
-
-	public:
-
-		RenderWindow();
-		virtual ~RenderWindow(void);
-
+		
 		/*
 		 * Assign a render device for the window.
 		 */
 		HRESULT assign(RenderDevice *device, const TCHAR *title);
+
+	public:
+
+		RenderWindow();
+		~RenderWindow(void);
 
 		/*
 		 * Release the window and clean up.
@@ -63,26 +60,6 @@ namespace Identi3D
 		 * # Should not be called directly.
 		 */
 		static	LRESULT WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
-		/*
-		 * Receive keyboard input message.
-		 */
-		virtual void onKeyboardInput(KeyType key, UINT repeat_times, bool previous_key_pressed) {};
-
-		/*
-		 * Receive render start message.
-		 */
-		virtual void onStartRendering(void);
-
-		/*
-		 * Receive render message.
-		 */
-		virtual void onRendering(void) = 0;
-
-		/*
-		 * Receive render end message.
-		 */
-		virtual void onEndRendering(void);
 
 		/*
 		 * Get the handle of window.

@@ -20,6 +20,13 @@ namespace Identi3D
 											__T("PluginOpenGL_d.dll"), };
 #endif
 
+	Renderer::Renderer(DebugManager *debugger)
+		: _render_device(NULL), _plugin_handle(NULL), _debugger(debugger), _render_window(NULL)
+	{
+		_backend_type = RenderBackendType_NoDevice;
+		_global_option = System::instance().getSettingsManager()->getOptionTree();
+	}
+
 	HRESULT Renderer::createDevice(RenderBackendType type)
 	{
 		const TCHAR *path;
@@ -57,6 +64,7 @@ namespace Identi3D
 			return E_FAIL;
 		}
 
+		_backend_type = type;
 		return S_OK;
 	}
 
@@ -72,8 +80,43 @@ namespace Identi3D
 		_render_device = NULL;
 		FreeLibrary(_plugin_handle);
 		_plugin_handle = NULL;
+		_backend_type = RenderBackendType_NoDevice;
+		_render_window = NULL;
 	}
 	
+	HRESULT Renderer::createDefaultDevice(void)
+	{
+		HRESULT hr;
+		RenderBackendType rbt;
+		TCHAR value[64];
+
+		hr = _global_option->getValue(__T("System.DefaultRenderDevice"), value, 64);
+		if(FAILED(hr)) rbt = RenderBackendType_Direct3D9;
+		else {
+			if(_tcscmp(value, __T("opengl")) == 0) {
+				rbt = RenderBackendType_OpenGL;
+			} else {
+				rbt = RenderBackendType_Direct3D9;
+			}
+		}
+
+		hr = createDevice(rbt);
+		if(FAILED(hr)) {
+			if(rbt != RenderBackendType_Direct3D9) {
+				hr = createDevice(RenderBackendType_Direct3D9);
+				if(FAILED(hr)) {
+					_DebugPrint(_debugger, E_NO_RENDER_DEVICE_AVAILABLE);
+					return E_FAIL;
+				}
+			} else {
+				_DebugPrint(_debugger, E_NO_RENDER_DEVICE_AVAILABLE);
+				return E_FAIL;
+			}
+		}
+
+		return S_OK;
+	}
+
 	HRESULT Renderer::assignRenderWindow(RenderWindow *window, const TCHAR *window_title)
 	{
 		HRESULT hr;
@@ -89,14 +132,14 @@ namespace Identi3D
 			return E_FAIL;
 		}
 
-		// TODO: check system state and get optiontree.
-		_render_device->init(window, /*****/);
+		// No need to check system state: A renderer must be and can only be allocated via a valid System.
+		_render_device->init(window, _global_option);
 		if(FAILED(hr)) {
 			_DebugPrint(_debugger, E_RENDER_WINDOW_ASSIGN_FAIL);
-			_debugger = backup;
 			return E_FAIL;
 		}
 
+		_render_window = window;
 		_DebugPrint(_debugger, E_RENDER_WINDOW_ASSIGN_SUCCESS);
 		return S_OK;
 	}

@@ -18,15 +18,26 @@ HRESULT App::init(void)
 {
 	HRESULT hr;
 	
-	hr = System::getInstance().init(NULL, __T("default.conf"));
+	listener = new (std::nothrow) Listener;
+	if(listener == NULL) return E_FAIL;
+
+	hr = System::instance().init(NULL, __T("default.conf"));
+	if(FAILED(hr)) return E_FAIL;
+	
+	System::instance().getEventDispatcher()->RegisterEventListener(listener);
+
+	_renderer = System::instance().getRenderer();
+	hr = _renderer->createDefaultDevice();
+	if(FAILED(hr)) return E_FAIL;
+	
+	_window = new (std::nothrow) RenderWindow;
+	if(_window == NULL) return E_FAIL;
+
+	hr = _renderer->assignRenderWindow(_window, __T("Identi3D Test"));
 	if(FAILED(hr)) return E_FAIL;
 
-	hr = System::getInstance().assignRenderWindow(this, 
-		SystemFlag_CreateRenderer | SystemFlag_CreateDefaultDevice, __T("Identi3D Test"));
-	if(FAILED(hr)) return E_FAIL;
-
-	_device = System::getInstance().getRenderer()->getDevice();
-	_debugger = System::getInstance().getDebugManager();
+	_device = _renderer->getDevice();
+	_debugger = System::instance().getDebugManager();
 	return S_OK;
 }
 
@@ -35,29 +46,13 @@ int App::run(void)
 	int retval;
 
 	_device->setClearColor(0, 0, 1.0f);
-	retval = start();
+	retval = System::instance().start();
 
 	return retval;
 }
 
 App::~App(void)
 {
-	System::getInstance().release();
-}
-
-
-void App::onKeyboardInput(KeyType key, UINT repeat_times, bool previous_key_pressed)
-{
-	_DebugPrintV(_debugger, __T("Keyboard Input Event: %d, %d, %s"), key, repeat_times, previous_key_pressed ? __T("true") : __T("false"));
-	switch(key)
-	{
-	case KeyType_Escape:
-		release();
-		return ;
-	}
-}
-
-void App::onRendering(void)
-{
-	return ;
+	System::instance().release();
+	delete listener;
 }

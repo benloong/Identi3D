@@ -21,8 +21,9 @@ namespace Identi3D
 	 */
 	enum RenderBackendType
 	{
-		RenderBackendType_Direct3D9	= 0,
-		RenderBackendType_OpenGL	= 1,
+		RenderBackendType_NoDevice	= 0,
+		RenderBackendType_Direct3D9	= 1,
+		RenderBackendType_OpenGL	= 2,
 
 		RenderBackendType_ForceDword= 0xFFFFFFFF
 	};
@@ -32,20 +33,29 @@ namespace Identi3D
 		friend class System;
 
 	private:
+		RenderBackendType _backend_type;
 		RenderDevice	*_render_device;
 		HMODULE			_plugin_handle;
 		DebugManager	*_debugger;
+		OptionTree		*_global_option;
+		RenderWindow	*_render_window;
 
 	private:
-		Renderer(DebugManager *debugger) : _render_device(NULL), _plugin_handle(NULL), _debugger(debugger) {} ;
+		Renderer(DebugManager *debugger);
 		Renderer(Renderer &r);
 		~Renderer(void) { releaseDevice(); }
 
 	public:
+
 		/*
 		 * Create a render device.
 		 */
 		HRESULT	createDevice(RenderBackendType type);
+
+		/*
+		 * Create the default render device.
+		 */
+		HRESULT createDefaultDevice(void);
 		
 		/*
 		 * Release the device and do some cleaning.
@@ -61,11 +71,6 @@ namespace Identi3D
 		 * Get current render device.
 		 */
 		RenderDevice *getDevice(void) { return _render_device; }
-		
-		/*
-		 * Get the handle of plugin file.
-		 */
-		HMODULE getPluginsHandle(void) { return _plugin_handle; }
 
 	};
 

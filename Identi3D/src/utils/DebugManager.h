@@ -9,9 +9,10 @@
 
 #include <src/identi3d/General.h>
 
-#if defined (UNICODE) && !defined (DBGHELP_TRANSLATE_TCHAR)
-# define DBGHELP_TRANSLATE_TCHAR				// Gain wide char support.
-#endif // !defined (DBGHELP_TRANSLATE_TCHAR)
+#pragma warning (disable : 4251)
+
+#include <fstream>
+#include <string>
 
 namespace Identi3D {
 
@@ -56,65 +57,73 @@ namespace Identi3D {
 	/*
 	 * Default debug flags.
 	 */
-	#if !defined (DEBUGMANAGER_DEFAULT_FLAG)
-	# define DEBUGMANAGER_DEFAULT_FLAG	(DebugFlag_FileOutput	| \
-										 DebugFlag_AttachSource | \
-										 DebugFlag_VerboseMode	| \
-										 DebugFlag_AttachTime)
-	#endif // !defined (DEBUGMANAGER_DEFAULT_FLAG)
+	static const DWORD DEBUGMANAGER_DEFAULTFLAG =
+		(DebugFlag_FileOutput | DebugFlag_AttachSource | DebugFlag_VerboseMode |  DebugFlag_AttachTime);
 
 	/*
 	 * Default log file name.
 	 */
-	#if !defined (DEBUGMANAGER_DEFAULT_FILENAME)
-	# define DEBUGMANAGER_DEFAULT_FILENAME	__T("identi3d.log")
-	#endif // !defined (DEBUGMANAGER_DEFAULT_FILENAME)
+	static const std::string DEBUGMANAGER_DEFAULTLOGNAME = "identi3d.log";
+
+	/*
+	 * Default welcome message of log file.
+	 */
+	static const std::string DEBUGMANAGER_WELCOMEMESSAGE = "Identi3D: Logging started.\n\n";
+
 
 	class __declspec(dllexport) DebugManager
 	{
 	public:
 
-		DebugManager(void);
-		~DebugManager(void);
+		DebugManager(void) throw () : _prevbuf(NULL), _flag(DEBUGMANAGER_DEFAULTFLAG) {} ;
+		~DebugManager(void) throw ();
 
 		/*
 		 * Write debugging information to log file.
 		 */
-		HRESULT print(const char *src_filename, int line_number, bool verbose, const TCHAR *message, ...);
+		bool print(const char *src_path, int line_number, bool verbose, const char *message, ...) throw ();
+
+		/*
+		 * Write the specified exception to log file.
+		 */
+		bool print(const char *src_path, int line_number, const std::exception &e) throw ();
 
 		/*
 		 * Set log file name.
 		 */
-		HRESULT setOutputFileName(const TCHAR *new_filename = DEBUGMANAGER_DEFAULT_FILENAME);
+		bool setOutputFileName(const std::string &new_filename = DEBUGMANAGER_DEFAULTLOGNAME) throw ();
 
 		/*
 		 * Create a new console window for debugging.
 		 */
-		HRESULT createDebugConsole(void);
+		bool createDebugConsole(void) throw ();
 		
 		/*
 		 * Print current call stack.
 		 */
-		HRESULT dumpCallStack(void);
-
-		/*
-		 * Print Option Tree.
-		 */
-		HRESULT printOptionTree(const OptionTree *tree);
+		void dumpCallStack(void) throw ();
 
 		/*
 		 * Set output flag.
 		 */
-		void setOutputFlag(DWORD new_flag = DEBUGMANAGER_DEFAULT_FLAG) { output_flag = new_flag; }
+		inline void setFlag(DWORD new_flag = DEBUGMANAGER_DEFAULTFLAG) { _flag = new_flag; }
 
 		/*
 		 * Get current output flag.
 		 */
-		const DWORD	getOutputFlag(void) const { return output_flag; }
+		inline const DWORD getFlag(void) const { return _flag; }
 
 	private:
-		FILE	*log_file, *console;
-		DWORD	output_flag;
+		std::ofstream _log;
+		std::ofstream _console;
+		std::streambuf *_prevbuf;
+
+		DWORD _flag;
+
+	private:
+		const std::string getTimeStamp(void) const;
+		const std::string getFormattedSourcePath(const char *src_path, int line_number) const;
+		void printRawString(const char *str, ...);
 	};
 
 };

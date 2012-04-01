@@ -36,6 +36,9 @@
     <ClInclude Include="EventListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IdentiExceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System.cc">
@@ -45,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EventListener.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IdentiExceptions.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

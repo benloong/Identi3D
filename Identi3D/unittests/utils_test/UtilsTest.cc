@@ -18,19 +18,22 @@ int main()
 {
 	DebugManager *dbgmgr = new DebugManager();
 
-	_DebugPrint(dbgmgr, __T("This is a test message."));
-	_DebugPrintV(dbgmgr, __T("This is a verbose message."));
-	_DebugPrint(dbgmgr, __T("This is a test message with arguments %.3f."), 2 * 3.14159);
+	dbgmgr->createDebugConsole();
+	dbgmgr->setFlag(dbgmgr->getFlag() | DebugFlag_ConsoleOutput);
+
+	_DebugPrint(dbgmgr, ("This is a test message."));
+	_DebugPrintV(dbgmgr, ("This is a verbose message."));
+	_DebugPrint(dbgmgr, ("This is a test message with arguments %.3f."), 2 * 3.14159);
 
 	CpuInfo *cinfo = new CpuInfo();
 
-	_DebugPrint(dbgmgr, __T("CPU INFORMATION:"));
-	_DebugPrint(dbgmgr, __T("\tVENDOR ID: %d"), cinfo->getVendor());
-	_DebugPrint(dbgmgr, __T("\tSSE SUPPORT: %s"), (cinfo->isSSESupported()) ? __T("YES") : __T("NO"));
-	_DebugPrint(dbgmgr, __T("\tSSE2 SUPPORT: %s"), (cinfo->isSSE2Supported()) ? __T("YES") : __T("NO"));
-	_DebugPrint(dbgmgr, __T("\tSSE3 SUPPORT: %s"), (cinfo->isSSE3Supported()) ? __T("YES") : __T("NO"));
-	_DebugPrint(dbgmgr, __T("\t3DNOW! SUPPORT: %s"), (cinfo->is3DNowSupported()) ? __T("YES") : __T("NO"));
-	_DebugPrint(dbgmgr, __T("\tMMX SUPPORT: %s"), (cinfo->isMMXSupported()) ? __T("YES") : __T("NO"));
+	_DebugPrint(dbgmgr, ("CPU INFORMATION:"));
+	_DebugPrint(dbgmgr, ("\tVENDOR ID: %d"), cinfo->getVendor());
+	_DebugPrint(dbgmgr, ("\tSSE SUPPORT: %s"), (cinfo->isSSESupported()) ? ("YES") : ("NO"));
+	_DebugPrint(dbgmgr, ("\tSSE2 SUPPORT: %s"), (cinfo->isSSE2Supported()) ? ("YES") : ("NO"));
+	_DebugPrint(dbgmgr, ("\tSSE3 SUPPORT: %s"), (cinfo->isSSE3Supported()) ? ("YES") : ("NO"));
+	_DebugPrint(dbgmgr, ("\t3DNOW! SUPPORT: %s"), (cinfo->is3DNowSupported()) ? ("YES") : ("NO"));
+	_DebugPrint(dbgmgr, ("\tMMX SUPPORT: %s"), (cinfo->isMMXSupported()) ? ("YES") : ("NO"));
 
 	delete cinfo;
 
@@ -79,9 +82,9 @@ int main()
 
 	delete option;
 
-	_DebugPrint(dbgmgr, __T("Bye."));
+	_DebugPrint(dbgmgr, ("Bye."));
 
-	system("pause");
+	//system("pause");
 	delete dbgmgr;
 	return 0;
 }

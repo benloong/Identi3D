@@ -35,8 +35,9 @@
 Nova\ 3D/ipch/
 obj/
 [Bb]in
-Nova\ 3D/[Dd]ebug*/
-Nova\ 3D/[Rr]elease*/
+tmp/
+*.vsp
+*.psess
 Ankh.NoLoad
 *.tlog
 *.lastbuildstate

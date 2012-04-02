@@ -21,7 +21,7 @@ namespace Identi3D {
 	 */
 	#if !defined (_DebugPrint)
 	# define _DebugPrint(DebugMgr, _Format, ...) \
-		((DebugMgr) && (reinterpret_cast<DebugManager *>(DebugMgr))->print(__FILE__, __LINE__, false, _Format, __VA_ARGS__))
+		((DebugMgr) && (static_cast<DebugManager *>(DebugMgr))->print(__FILE__, __LINE__, false, _Format, __VA_ARGS__))
 	#endif // !defined (_DebugPrint)
 	
 	/*
@@ -29,7 +29,7 @@ namespace Identi3D {
 	 */
 	#if !defined (_DebugPrintV)
 	# define _DebugPrintV(DebugMgr, _Format, ...) \
-		((DebugMgr) && (reinterpret_cast<DebugManager *>(DebugMgr))->print(__FILE__, __LINE__, true, _Format, __VA_ARGS__))
+		((DebugMgr) && (static_cast<DebugManager *>(DebugMgr))->print(__FILE__, __LINE__, true, _Format, __VA_ARGS__))
 	#endif // !defined (_DebugPrintV)
 
 	/*
@@ -119,6 +119,10 @@ namespace Identi3D {
 		std::streambuf *_prevbuf;
 
 		DWORD _flag;
+
+	private:
+		DebugManager(DebugManager &mgr);
+		DebugManager &operator=(DebugManager &rhs);
 
 	private:
 		const std::string getTimeStamp(void) const;

@@ -19,13 +19,13 @@ namespace Identi3D
 	ULONG item_hash[4];
 	const int max_hash_item = 4;
 
-	bool Direct3D9SettingsManager::convStringToBool(const TCHAR *str)
+	bool Direct3D9SettingsManager::convStringToBool(const wchar_t *str)
 	{
 		if(_tcscmp(str, __T("true")) == 0) return true;
 		return false;
 	}
 
-	const TCHAR *Direct3D9SettingsManager::convBoolToString(bool value)
+	const wchar_t *Direct3D9SettingsManager::convBoolToString(bool value)
 	{
 		if(value) return __T("true");
 		return __T("false");
@@ -96,7 +96,7 @@ namespace Identi3D
 	HRESULT Direct3D9SettingsManager::write(void)
 	{
 		OptionElement *p;
-		TCHAR tmpstr[256];
+		wchar_t tmpstr[256];
 		long s;
 
 		if(_tree == NULL) return E_FAIL;

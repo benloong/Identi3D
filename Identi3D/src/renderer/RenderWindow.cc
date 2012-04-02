@@ -29,7 +29,7 @@ namespace Identi3D
 		release();
 	}
 
-	HRESULT RenderWindow::assign(RenderDevice *device, const TCHAR *title)
+	HRESULT RenderWindow::assign(RenderDevice *device, const wchar_t *title)
 	{
 		HRESULT hr;
 
@@ -58,11 +58,11 @@ namespace Identi3D
 
 	void RenderWindow::generateClassName(void)
 	{
-		const TCHAR random_table[37] = __T("abcdefghijklmnopqrstuvwxyz0123456789");
+		const wchar_t random_table[37] = __T("abcdefghijklmnopqrstuvwxyz0123456789");
 		const UINT random_length = 7;
 
 		_tcscpy_s(class_name, __T("NRW"));
-		TCHAR *p = class_name + 3;
+		wchar_t *p = class_name + 3;
 		srand((unsigned int)time(NULL));
 		for(int i = 0; i < random_length; i++) {
 			*p = random_table[rand() % 36];
@@ -93,7 +93,7 @@ namespace Identi3D
 		RegisterClassEx(&wcex);
 	}
 
-	HRESULT RenderWindow::createWindow(int width, int height, const TCHAR *title)
+	HRESULT RenderWindow::createWindow(int width, int height, const wchar_t *title)
 	{
 		window = CreateWindow(
 			class_name, title, window_style, 

@@ -5,6 +5,7 @@
 
 #include <src/utils/SettingsManager.h>
 #include <src/utils/DebugManager.h>
+#include <src/identi3d/IdentiExceptions.h>
 
 namespace Identi3D
 {
@@ -19,70 +20,67 @@ namespace Identi3D
 	{
 	}
 
-	HRESULT SettingsManager::load(const TCHAR *filename)
+	bool SettingsManager::load(const std::wstring &path)
 	{
-		FILE *fp;
+		std::wifstream fin;
 		int correct, total;
-		TCHAR name[OPTIONTREE_NAME_MAXLEN + 1], value[OPTIONTREE_VALUE_MAXLEN + 1];
+		std::wstring name, value;
 
-		_tree.clean();
+		try{
+			_tree.clean();
+			correct = 0, total = 0;
 
-		_tfopen_s(&fp, filename, __T("r"));
-		if(fp == NULL) {
-			_DebugPrint(_debugger, E_FILE_OPEN_FAILURE, filename);
-			return E_FAIL;
-		}
-		correct = 0, total = 0;
-		memset(name, 0, sizeof(name));
-		memset(value, 0, sizeof(value));
-		while(!feof(fp)) {
-			_ftscanf_s(fp, __T("%s%s\r\n"), name, OPTIONTREE_NAME_MAXLEN + 1, value, OPTIONTREE_VALUE_MAXLEN + 1);
-			if(_tcslen(name) == 0 || _tcslen(value) == 0) continue;
-			if(_tree.addElement(name, value) != NULL) {
-				correct++;
+			fin.open(path);
+			if(!fin.is_open()) throw FileOperationFailureException();
+
+			while(!fin.eof()) {
+				fin >> name >> value;
+				if(name.length() == 0 || value.length() == 0) continue;
+				if(_tree.addElement(name, value)) correct++;
+				total++;
 			}
-			total++;
+
+			fin.close();
+			_DebugPrint(_debugger, I_SETTINGS_LOAD_COMPLETED, path, correct, total);
+		} catch(std::exception &e) {
+			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			fin.close();
+			return false;
 		}
-		fclose(fp);
-		_DebugPrint(_debugger, I_SETTINGS_LOAD_COMPLETED, filename, correct, total);
-		return S_OK;
+		return true;
 	}
 
-	HRESULT SettingsManager::save(const TCHAR *filename)
+	bool SettingsManager::save(const std::wstring &path)
 	{
-		FILE *fp;
+		std::wofstream fout;
 
-		_tfopen_s(&fp, filename, __T("w"));
-		if(fp == NULL) {
-			_DebugPrint(_debugger, E_FILE_OPEN_FAILURE, filename);
-			return E_FAIL;
+		try
+		{
+			fout.open(path);
+			if(!fout.is_open()) throw FileOperationFailureException();
+
+			saveElementRecursively(NULL, fout);
+			fout.close();
+		} catch(std::exception &e) {
+			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			fout.close();
+			return false;
 		}
-		saveOptionElement(NULL, fp);
-		fclose(fp);
-		return S_OK;
+		return true;
 	}
 
-	void SettingsManager::saveOptionElement(OptionElement *elem, FILE *fp)
+	void SettingsManager::saveElementRecursively(OptionElement *elem, std::wofstream &fout)
 	{
 		OptionIterator iter((elem == NULL) ? _tree.getRootIterator() : elem->child);
-		TCHAR loc[OPTIONTREE_LOCATION_MAXLEN];
 		
 		while(!iter.end()) {
 			if((*iter).child) {
-				saveOptionElement(iter.get(), fp);
+				saveElementRecursively(iter.get(), fout);
 			} else {
-				if(SUCCEEDED(_tree.getLocation(iter.get(), loc, OPTIONTREE_LOCATION_MAXLEN))) {
-					_ftprintf_s(fp, __T("%s %s\n"), loc, (*iter).value);
-				}
+				fout << (*iter).name << TEXT(" ") << (*iter).value << std::endl;
 			}
 			++iter;
 		}
-	}
-
-	void SettingsManager::setDebugManager(DebugManager *new_debugger)
-	{ 
-		_debugger = new_debugger;
-		_tree.setDebugManager(new_debugger);
 	}
 
 };

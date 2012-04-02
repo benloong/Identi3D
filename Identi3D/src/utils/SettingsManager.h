@@ -22,33 +22,42 @@ namespace Identi3D
 		DebugManager *_debugger;
 
 	private:
-		SettingsManager(DebugManager *debugger);
 		SettingsManager(SettingsManager &mgr);
-		~SettingsManager(void);
+		SettingsManager &operator=(SettingsManager &rhs);
 
-		void saveOptionElement(OptionElement *elem, FILE *fp);
+	private:
+		void saveElementRecursively(OptionElement *elem, std::wofstream &fout);
 
 	public:
+		SettingsManager(DebugManager *debugger);
+		~SettingsManager(void);
 
 		/*
 		 * Load configuration from file.
 		 */
-		HRESULT load(const TCHAR *filename);
+		bool load(const std::wstring &path);
 
 		/*
 		 * Write configuration to file.
 		 */
-		HRESULT save(const TCHAR *filename);
+		bool save(const std::wstring &path);
 
 		/*
 		 * Get the handle of global OptionTree.
 		 */
-		OptionTree *getOptionTree(void) { return &_tree; }
+		inline OptionTree &getOptionTree(void)
+		{
+			return _tree;
+		}
 
 		/*
 		 * Set a debug manager.
 		 */
-		void setDebugManager(DebugManager *new_debugger = NULL);
+		inline void setDebugManager(DebugManager *new_debugger = NULL)
+		{
+			_debugger = new_debugger;
+			_tree.setDebugManager(new_debugger);
+		}
 	};
 
 };

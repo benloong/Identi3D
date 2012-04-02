@@ -20,7 +20,7 @@ namespace Identi3D
 	private:
 		HWND			window;
 		RenderDevice	*render_device;
-		TCHAR			class_name[256];
+		wchar_t			class_name[256];
 		DebugManager	*debugger;
 
 	private:
@@ -38,12 +38,12 @@ namespace Identi3D
 		/*
 		 * Create window with specified attributes.
 		 */
-		HRESULT createWindow(int width, int height, const TCHAR *title);
+		HRESULT createWindow(int width, int height, const wchar_t *title);
 		
 		/*
 		 * Assign a render device for the window.
 		 */
-		HRESULT assign(RenderDevice *device, const TCHAR *title);
+		HRESULT assign(RenderDevice *device, const wchar_t *title);
 
 	public:
 

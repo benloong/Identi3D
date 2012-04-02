@@ -64,6 +64,9 @@
 // Identi3D Internal Libraries
 #include "Messages.h"
 
+// wchar_t string
+namespace std { typedef std::basic_string<wchar_t> wstring; };
+
 // Forward Declaration
 namespace Identi3D
 {

@@ -44,7 +44,7 @@ namespace Identi3D
 
 		Renderer *_renderer;
 
-		TCHAR _conf_path[261];
+		wchar_t _conf_path[261];
 
 	public:
 
@@ -57,7 +57,7 @@ namespace Identi3D
 		 *		SystemFlag_AllowFallbackConfig
 		 *		SystemFlag_DisableDebugManager
 		 */
-		HRESULT init(DWORD flag = NULL, const TCHAR *config_name = NULL);
+		HRESULT init(DWORD flag = NULL, const wchar_t *config_name = NULL);
 
 		/*
 		 * Release the system and save configuration.

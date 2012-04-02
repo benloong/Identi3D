@@ -160,84 +160,6 @@ namespace Identi3D {
 		return true;
 	}
 
-
-
-//	HRESULT DebugManager::print(const char *src_filename, 
-//								int line_number, 
-//								bool verbose,
-//								const TCHAR *message,
-//								...)
-//	{
-//		TCHAR	buffer[max_buffer_length], 
-//				tmp_buffer[max_buffer_length],
-//				msg_buffer[max_buffer_length],
-//				source_fname[max_buffer_length];
-//		time_t	rawtime;
-//		struct	tm tmetrics;
-//		va_list arg;
-//		size_t	s;
-//		
-//		if(src_filename == NULL || message == NULL) 
-//			return E_FAIL;
-//		if((output_flag & DebugFlag_VerboseMode) == 0 && verbose) 
-//			return S_FALSE;
-//
-//		va_start(arg, message);
-//		_vsntprintf_s(msg_buffer, max_buffer_length, message, arg);
-//		va_end(arg);
-//
-//		memset(buffer, 0, sizeof(buffer));
-//		_tcsncpy_s(buffer, perfix_mark, max_buffer_length - 1);
-//
-//		if(output_flag & DebugFlag_AttachTime) {					// Attach a timestamp.
-//			time(&rawtime);
-//			localtime_s(&tmetrics, &rawtime);						// Get local time
-//
-//			_sntprintf_s(tmp_buffer, max_buffer_length, time_format, month_name[tmetrics.tm_mon], 
-//				tmetrics.tm_mday, tmetrics.tm_hour, tmetrics.tm_min);
-//			connectString(buffer, tmp_buffer);
-//
-//			if(output_flag & DebugFlag_AttachSource) {
-//				connectString(buffer, info_seperator);
-//			}
-//		}
-//
-//		if(output_flag & DebugFlag_AttachSource){					// Attach source path & line.
-//
-//#if defined(_UNICODE)
-//			mbstowcs_s(&s, source_fname, src_filename, max_buffer_length);
-//			if(s == 0) return E_FAIL;
-//#else
-//			strncpy(source_fname, src_filename, max_buffer_length);
-//#endif
-//			truncSourceFileName(source_fname);
-//			_sntprintf_s(tmp_buffer, max_buffer_length, source_format, source_fname, line_number);
-//			connectString(buffer, tmp_buffer);
-//		}
-//
-//		connectString(buffer, suffix_mark);
-//		connectString(buffer, msg_buffer);
-//		connectString(buffer, __T("\n"));
-//
-//		if(output_flag & DebugFlag_ConsoleOutput && console != NULL)	// Write to console window (if any).
-//			_fputts(buffer, console);
-//		
-//		if(output_flag & DebugFlag_FileOutput){						// Write to log file.
-//			if(log_file == NULL){
-//				_tfopen_s(&log_file, DEBUGMANAGER_DEFAULT_FILENAME, __T("w"));
-//				if(log_file == NULL){
-//					_ftprintf(stderr, E_FILE_OPEN_FAILURE, DEBUGMANAGER_DEFAULT_FILENAME);
-//					output_flag &= ~DebugFlag_FileOutput;
-//				}
-//				_fputts(I_LOG_STARTED, log_file);
-//			}
-//
-//			_fputts(buffer, log_file);
-//		}
-//
-//		return S_OK;
-//	}
-
 	bool DebugManager::setOutputFileName(const std::string &new_filename)
 	{
 		try
@@ -350,7 +272,7 @@ namespace Identi3D {
 							stackframe.AddrPC.Offset);
 				} else {
 					if(GetLastError() == 0x1E7) {
-						printRawString(": No debug symbol loaded.");
+						printRawString(": No debug symbol loaded.\n");
 					}
 				}
 			}

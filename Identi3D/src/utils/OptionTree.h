@@ -8,30 +8,34 @@
 #define IDENTI3D_SRC_UTILS_OPTIONTREE_H
 
 #include <src/identi3d/General.h>
+#include <string>
 #include <iterator>
 
 typedef unsigned long ULONG;
 
-#define OPTIONTREE_NAME_MAXLEN		32
-#define OPTIONTREE_VALUE_MAXLEN		32
-#define OPTIONTREE_LOCATION_MAXLEN	260
-
-#define OPTIONTREE_MAX_DEPTH		10
-
-#define OPTIONELEMENT_GROUPVALUE	__T("")
-
 namespace Identi3D
 {
 
+	/*
+	 * Max size of hash table.
+	 */
+	const int OPTIONTREE_HASHTABLE_SIZE = 1087;
+
+	/*
+	 * Group value specified for OptionElement.
+	 */
+	const std::wstring OPTIONTREE_GROUPVALUE = __T("");
+
 	struct OptionElement
 	{
-		TCHAR		name[OPTIONTREE_NAME_MAXLEN + 1];
-		TCHAR		value[OPTIONTREE_VALUE_MAXLEN + 1];
-		UINT		hash;
+		std::wstring name;
+		std::wstring value;
+		ULONG		 hash;
 
 		struct OptionElement *child;
 		struct OptionElement *father;
 		struct OptionElement *next;
+		struct OptionElement *table_next;
 	};
 
 	class __declspec(dllexport) OptionIterator : 
@@ -56,76 +60,72 @@ namespace Identi3D
 	class __declspec(dllexport) OptionTree
 	{
 	private:
+		OptionElement *_table[OPTIONTREE_HASHTABLE_SIZE];
+
 		OptionElement *_root;
 		DebugManager *_debugger;
 
 	private:
 		OptionTree(const OptionTree &tree);
+		OptionTree &operator=(OptionTree &rhs);
+
+	private:
+		void rawDelete(OptionElement *elem);
 
 	public:
-		OptionTree(void) : _root(NULL), _debugger(NULL) {} ;
-		~OptionTree(void) { clean(); } ;
+		OptionTree(DebugManager *debugger = NULL);
+		~OptionTree(void);
 
 		/*
 		 * Get the hash value of a string.
 		 */
-		static ULONG hashString(const TCHAR *str);
+		static ULONG hashString(const wchar_t *str);
 
 		/*
 		 * Remove entire option tree.
 		 */
-		void clean(void);
+		bool clean(void);
 
 		/*
 		 * Get root level iterator.
 		 */
-		const OptionIterator getRootIterator(void) const { return OptionIterator(_root); }
+		inline const OptionIterator getRootIterator(void) const 
+		{ 
+			return OptionIterator(_root);
+		}
 		
 		/*
 		 * Add a option element (father == NULL specifies the Root node).
 		 */
-		OptionElement *addElement(OptionElement *father, const TCHAR *name, const TCHAR *value);
+		OptionElement *addElement(OptionElement *father, const std::wstring &name, const std::wstring &value);
 
 		/*
-		 * Add a option element according to the location.
+		 * Create the location and assign the value.
 		 */
-		OptionElement *addElement(const TCHAR *location, const TCHAR *value);
-		
-		/*
-		 * Remove the specified element.
-		 */
-		void removeElement(OptionElement *elem);
+		OptionElement *addElement(const std::wstring &location, const std::wstring &value);
 
 		/*
-		 * Set key in the location.
+		 * Set value of the location.
 		 */
-		HRESULT setValue(const TCHAR *location, const TCHAR *value);
+		bool setValue(const std::wstring &location, const std::wstring &value);
 			
 		/*
-		 * Get key value in the location.
-		 * Calls will fail if expected_type is not correct.
+		 * Get value of the location (return "" if not exists).
 		 */
-		HRESULT getValue(const TCHAR *location, TCHAR *value, UINT buffer_size);
+		const std::wstring getValue(const std::wstring &location) const;
 
 		/*
-		 * Translate element to location.
+		 * Check element's existence and fetch the object.
 		 */
-		HRESULT getLocation(OptionElement *elem, TCHAR *location, UINT buffer_size);
-
-		/*
-		 * Translate location to element.
-		 */
-		OptionElement *getElement(const TCHAR *location);
-
-		/*
-		 * Does item exist.
-		 */
-		OptionElement *checkExistence(OptionElement *father, const TCHAR *name);
+		OptionElement *getElement(const std::wstring &location) const;
 
 		/*
 		 * Set a debug manager.
 		 */
-		void setDebugManager(DebugManager *new_debugger = NULL) { _debugger = new_debugger; }
+		inline void setDebugManager(DebugManager *new_debugger = NULL)
+		{
+			_debugger = new_debugger;
+		}
 	};
 
 };

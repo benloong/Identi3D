@@ -25,7 +25,7 @@ namespace Identi3D
 		release();
 	}
 
-	HRESULT System::init(DWORD flag, const TCHAR *config_name)
+	HRESULT System::init(DWORD flag, const wchar_t *config_name)
 	{
 		HRESULT hr;
 

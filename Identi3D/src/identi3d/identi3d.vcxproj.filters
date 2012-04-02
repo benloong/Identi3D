@@ -50,8 +50,5 @@
     <ClCompile Include="EventListener.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IdentiExceptions.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

@@ -13,10 +13,10 @@ namespace Identi3D
 {
 
 #ifndef _DEBUG
-	const TCHAR *render_plugin_path[] = {	__T("PluginDirect3D9.dll"),
+	const wchar_t *render_plugin_path[] = {	__T("PluginDirect3D9.dll"),
 											__T("PluginOpenGL.dll"), };
 #else
-	const TCHAR *render_plugin_path[] = {	__T("PluginDirect3D9_d.dll"),
+	const wchar_t *render_plugin_path[] = {	__T("PluginDirect3D9_d.dll"),
 											__T("PluginOpenGL_d.dll"), };
 #endif
 
@@ -29,7 +29,7 @@ namespace Identi3D
 
 	HRESULT Renderer::createDevice(RenderBackendType type)
 	{
-		const TCHAR *path;
+		const wchar_t *path;
 		CREATERENDERDEVICE createRenderDevice;
 		HRESULT hr;
 
@@ -88,7 +88,7 @@ namespace Identi3D
 	{
 		HRESULT hr;
 		RenderBackendType rbt;
-		TCHAR value[64];
+		wchar_t value[64];
 
 		hr = _global_option->getValue(__T("System.DefaultRenderDevice"), value, 64);
 		if(FAILED(hr)) rbt = RenderBackendType_Direct3D9;
@@ -117,7 +117,7 @@ namespace Identi3D
 		return S_OK;
 	}
 
-	HRESULT Renderer::assignRenderWindow(RenderWindow *window, const TCHAR *window_title)
+	HRESULT Renderer::assignRenderWindow(RenderWindow *window, const wchar_t *window_title)
 	{
 		HRESULT hr;
 

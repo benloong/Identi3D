@@ -65,7 +65,7 @@ namespace Identi3D
 		/*
 		 * Assign a render target for the render device.
 		 */
-		HRESULT assignRenderWindow(RenderWindow *window, const TCHAR *window_title = IDENTI3D_NAME);
+		HRESULT assignRenderWindow(RenderWindow *window, const wchar_t *window_title = IDENTI3D_NAME);
 
 		/*
 		 * Get current render device.

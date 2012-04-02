@@ -19,8 +19,8 @@ namespace Identi3D
 		OptionTree		*_tree;
 
 	private:
-		bool convStringToBool(const TCHAR *str);
-		const TCHAR *convBoolToString(bool value);
+		bool convStringToBool(const wchar_t *str);
+		const wchar_t *convBoolToString(bool value);
 
 	public:
 		bool _is_windowed;

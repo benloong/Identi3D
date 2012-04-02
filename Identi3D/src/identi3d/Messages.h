@@ -26,17 +26,14 @@
 #define I_SYSTEM_RELEASE_SCHEDULED			("System is going to be released.")
 #define E_SYSTEM_RENDERER_CREATE_FAILED		("Failed to create a renderer.")
 
-// Debug Manager
-#define I_LOG_STARTED						("Identi3D Debugging System\nLog started.\n\n")
-
 // Settings Manager
 #define I_SETTINGS_LOAD_COMPLETED			("Settings load complete. Source: %S, %d/%d accepted.")
 
 // OptionTree
-#define W_OPTION_ELEMENT_ALREADY_EXISTS		("Element \"%S\" already exists in OptionTree. Value will be overwritten.")
-#define I_NEW_OPTION_ELEMENT_ADDED			("New element has been added: Name [%S], Value [%S].")
+#define W_OPTION_ELEMENT_ALREADY_EXISTS		"Element \"%S\" already exists in OptionTree. Value will be overwritten."
+#define I_NEW_OPTION_ELEMENT_ADDED			"New element added: Name [%S], Value [%S]."
+#define I_OPTION_TREE_REMOVED				"Option tree removed."
 #define I_OPTION_ELEMENT_REMOVAL_SCHEDULED	("Will now remove: Name [%S].")
-#define I_REMOVING_ENTIRE_OPTION_TREE		("Removing the entire option tree...")
 #define E_OPTION_ELEMENT_STACK_OVERFLOW		("Layers of location exceeded %d ; aborting...")
 #define I_OPTION_ELEMENT_LOCATION			("Location result: %S")
 #define I_OPTION_VALUE_MODIFIED				("Element \"%S\" value modified: New value = [%S].")

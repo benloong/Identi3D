@@ -84,7 +84,6 @@
   <ItemGroup>
     <ClCompile Include="EventDispatcher.cc" />
     <ClCompile Include="EventListener.cc" />
-    <ClCompile Include="IdentiExceptions.cc" />
     <ClCompile Include="System.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

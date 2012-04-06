@@ -73,16 +73,16 @@ namespace Identi3D
 					switch(i)
 					{
 					case OPTION_WINDOWED: 
-						_is_windowed = convStringToBool((*iter).value);
+						_is_windowed = convStringToBool((*iter).value.c_str());
 						break;
 					case OPTION_HAL:
-						_is_hardware_accelerated = convStringToBool((*iter).value);
+						_is_hardware_accelerated = convStringToBool((*iter).value.c_str());
 						break;
 					case OPTION_STENCIL:
-						_is_stencil_buffer_enabled = convStringToBool((*iter).value);
+						_is_stencil_buffer_enabled = convStringToBool((*iter).value.c_str());
 						break;
 					case OPTION_RESOLUTION:
-						_stscanf_s((*iter).value, __T("%dx%dx%d@%d"), 
+						_stscanf_s((*iter).value.c_str(), __T("%dx%dx%d@%d"), 
 							&_screen_width, &_screen_height, &_color_depth, &_refresh_rate);
 						break;
 					}
@@ -103,7 +103,7 @@ namespace Identi3D
 
 		p = _tree->getElement(__T("Graphics"));
 		if(p == NULL) {
-			p = _tree->addElement(NULL, __T("Graphics"), OPTIONELEMENT_GROUPVALUE);
+			p = _tree->addElement(NULL, __T("Graphics"), OPTIONTREE_GROUPVALUE);
 			if(p == NULL) {
 				_DebugPrint(_debugger, E_D3D9_OPTION_GROUP_CREATE_FAILED, __T("Graphics"));
 				return E_FAIL;

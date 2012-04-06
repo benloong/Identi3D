@@ -250,7 +250,7 @@ namespace Identi3D
 		g = static_cast<BYTE>(green * 255) & 0xFF;
 		b = static_cast<BYTE>(blue * 255) & 0xFF;
 		_clear_color = static_cast<D3DCOLOR>((0xFF << 24) + (r << 16) + (g << 8) + b);
-		_DebugPrintV(_debugger, __T("Clear color set to (%d, %d, %d)."), r, g, b);
+		_DebugPrintV(_debugger, ("Clear color set to (%d, %d, %d)."), r, g, b);
 	}
 
 };

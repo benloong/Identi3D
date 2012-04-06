@@ -90,8 +90,8 @@ namespace Identi3D
 		RenderBackendType rbt;
 		wchar_t value[64];
 
-		hr = _global_option->getValue(__T("System.DefaultRenderDevice"), value, 64);
-		if(FAILED(hr)) rbt = RenderBackendType_Direct3D9;
+		std::wstring result = _global_option->getValue(__T("System.DefaultRenderDevice"));
+		if(result == L"") rbt = RenderBackendType_Direct3D9;
 		else {
 			if(_tcscmp(value, __T("opengl")) == 0) {
 				rbt = RenderBackendType_OpenGL;

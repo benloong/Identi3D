@@ -5,11 +5,12 @@
 
 #include <src/identi3d/EventDispatcher.h>
 #include <src/identi3d/EventListener.h>
+#include <src/identi3d/IdentiExceptions.h>
 
 namespace Identi3D
 {
 
-	EventDispatcher::EventDispatcher(void)
+	EventDispatcher::EventDispatcher(DebugManager *debugger) : DebugFrame(debugger)
 	{
 		memset(_hook, 0, sizeof(_hook));
 		_hook_count = 0;
@@ -57,10 +58,17 @@ namespace Identi3D
 			return DefWindowProc(hwnd, msg, wparam, lparam);
 		}
 
-		abandoned = true;
-		retval = 0;
-		for(UINT i = 0; i < _hook_count; i++) {
-			if(_hook[i]->processRawPacket(packet, retval)) abandoned = false;
+		try
+		{
+			abandoned = true;
+			retval = 0;
+			for(UINT i = 0; i < _hook_count; i++) {
+				if(_hook[i]->processRawPacket(packet, retval)) abandoned = false;
+			}
+		} catch(std::exception &e) {
+			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+		} catch(...) {
+			if(_debugger) _debugger->print(__FILE__, __LINE__, UnknownException());
 		}
 
 		if(abandoned) return DefWindowProc(hwnd, msg, wparam, lparam);

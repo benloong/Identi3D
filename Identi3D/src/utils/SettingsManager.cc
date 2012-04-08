@@ -10,9 +10,8 @@
 namespace Identi3D
 {
 	
-	SettingsManager::SettingsManager(DebugManager *debugger)
+	SettingsManager::SettingsManager(DebugManager *debugger) : DebugFrame(debugger)
 	{
-		_debugger = debugger;
 		_tree.setDebugManager(debugger);
 	}
 
@@ -44,6 +43,7 @@ namespace Identi3D
 			_DebugPrint(_debugger, I_SETTINGS_LOAD_COMPLETED, path, correct, total);
 		} catch(std::exception &e) {
 			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_tree.clean();
 			fin.close();
 			return false;
 		}

@@ -14,10 +14,21 @@ namespace Identi3D {
 									"Jul", "Aug", "Sept", 
 									"Oct", "Nov", "Dec" };
 
+	size_t DebugManager::_allocated_memory = 0;
+
 	DebugManager::~DebugManager(void)
 	{
 		try
 		{
+#if defined(_MEMORY_LEAK_DETECTION)
+			if(_allocated_memory) {
+				printRawString(" [WARNING] Memory leaks detected before DebugManager freed. Orphan size: %d\n",
+					_allocated_memory);
+			} else {
+				printRawString(" No memory leaks detected.\n");
+			}
+#endif // defined(_MEMORY_LEAK_DETECTION)
+
 			if(!_prevbuf) {
 				std::clog.rdbuf(_prevbuf);
 				_prevbuf = NULL;
@@ -289,5 +300,14 @@ namespace Identi3D {
 		return ;
 	}
 
+	void DebugManager::onAllocation(size_t size)
+	{
+		_allocated_memory += size;
+	}
+
+	void DebugManager::onDeallocation(size_t size)
+	{
+		_allocated_memory -= size;
+	}
 
 };

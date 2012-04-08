@@ -13,12 +13,14 @@
 namespace Identi3D
 {
 
-	enum SystemFlag
+	struct SystemStartupProperties
 	{
-		SystemFlag_AllowFallbackConfig	= 0x00000001,
-		SystemFlag_DisableDebugManager	= 0x00000002,
+		bool disable_debug_manager;
+		bool disallow_fallback_config;
 
-		SystemFlag_ForceDword			= 0xFFFFFFFF
+		SystemStartupProperties(bool disableDebugManager, bool disallowFallbackConfig) :
+			disable_debug_manager(disableDebugManager),
+			disallow_fallback_config(disallowFallbackConfig) {};
 	};
 
 	enum SystemState
@@ -34,6 +36,7 @@ namespace Identi3D
 	{
 	private:
 		System(System &s);
+		System &operator=(System &rhs);
 
 	private:
 		SystemState _state;
@@ -44,7 +47,7 @@ namespace Identi3D
 
 		Renderer *_renderer;
 
-		wchar_t _conf_path[261];
+		std::wstring _conf_path;
 
 	public:
 
@@ -57,12 +60,12 @@ namespace Identi3D
 		 *		SystemFlag_AllowFallbackConfig
 		 *		SystemFlag_DisableDebugManager
 		 */
-		HRESULT init(DWORD flag = NULL, const wchar_t *config_name = NULL);
+		bool init(const std::wstring &config_name, const SystemStartupProperties &prop);
 
 		/*
 		 * Release the system and save configuration.
 		 */
-		HRESULT release(bool save_config = true);
+		bool release(bool save_config = true);
 
 		/*
 		 * Create a renderer.
@@ -87,27 +90,42 @@ namespace Identi3D
 		/*
 		 * Get Renderer handle.
 		 */
-		Renderer *getRenderer(void) const { return _renderer; }
+		inline Renderer &getRenderer(void) const
+		{
+			return *_renderer;
+		}
 
 		/*
 		 * Get DebugManager handle.
 		 */
-		DebugManager *getDebugManager(void) const { return _debugger; }
+		inline DebugManager &getDebugManager(void) const 
+		{
+			return *_debugger;
+		}
 
 		/*
 		 * Get SettingsManager handle.
 		 */
-		SettingsManager *getSettingsManager(void) const { return _confmgr; }
+		inline SettingsManager &getSettingsManager(void) const
+		{
+			return *_confmgr;
+		}
 
 		/*
 		 * Get EventDispatcher handle.
 		 */
-		EventDispatcher *getEventDispatcher(void) const { return _dispatcher; }
+		inline EventDispatcher &getEventDispatcher(void) const
+		{
+			return *_dispatcher;
+		}
 
 		/*
 		 * Get system state.
 		 */
-		SystemState getState(void) const { return _state; }
+		inline SystemState getState(void) const
+		{
+			return _state;
+		}
 
 	};
 

@@ -52,6 +52,30 @@ namespace Identi3D
 		}
 	};
 
+	class InitializationFailedException : public std::exception
+	{
+		const char *what(void) const throw ()
+		{
+			return "Failed to initialize object(s).";
+		}
+	};
+
+	class RenderingProcedureFailedException : public std::exception
+	{
+		const char *what(void) const throw()
+		{
+			return "System failed to render.";
+		}
+	};
+
+	class PrerequisiteNotSatisfiedException : public std::exception
+	{
+		const char *what(void) const throw()
+		{
+			return "Prerequisites are not satisfied.";
+		}
+	};
+
 };
 
 #endif // IDENTI3D_SRC_IDENTI3D_IDENTIEXCEPTION_H

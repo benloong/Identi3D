@@ -5,6 +5,7 @@
 
 #include <src/identi3d/System.h>
 #include <src/identi3d/EventDispatcher.h>
+#include <src/identi3d/IdentiExceptions.h>
 
 namespace Identi3D
 {
@@ -25,107 +26,88 @@ namespace Identi3D
 		release();
 	}
 
-	HRESULT System::init(DWORD flag, const wchar_t *config_name)
+	bool System::init(const std::wstring &config_name, const SystemStartupProperties &prop)
 	{
 		HRESULT hr;
 
-		if(_state != SystemState_NotInitialized) {
-			_DebugPrint(_debugger, E_SYSTEM_INITIALIZED);
-			return E_FAIL;
-		}
+		try
+		{
+			// Already initialized.
+			if(_state != SystemState_NotInitialized) return true;
 
-		if((flag & SystemFlag_DisableDebugManager) == 0) {
-			_debugger = new (std::nothrow) DebugManager;
-			if(_debugger == NULL) {
-				_DebugPrint(_debugger, E_OUT_OF_MEMORY);
-				return E_FAIL;
+			// Create a DebugManager instance.
+			if(!prop.disable_debug_manager) {
+				_debugger = new DebugManager();
 			}
-		} else {
-			_debugger = NULL;
-		}
 
-		_dispatcher = new (std::nothrow) EventDispatcher;
-		if(_dispatcher == NULL) {
-			delete _debugger;
-			_debugger = NULL;
-			_DebugPrint(_debugger, E_OUT_OF_MEMORY);
-		}
+			_dispatcher = new EventDispatcher(_debugger);
+			_confmgr = new SettingsManager(_debugger);
 
-		_confmgr = new (std::nothrow) SettingsManager(_debugger);
-		if(_confmgr == NULL) {
-			delete _dispatcher;
-			_dispatcher = NULL;
-			delete _debugger;
-			_debugger = NULL;
-			_DebugPrint(_debugger, E_OUT_OF_MEMORY);
-			return E_FAIL;
-		}
-
-		if(config_name != NULL) {
-			if(_tcslen(config_name) < 260) {
+			// Load configuration.
+			if(config_name.length() > 0) {
 				_DebugPrintV(_debugger, I_SYSTEM_LOAD_CONFIGURATION, config_name);
-				hr = _confmgr->load(config_name);
-				if(SUCCEEDED(hr)) {
+				if(_confmgr->load(config_name)) {
+					// Load successfully.
 					_DebugPrintV(_debugger, I_SYSTEM_CONFIGURATION_LOAD_SUCCESS);
-					_tcscpy_s(_conf_path, config_name);
+					_conf_path = config_name;		// Make a copy of configuration path.
 				} else {
 					_DebugPrint(_debugger, E_SYSTEM_CONFIGURATION_LOAD_FAIL);
-					if((flag & SystemFlag_AllowFallbackConfig) == NULL) {
-						delete _confmgr;
-						_confmgr = NULL;
-						delete _dispatcher;
-						_dispatcher = NULL;
-						delete _debugger;
-						_debugger = NULL;
-						return E_FAIL;
+					if(prop.disallow_fallback_config) {
+						// If fallback configuration is not acceptable.
+						throw InvalidParametersException();
 					}
 				}
-			} else {
-				_DebugPrint(_debugger, E_SYSTEM_CONFIGURATION_LOAD_FAIL);
-				if((flag & SystemFlag_AllowFallbackConfig) == NULL) {
-					delete _confmgr;
-					_confmgr = NULL;
-					delete _dispatcher;
-					_dispatcher = NULL;
-					delete _debugger;
-					_debugger = NULL;
-					return E_FAIL;
-				}
 			}
-		}
 
-		if(NULL == createRenderer()) {
+			if(NULL == createRenderer()) throw InitializationFailedException();
+
+			_state = SystemState_Idle;
+			_DebugPrintV(_debugger, I_SYSTEM_CREATE_SUCCESS);
+		} catch(std::exception &e) {
+			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+
+			// Whoa, crashed. Do all cleanup jobs.
+			releaseRenderer();
+
 			delete _confmgr;
 			_confmgr = NULL;
+
 			delete _dispatcher;
 			_dispatcher = NULL;
+
 			delete _debugger;
 			_debugger = NULL;
-			_DebugPrint(_debugger, E_SYSTEM_RENDERER_CREATE_FAILED);
-			return E_FAIL;
-		}
 
-		_state = SystemState_Idle;
-		_DebugPrintV(_debugger, I_SYSTEM_CREATE_SUCCESS);
-		return S_OK;
+			return false;
+		}
+		return true;
 	}
 
-	HRESULT System::release(bool save_config)
+	bool System::release(bool save_config)
 	{
-		if(_state == SystemState_NotInitialized) return S_FALSE;
+		// System not initialized.
+		if(_state == SystemState_NotInitialized) return true;
+		
+		_DebugPrintV(_debugger, I_SYSTEM_RELEASING);
 
+		// Stop listener.
+		if(_state == SystemState_Listening) kill();
+
+		// Kill renderer.
 		releaseRenderer();
 
-		if(save_config)
-		{
+		// Write configuration back.
+		if(save_config)	{
 			_confmgr->save(_conf_path);
 		}
 		delete _confmgr;
 		_confmgr = NULL;
 
+		// Kill event dispatcher.
 		delete _dispatcher;
+		_dispatcher = NULL;
 
-		_DebugPrintV(_debugger, I_SYSTEM_RELEASE_SCHEDULED);
+		// Kill debugger.
 		delete _debugger;
 		_debugger = NULL;
 
@@ -135,12 +117,14 @@ namespace Identi3D
 
 	Renderer *System::createRenderer(void)
 	{
-		if(_renderer) delete _renderer;
-
-		_renderer = new (std::nothrow) Renderer(_debugger);
-		if(_renderer == NULL) {
-			_DebugPrint(_debugger, E_OUT_OF_MEMORY);
-			return NULL;
+		try
+		{
+			if(_renderer) delete _renderer;
+			_renderer = new Renderer(_debugger);
+		} catch(std::exception &e) {
+			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			delete _renderer;
+			_renderer = NULL;
 		}
 
 		return _renderer;
@@ -169,13 +153,17 @@ namespace Identi3D
 			}
 			if(msg.message == WM_QUIT) break;
 
-			if(_renderer->_render_device->isRunning()) {
-				hr = _renderer->_render_device->startRendering(true, true, true);
-				if(FAILED(hr)) {
-					_DebugPrint(_debugger, E_START_RENDERING_FAILURE);
+			try
+			{
+				if(_renderer->_render_device->isRunning()) {
+					hr = _renderer->_render_device->startRendering(true, true, true);
+					if(FAILED(hr)) throw RenderingProcedureFailedException();
+					_dispatcher->postEvent(Event_Rendering);
+					_renderer->_render_device->endRendering();
 				}
-				_dispatcher->postEvent(Event_Rendering);
-				_renderer->_render_device->endRendering();
+			} catch(std::exception &e) {
+				_dispatcher->postEvent(Event_RenderExceptionCaught);
+				if(_debugger) _debugger->print(__FILE__, __LINE__, e);
 			}
 		}
 		
@@ -185,7 +173,7 @@ namespace Identi3D
 
 	void System::kill(void)
 	{
-		if(_renderer->_render_window)
+		if(_renderer && _renderer->_render_window)
 			DestroyWindow(_renderer->_render_window->getHandle());
 	}
 

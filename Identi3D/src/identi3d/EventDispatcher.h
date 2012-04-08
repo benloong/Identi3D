@@ -8,6 +8,7 @@
 #define IDENTI3D_SRC_IDENTI3D_EVENTDISPATCHER_H
 
 #include <src/identi3d/General.h>
+#include <src/utils/DebugManager.h>
 
 #define MAX_EVENT_LISTENER	5
 
@@ -19,26 +20,31 @@ namespace Identi3D
 		Event_Rendering		= 0x00000001,
 		Event_KeyPressed	= 0x00000002,
 
+		Event_RenderExceptionCaught	= 0x00010001,
+
 		Event_ForceDword	= 0xFFFFFFFF
 	};
 
 	struct EventPacket
 	{
-		//HWND target_window; [INVALID]	// Event target window, NULL specifies BOARDCAST.
 		Event event_message;		// Event content
 		UINT time_since_last_frame;	// Time since last frame
 		DWORD param1;
 		DWORD param2;
 	};
 
-	class EventDispatcher
+	class EventDispatcher : public DebugFrame
 	{
 	private:
 		EventListener *_hook[MAX_EVENT_LISTENER];
 		UINT _hook_count;
 
+	private:
+		EventDispatcher(EventDispatcher &dispatcher);
+		EventDispatcher &operator=(EventDispatcher &rhs);
+
 	public:
-		EventDispatcher(void);
+		EventDispatcher(DebugManager *debugger = NULL);
 		~EventDispatcher(void) {} ;
 
 		HRESULT RegisterEventListener(EventListener *listener);

@@ -8,18 +8,18 @@
 #define IDENTI3D_SRC_UTILS_SETTINGSMANAGER_H
 
 #include <src/identi3d/General.h>
+#include <src/utils/DebugManager.h>
 #include <src/utils/OptionTree.h>
 
 namespace Identi3D
 {
 
-	class __declspec(dllexport) SettingsManager
+	class __declspec(dllexport) SettingsManager : public DebugFrame
 	{
 		friend class System;
 
 	private:
 		OptionTree _tree;
-		DebugManager *_debugger;
 
 	private:
 		SettingsManager(SettingsManager &mgr);
@@ -29,7 +29,7 @@ namespace Identi3D
 		void saveElementRecursively(OptionElement *elem, std::wofstream &fout);
 
 	public:
-		SettingsManager(DebugManager *debugger);
+		SettingsManager(DebugManager *debugger = NULL);
 		~SettingsManager(void);
 
 		/*
@@ -53,10 +53,10 @@ namespace Identi3D
 		/*
 		 * Set a debug manager.
 		 */
-		inline void setDebugManager(DebugManager *new_debugger = NULL)
+		void setDebugManager(DebugManager *debugger = NULL)
 		{
-			_debugger = new_debugger;
-			_tree.setDebugManager(new_debugger);
+			_debugger = debugger;
+			_tree.setDebugManager(debugger);
 		}
 	};
 

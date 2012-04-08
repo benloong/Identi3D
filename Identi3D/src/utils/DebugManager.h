@@ -113,12 +113,23 @@ namespace Identi3D {
 		 */
 		inline const DWORD getFlag(void) const { return _flag; }
 
+		/*
+		 * On memory allocation.
+		 */
+		static void onAllocation(size_t size);
+
+		/*
+		 * On memory deallocation.
+		 */
+		static void onDeallocation(size_t size);
+
 	private:
 		std::ofstream _log;
 		std::ofstream _console;
 		std::streambuf *_prevbuf;
 
 		DWORD _flag;
+		static size_t _allocated_memory;
 
 	private:
 		DebugManager(DebugManager &mgr);
@@ -128,6 +139,49 @@ namespace Identi3D {
 		const std::string getTimeStamp(void) const;
 		const std::string getFormattedSourcePath(const char *src_path, int line_number) const;
 		void printRawString(const char *str, ...);
+	};
+
+	class __declspec(dllexport) DebugFrame
+	{
+	protected:
+		DebugManager *_debugger;
+
+	public:
+
+		DebugFrame(DebugManager *debugger = NULL)
+		{
+			_debugger = debugger;
+		}
+
+		virtual ~DebugFrame(void) {} ;
+
+#if defined(_MEMORY_LEAK_DETECTION)
+		/*
+		 * Override object's new operator.
+		 */
+		static void *operator new(size_t size)
+		{
+			DebugManager::onAllocation(size);
+			return ::operator new(size);
+		}
+
+		/*
+		 * Override object's delete operator.
+		 */
+		static void operator delete(void *p, size_t size)
+		{
+			DebugManager::onDeallocation(size);
+			::operator delete(p);
+		}
+#endif //
+		
+		/*
+		 * Set a debug manager.
+		 */
+		virtual void setDebugManager(DebugManager *debugger = NULL)
+		{
+			_debugger = debugger;
+		}
 	};
 
 };

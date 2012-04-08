@@ -8,6 +8,7 @@
 #define IDENTI3D_SRC_UTILS_OPTIONTREE_H
 
 #include <src/identi3d/General.h>
+#include <src/utils/DebugManager.h>
 #include <string>
 #include <iterator>
 
@@ -36,6 +37,20 @@ namespace Identi3D
 		struct OptionElement *father;
 		struct OptionElement *next;
 		struct OptionElement *table_next;
+
+#if defined (_MEMORY_LEAK_DETECTION)
+		static void *operator new(size_t size)
+		{
+			DebugManager::onAllocation(size);
+			return ::operator new(size);
+		}
+
+		static void operator delete(void *p, size_t size)
+		{
+			DebugManager::onDeallocation(size);
+			return ::operator delete(p);
+		}
+#endif // defined (_MEMORY_LEAK_DETECTION)
 	};
 
 	class __declspec(dllexport) OptionIterator : 
@@ -57,13 +72,12 @@ namespace Identi3D
 		bool end(void) const { return _ptr == NULL; }
 	};
 
-	class __declspec(dllexport) OptionTree
+	class __declspec(dllexport) OptionTree : public DebugFrame
 	{
 	private:
 		OptionElement *_table[OPTIONTREE_HASHTABLE_SIZE];
 
 		OptionElement *_root;
-		DebugManager *_debugger;
 
 	private:
 		OptionTree(const OptionTree &tree);
@@ -118,14 +132,6 @@ namespace Identi3D
 		 * Check element's existence and fetch the object.
 		 */
 		OptionElement *getElement(const std::wstring &location) const;
-
-		/*
-		 * Set a debug manager.
-		 */
-		inline void setDebugManager(DebugManager *new_debugger = NULL)
-		{
-			_debugger = new_debugger;
-		}
 	};
 
 };

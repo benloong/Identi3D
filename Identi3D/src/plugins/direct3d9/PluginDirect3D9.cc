@@ -4,7 +4,7 @@
 //
 
 #include <src/plugins/direct3d9/PluginDirect3D9.h>
-
+#include <src/identi3d/IdentiExceptions.h>
 #include <src/renderer/RenderWindow.h>
 #include <src/utils/DebugManager.h>
 #include <src/utils/OptionTree.h>
@@ -32,28 +32,51 @@ namespace Identi3D
 		release();
 	}
 
-	HRESULT PluginDirect3D9::init(RenderWindow *target, OptionTree *option)
+	bool PluginDirect3D9::init(RenderWindow &target, OptionTree *option)
 	{
-		_settings.read(option);
+		try
+		{
+			// Only one instance is allowed.
+			if(_is_running) return true;
 
-		_direct3d = Direct3DCreate9(D3D_SDK_VERSION);
-		if(_direct3d == NULL){
-			_DebugPrint(_debugger, E_DIRECT3D_INIT_FAILURE);
-			return E_FAIL;
+			// Load configuration.
+			if(option) _settings.read(option);
+
+			// Create Direct3D9 object.
+			_direct3d = Direct3DCreate9(D3D_SDK_VERSION);
+			if(_direct3d == NULL) throw InitializationFailedException();
+			
+			// Store render target handle.
+			_render_target = &target;
+
+			D3DFORMAT format = (_settings._color_depth == 16) ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+
+			// Check display device compatibility.
+			if(!checkPrerequisite(format)) throw PrerequisiteNotSatisfiedException();
+
+			// Initialize device.
+			if(!run(format)) throw InitializationFailedException();
+		} catch(std::exception &e) {
+			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_settings.reset();
+			_render_target = NULL;
+			if(_direct3d) {
+				_direct3d->Release();
+				_direct3d = NULL;
+			}
+			return false;
 		}
-		_render_target = target;
 
-		if(!checkPrerequisite()) return E_FAIL;
-		return run();
+		return true;
 	}
 
-	bool PluginDirect3D9::checkPrerequisite(void)
+	bool PluginDirect3D9::checkPrerequisite(D3DFORMAT format)
 	{
 		D3DDISPLAYMODE mode;
 		UINT i, count = 0;
 		HRESULT hr;
 
-		count = _direct3d->GetAdapterModeCount(D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8);
+		count = _direct3d->GetAdapterModeCount(D3DADAPTER_DEFAULT, format);
 		if(0 == count){
 			_DebugPrint(_debugger, E_NO_DISPLAY_MODE_AVAILABLE);
 			return false;
@@ -62,7 +85,7 @@ namespace Identi3D
 		_DebugPrintV(_debugger, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
 
 		for(i = 0; i < count; i++){
-			hr = _direct3d->EnumAdapterModes(D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8, i, &mode);
+			hr = _direct3d->EnumAdapterModes(D3DADAPTER_DEFAULT, format, i, &mode);
 			if(FAILED(hr)){
 				_DebugPrint(_debugger, E_ENUMERATE_DISPLAY_MODE_FAILURE);
 				return false;
@@ -71,7 +94,7 @@ namespace Identi3D
 			if(_settings._screen_width == mode.Width && 
 				_settings._screen_height == mode.Height &&
 				_settings._refresh_rate == mode.RefreshRate &&
-				mode.Format == D3DFMT_X8R8G8B8){
+				mode.Format == format){
 					_DebugPrint(_debugger, I_DISPLAY_MODE_FOUND);
 					break;
 			}
@@ -83,7 +106,7 @@ namespace Identi3D
 
 		hr = _direct3d->CheckDeviceType(D3DADAPTER_DEFAULT, 
 			(_settings._is_hardware_accelerated ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
-			D3DFMT_X8R8G8B8, D3DFMT_X8R8G8B8, _settings._is_windowed);
+			format, format, _settings._is_windowed);
 		if(FAILED(hr)){
 			_DebugPrint(_debugger, E_NOT_SUPPORTED_MODE);
 			return false;
@@ -92,20 +115,22 @@ namespace Identi3D
 		return true;
 	}
 
-	HRESULT PluginDirect3D9::run(void)
+	bool PluginDirect3D9::run(D3DFORMAT format)
 	{
 		HRESULT hr;
 		DWORD flag;
 		D3DCAPS9 caps;
 
+		// Get device capabilities
 		hr = _direct3d->GetDeviceCaps(D3DADAPTER_DEFAULT,
 			(_settings._is_hardware_accelerated ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
 			&caps);
 		if(FAILED(hr)) {
 			_DebugPrint(_debugger, E_GET_DEVICE_CAPABILITIES_FAILURE);
-			return E_FAIL;
+			return false;
 		}
 		
+		// Set hardware acceleration.
 		flag = 0;
 		if(caps.VertexProcessingCaps) {
 			flag |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
@@ -113,53 +138,52 @@ namespace Identi3D
 			flag |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 		}
 		
+		// Set present parameters.
 		memset(&_present_parameters, 0, sizeof(_present_parameters));
 		_present_parameters.hDeviceWindow = _render_target->getHandle();
 		_present_parameters.Windowed = (_settings._is_windowed) ? TRUE : FALSE;
 		_present_parameters.BackBufferCount = 1;
-		_present_parameters.BackBufferFormat = D3DFMT_X8R8G8B8;		// Temporarily set to D3DFMT_X8R8G8B8
+		_present_parameters.BackBufferFormat = format;
 		_present_parameters.EnableAutoDepthStencil = TRUE;
-		_present_parameters.AutoDepthStencilFormat = D3DFMT_D24S8;	// Temporarily set to D3DFMT_D24S8
+		_present_parameters.AutoDepthStencilFormat = D3DFMT_D24S8;	// TODO: Temporarily set to D3DFMT_D24S8
 		_present_parameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
 
+		// Set screen resolution.
+		_present_parameters.BackBufferWidth = _settings._screen_width;
+		_present_parameters.BackBufferHeight = _settings._screen_height;
 		if(!_settings._is_windowed) {
 			_present_parameters.FullScreen_RefreshRateInHz = _settings._refresh_rate;
-			_present_parameters.BackBufferWidth = _settings._screen_width;
-			_present_parameters.BackBufferHeight = _settings._screen_height;
 			ShowCursor(FALSE);
-		} else {
-			_present_parameters.BackBufferWidth = GetSystemMetrics(SM_CXSCREEN);
-			_present_parameters.BackBufferHeight = GetSystemMetrics(SM_CYSCREEN);
 		}
 
 		// Enable FSAA ( TODO: Replace it by reading configuration. )
 		hr = _direct3d->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT,
 			(_settings._is_hardware_accelerated ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
-			D3DFMT_X8R8G8B8,
-			(_settings._is_windowed ? TRUE : FALSE),
+			format, (_settings._is_windowed ? TRUE : FALSE),
 			D3DMULTISAMPLE_2_SAMPLES,
 			NULL);
 		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_FSAA_NOT_AVAILABLE);
+			_DebugPrint(_debugger, W_FSAA_NOT_AVAILABLE);
 			_present_parameters.MultiSampleType = D3DMULTISAMPLE_NONE;
 		} else {
 			_present_parameters.MultiSampleType = D3DMULTISAMPLE_2_SAMPLES;
 		}
 
+		// Create device.
 		hr = _direct3d->CreateDevice(D3DADAPTER_DEFAULT,
-			(_settings._is_hardware_accelerated ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
-			_render_target->getHandle(),
-			flag,
+			(_settings._is_hardware_accelerated ? D3DDEVTYPE_HAL : D3DDEVTYPE_SW),
+			_render_target->getHandle(), flag,
 			&_present_parameters,
 			&_direct_device);
 		if(FAILED(hr)) {
 			_DebugPrint(_debugger, E_CREATE_DIRECT3D_DEVICE_FAILURE);
-			return E_FAIL;
+			_direct_device == NULL;
+			return false;
 		}
 
 		_is_running = true;
 		_is_scene_running = false;
-		return S_OK;
+		return true;
 	}
 
 	void PluginDirect3D9::release(void)
@@ -176,7 +200,7 @@ namespace Identi3D
 		return _is_running;
 	}
 
-	HRESULT PluginDirect3D9::startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil)
+	bool PluginDirect3D9::startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil)
 	{
 		DWORD clear_flag = 0;
 		HRESULT hr;
@@ -204,12 +228,12 @@ namespace Identi3D
 	void PluginDirect3D9::endRendering(void)
 	{
 		if(!_is_scene_running) return ;
+		_is_scene_running = false;
 		_direct_device->EndScene();
 		_direct_device->Present(NULL, NULL, NULL, NULL);
-		_is_scene_running = false;
 	}
 
-	HRESULT PluginDirect3D9::clear(bool clear_pixel, bool clear_depth, bool clear_stencil)
+	bool PluginDirect3D9::clear(bool clear_pixel, bool clear_depth, bool clear_stencil)
 	{
 		DWORD clear_flag = 0;
 		HRESULT hr;
@@ -250,7 +274,7 @@ namespace Identi3D
 		g = static_cast<BYTE>(green * 255) & 0xFF;
 		b = static_cast<BYTE>(blue * 255) & 0xFF;
 		_clear_color = static_cast<D3DCOLOR>((0xFF << 24) + (r << 16) + (g << 8) + b);
-		_DebugPrintV(_debugger, __T("Clear color set to (%d, %d, %d)."), r, g, b);
+		_DebugPrintV(_debugger, I_SET_CLEAR_COLOR, r, g, b);
 	}
 
 };

@@ -7,18 +7,17 @@
 #ifndef IDENTI3D_SRC_PLUGINS_DIRECT3D9_PLUGINDIRECT3D9_H
 #define IDENTI3D_SRC_PLUGINS_DIRECT3D9_PLUGINDIRECT3D9_H
 
-#include <src/plugins/direct3d9/Settings.h>
-
 #include <src/identi3d/General.h>
+#include <src/plugins/direct3d9/Settings.h>
+#include <src/utils/DebugManager.h>
 #include <src/renderer/RenderDevice.h>
-#include <src/utils/OptionTree.h>
 
 #include <d3d9.h>
 
 namespace Identi3D
 {
 
-	class PluginDirect3D9 : public RenderDevice
+	class PluginDirect3D9 : public RenderDevice, public DebugFrame
 	{
 	private:
 		RenderWindow			*_render_target;
@@ -32,13 +31,12 @@ namespace Identi3D
 		DebugManager			*_debugger;
 		Direct3D9SettingsManager _settings;
 		
-		bool	_is_running;
-		bool	_is_scene_running;
-
+		bool _is_running;
+		bool _is_scene_running;
 
 	private:
-		HRESULT run(void);
-		bool	checkPrerequisite(void);
+		bool run(D3DFORMAT format);
+		bool checkPrerequisite(D3DFORMAT format);
 
 	public:
 
@@ -48,7 +46,7 @@ namespace Identi3D
 		/*
 		 * Initialize the render device.
 		 */
-		HRESULT init(RenderWindow *target, OptionTree *option = NULL);
+		bool init(RenderWindow &target, OptionTree *option = NULL);
 
 		/*
 		 * Release the render device.
@@ -63,7 +61,7 @@ namespace Identi3D
 		/*
 		 * Start the rendering procedure.
 		 */
-		HRESULT startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil);
+		bool startRendering(bool clear_pixel, bool clear_depth, bool clear_stencil);
 
 		/*
 		 * End the rendering procedure.
@@ -73,7 +71,7 @@ namespace Identi3D
 		/*
 		 * Clear screen buffer.
 		 */
-		HRESULT	clear(bool clear_pixel, bool clear_depth, bool clear_stencil);
+		bool clear(bool clear_pixel, bool clear_depth, bool clear_stencil);
 
 		/*
 		 * Set clear color.

@@ -46,6 +46,10 @@
 # define _SSE_ONLY
 #endif // !defined (_SSE_ONLY)
 
+// Enable memory leak detection
+#if !defined (_MEMORY_LEAK_DETECTION)
+# define _MEMORY_LEAK_DETECTION
+#endif // !defined (_MEMORY_LEAK_DETECTION)
 
 // C++ runtime libraries.
 #include <cstdio>

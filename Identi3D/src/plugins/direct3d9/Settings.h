@@ -8,19 +8,25 @@
 #define IDENTI3D_SRC_PLUGINS_DIRECT3D9_SETTINGS_H
 
 #include <src/identi3d/General.h>
+#include <src/utils/DebugManager.h>
 
 namespace Identi3D
 {
 	
-	class Direct3D9SettingsManager
+	class Direct3D9SettingsManager : public DebugFrame
 	{
 	private:
-		DebugManager	*_debugger;
-		OptionTree		*_tree;
+		OptionTree	*_tree;
 
 	private:
-		bool convStringToBool(const wchar_t *str);
-		const wchar_t *convBoolToString(bool value);
+
+		/*
+		 * Convert from string to bool.
+		 */
+		inline bool convStringToBool(const std::wstring &str)
+		{
+			return (str == std::wstring(TEXT("true")));
+		}
 
 	public:
 		bool _is_windowed;
@@ -33,7 +39,7 @@ namespace Identi3D
 
 	public:
 		
-		Direct3D9SettingsManager(void);
+		Direct3D9SettingsManager(DebugManager *debugger = NULL);
 		~Direct3D9SettingsManager(void) {} ;
 
 		/*
@@ -44,17 +50,12 @@ namespace Identi3D
 		/*
 		 * Read configuration from OptionTree.
 		 */
-		HRESULT read(OptionTree *tree);
+		bool read(OptionTree *tree);
 
 		/*
 		 * Write configuration to OptionTree.
 		 */
-		HRESULT write(void);
-
-		/*
-		 * Set a debug manager.
-		 */
-		void setDebugManager(DebugManager *new_debugger = NULL) { _debugger = new_debugger; }
+		bool write(void);
 	};
 
 };

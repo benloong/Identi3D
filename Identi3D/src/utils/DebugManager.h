@@ -9,28 +9,7 @@
 
 #include <src/identi3d/General.h>
 
-#pragma warning (disable : 4251)
-
-#include <fstream>
-#include <string>
-
 namespace Identi3D {
-
-	/*
-	 * Prints non-verbose debug messages.
-	 */
-	#if !defined (_DebugPrint)
-	# define _DebugPrint(DebugMgr, _Format, ...) \
-		((DebugMgr) && (static_cast<DebugManager *>(DebugMgr))->print(__FILE__, __LINE__, false, _Format, __VA_ARGS__))
-	#endif // !defined (_DebugPrint)
-	
-	/*
-	 * Prints verbose debug messages.
-	 */
-	#if !defined (_DebugPrintV)
-	# define _DebugPrintV(DebugMgr, _Format, ...) \
-		((DebugMgr) && (static_cast<DebugManager *>(DebugMgr))->print(__FILE__, __LINE__, true, _Format, __VA_ARGS__))
-	#endif // !defined (_DebugPrintV)
 
 	/*
 	 * Several flags used in formatting the output.
@@ -70,6 +49,10 @@ namespace Identi3D {
 	 */
 	static const std::string DEBUGMANAGER_WELCOMEMESSAGE = "Identi3D: Logging started.\n\n";
 
+	/*
+	 * Undefined class signature.
+	 */
+	static const char *DEBUGFRAME_UNDEFINEDSIGNATURE = "undefined";
 
 	class __declspec(dllexport) DebugManager
 	{
@@ -82,6 +65,11 @@ namespace Identi3D {
 		 * Write debugging information to log file.
 		 */
 		bool print(const char *src_path, int line_number, bool verbose, const char *message, ...) throw ();
+		
+		/*
+		 * Write debugging information to log file.
+		 */
+		bool print(const char *src_path, int line_number, bool verbose, const char *message, va_list &arg) throw ();
 
 		/*
 		 * Write the specified exception to log file.
@@ -106,22 +94,60 @@ namespace Identi3D {
 		/*
 		 * Set output flag.
 		 */
-		inline void setFlag(DWORD new_flag = DEBUGMANAGER_DEFAULTFLAG) { _flag = new_flag; }
+		inline void setFlag(DWORD new_flag = DEBUGMANAGER_DEFAULTFLAG) throw () { _flag = new_flag; }
 
 		/*
 		 * Get current output flag.
 		 */
-		inline const DWORD getFlag(void) const { return _flag; }
+		inline const DWORD getFlag(void) const throw () { return _flag; }
 
 		/*
 		 * On memory allocation.
 		 */
-		static void onAllocation(size_t size);
+		static void onAllocation(size_t size) throw ();
 
 		/*
 		 * On memory deallocation.
 		 */
-		static void onDeallocation(size_t size);
+		static void onDeallocation(size_t size) throw ();
+
+		/*
+		 * Print memory allocation status.
+		 */
+		void printMemoryStatus(void) throw ();
+
+		/*
+		 * Query global debug manager availability.
+		 */
+		static bool isValid(void) throw ();
+
+		/*
+		 * Print raw string without being processed.
+		 */
+		void printRawString(const char *str, ...) throw ();
+
+	public:
+		/*
+		 * Overload new operator.
+		 */
+		static void *operator new(size_t size) throw();
+
+		/*
+		 * Overload delete operator.
+		 */
+		static void operator delete(void *p) throw();
+
+	private:
+		/*
+		 * Restrict access to create multiple DebugManager object.
+		 */
+		static void *operator new[](size_t size);
+		static void *operator new[](size_t size, void *p);
+
+		/*
+		 * and deny inplacement new as well.
+		 */
+		static void *operator new(size_t size, void *p);
 
 	private:
 		std::ofstream _log;
@@ -129,7 +155,9 @@ namespace Identi3D {
 		std::streambuf *_prevbuf;
 
 		DWORD _flag;
+
 		static size_t _allocated_memory;
+		static bool _is_valid;
 
 	private:
 		DebugManager(DebugManager &mgr);
@@ -138,50 +166,58 @@ namespace Identi3D {
 	private:
 		const std::string getTimeStamp(void) const;
 		const std::string getFormattedSourcePath(const char *src_path, int line_number) const;
-		void printRawString(const char *str, ...);
 	};
 
 	class __declspec(dllexport) DebugFrame
 	{
 	protected:
 		DebugManager *_debugger;
+		std::string _sign;
 
 	public:
 
-		DebugFrame(DebugManager *debugger = NULL)
-		{
-			_debugger = debugger;
-		}
-
-		virtual ~DebugFrame(void) {} ;
+		DebugFrame(DebugManager *debugger = NULL, const char *class_sign = DEBUGFRAME_UNDEFINEDSIGNATURE);
+		virtual ~DebugFrame(void) = 0;
 
 #if defined(_MEMORY_LEAK_DETECTION)
 		/*
 		 * Override object's new operator.
 		 */
-		static void *operator new(size_t size)
-		{
-			DebugManager::onAllocation(size);
-			return ::operator new(size);
-		}
+		static void *operator new(size_t size);
+		static void *operator new[](size_t size);
 
 		/*
 		 * Override object's delete operator.
 		 */
-		static void operator delete(void *p, size_t size)
-		{
-			DebugManager::onDeallocation(size);
-			::operator delete(p);
-		}
-#endif //
+		static void operator delete(void *p, size_t size);
+		static void operator delete[](void *p, size_t size);
+
+#endif // defined(_MEMORY_LEAK_DETECTION)
 		
 		/*
 		 * Set a debug manager.
 		 */
-		virtual void setDebugManager(DebugManager *debugger = NULL)
-		{
-			_debugger = debugger;
-		}
+		virtual void setDebugManager(DebugManager *debugger = NULL);
+		
+	protected:
+
+		/*
+		 * Print an exception.
+		 * Pass __FILE__ and __LINE__ for first two arguments.
+		 */
+		bool _printException(const char *src_path, int line_number, const std::exception &e) const;
+
+		/*
+		 * Print verbose message.
+		 * Pass __FILE__ and __LINE__ for first two arguments.
+		 */
+		bool _printVerboseMessage(const char *src_path, int line_number, const char *message, ...) const;
+
+		/*
+		 * Print normal message.
+		 * Pass __FILE__ and __LINE__ for first two arguments.
+		 */
+		bool _printMessage(const char *src_path, int line_number, const char *message, ...) const;
 	};
 
 };

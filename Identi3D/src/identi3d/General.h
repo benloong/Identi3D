@@ -10,48 +10,75 @@
 #ifndef IDENTI3D_SRC_IDENTI3D_GENERAL_H
 #define IDENTI3D_SRC_IDENTI3D_GENERAL_H
 
-// General Name
+/*
+ * Detect unicode support.
+ */
+#if !defined (UNICODE)
+# error "Identi3D Library: Requires unicode environment."
+#endif // !define (UNICODE)
+
+/*
+ * Identi3D general name string.
+ */
 #if !defined (IDENTI3D_NAME)
-# if defined (UNICODE)
-#  define IDENTI3D_NAME			L"Identi3D"
-# else
-#  define IDENTI3D_NAME			"Identi3D"
-# endif // defined (UNICODE)
+# define IDENTI3D_NAME			L"Identi3D"
 #endif // !defined (IDENTI3D_NAME)
 
-// Version 0.1 [PRERELEASE]
+/*
+ * Current library version:
+ *    0.1 [prerelease]
+ */
 #if !defined (IDENTI3D_VERSION)
 # define IDENTI3D_VERSION			0x0001
 #else
 # error "Identi3D Library: Version conflict detected."
 #endif // !defined (IDENTI3D_VERSION)
 
-// Check platform
+/*
+ * Check target platform.
+ */
 #if defined (_WIN32)
 # include <Windows.h>
+
+/*
+ * Compile DirectX support module.
+ */
 # if !defined (_TARGET_DIRECTX)
 #  define _TARGET_DIRECTX
 # endif // !defined (_TARGET_DIRECTX)
+
 #else
 # error "Identi3D Library: Support Windows platform only."
 #endif // defined (_WIN32)
 
-// 16 bit data align.
+/*
+ * Enable 16 bit data align.
+ * Essential for SSE computation.
+ */
 #if !defined (_DATA_ALIGN)
 # define _DATA_ALIGN __declspec(align(16))
 #endif // !defined(_DATA_ALIGN)
 
-// Compile SSE code only.
+/*
+ * Compile SSE code only [Improve Performance].
+ * Many CPUs are shipped with SSE support,
+ *   cutting away normal calculations seems to be fine.
+ */
 #if !defined (_SSE_ONLY)
 # define _SSE_ONLY
 #endif // !defined (_SSE_ONLY)
 
-// Enable memory leak detection
+/*
+ * Enable internal memory leak detection.
+ * Object inherited from DebugFrame will be recorded.
+ */
 #if !defined (_MEMORY_LEAK_DETECTION)
 # define _MEMORY_LEAK_DETECTION
 #endif // !defined (_MEMORY_LEAK_DETECTION)
 
-// C++ runtime libraries.
+/*
+ * C++ Runtime and STL libraries.
+ */
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -60,18 +87,29 @@
 #include <cmath>
 #include <new>
 #include <fstream>
+#include <string>
 #include <tchar.h>
 
+/*
+ * SSE & SSE2 essentials.
+ */
 #include <xmmintrin.h>
 #include <intrin.h>
 
-// Identi3D Internal Libraries
+/*
+ * Something went wrong between STL and DLL classes.
+ * No affect though, just disable it.
+ */
+#pragma warning (disable : 4251)
+
+/*
+ * Debug messages header file.
+ */
 #include "Messages.h"
 
-// wchar_t string
-namespace std { typedef std::basic_string<wchar_t> wstring; };
-
-// Forward Declaration
+/*
+ * Forward declaration.
+ */
 namespace Identi3D
 {
 	
@@ -116,6 +154,7 @@ namespace Identi3D
 
 	class CpuInfo;
 	class DebugManager;
+	class DebugFrame;
 	class OptionTree;
 	class SettingsManager;
 

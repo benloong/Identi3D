@@ -9,15 +9,6 @@
 
 namespace Identi3D
 {
-	
-	SettingsManager::SettingsManager(DebugManager *debugger) : DebugFrame(debugger)
-	{
-		_tree.setDebugManager(debugger);
-	}
-
-	SettingsManager::~SettingsManager(void)
-	{
-	}
 
 	bool SettingsManager::load(const std::wstring &path)
 	{
@@ -32,7 +23,7 @@ namespace Identi3D
 			fin.open(path);
 			if(!fin.is_open()) throw FileOperationFailureException();
 
-			while(!fin.eof()) {
+			while(!fin) {
 				fin >> name >> value;
 				if(name.length() == 0 || value.length() == 0) continue;
 				if(_tree.addElement(name, value)) correct++;
@@ -40,9 +31,9 @@ namespace Identi3D
 			}
 
 			fin.close();
-			_DebugPrint(_debugger, I_SETTINGS_LOAD_COMPLETED, path, correct, total);
+			_printVerboseMessage(__FILE__, __LINE__, I_SETTINGS_LOAD_COMPLETED, path, correct, total);
 		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_printException(__FILE__, __LINE__, e);
 			_tree.clean();
 			fin.close();
 			return false;
@@ -62,22 +53,22 @@ namespace Identi3D
 			saveElementRecursively(NULL, fout);
 			fout.close();
 		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_printException(__FILE__, __LINE__, e);
 			fout.close();
 			return false;
 		}
 		return true;
 	}
 
-	void SettingsManager::saveElementRecursively(OptionElement *elem, std::wofstream &fout)
+	void SettingsManager::saveElementRecursively(const OptionElement *elem, std::wofstream &fout)
 	{
 		OptionIterator iter((elem == NULL) ? _tree.getRootIterator() : elem->child);
 		
-		while(!iter.end()) {
-			if((*iter).child) {
+		while(!iter) {
+			if(iter->child) {
 				saveElementRecursively(iter.get(), fout);
 			} else {
-				fout << (*iter).name << TEXT(" ") << (*iter).value << std::endl;
+				fout << iter->name << TEXT(" ") << iter->value << std::endl;
 			}
 			++iter;
 		}

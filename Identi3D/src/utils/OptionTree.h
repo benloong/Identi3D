@@ -41,14 +41,32 @@ namespace Identi3D
 #if defined (_MEMORY_LEAK_DETECTION)
 		static void *operator new(size_t size)
 		{
-			DebugManager::onAllocation(size);
-			return ::operator new(size);
+			void *p = ::operator new(size, std::nothrow);
+			if(p != NULL) {
+				DebugManager::onAllocation(size);
+			}
+			return p;
+		}
+
+		static void *operator new[](size_t size)
+		{
+			void *p = ::operator new[](size, std::nothrow);
+			if(p != NULL) {
+				DebugManager::onAllocation(size);
+			}
+			return p;
 		}
 
 		static void operator delete(void *p, size_t size)
 		{
 			DebugManager::onDeallocation(size);
-			return ::operator delete(p);
+			return ::operator delete(p, std::nothrow);
+		}
+
+		static void operator delete[](void *p, size_t size)
+		{
+			DebugManager::onDeallocation(size);
+			return ::operator delete[](p, std::nothrow);
 		}
 #endif // defined (_MEMORY_LEAK_DETECTION)
 	};
@@ -56,20 +74,25 @@ namespace Identi3D
 	class __declspec(dllexport) OptionIterator : 
 		public std::iterator<std::input_iterator_tag, OptionElement>
 	{
+	private:
 		OptionElement *_ptr;
 
 	public:
+		OptionIterator(void) : _ptr(NULL) {} ;
 		OptionIterator(OptionElement *elem) : _ptr(elem) {} ;
 		OptionIterator(const OptionIterator &iter) : _ptr(iter._ptr) {} ;
+		~OptionIterator(void) {} ;
 		
-		OptionIterator &operator ++() { if(_ptr) _ptr = _ptr->next; return *this; }
-		OptionIterator operator ++(int) { OptionIterator tmp(*this); operator++(); return tmp; }
-		bool operator ==(const OptionIterator &iter) const { return _ptr == iter._ptr; }
-		bool operator !=(const OptionIterator &iter) const { return _ptr != iter._ptr; }
-		OptionElement &operator *() { return *_ptr; }
+		inline OptionIterator &operator ++() { if(_ptr) _ptr = _ptr->next; return *this; }
+		inline OptionIterator operator ++(int) { OptionIterator tmp(*this); operator++(); return tmp; }
+		inline bool operator ==(const OptionIterator &iter) const { return _ptr == iter._ptr; }
+		inline bool operator !=(const OptionIterator &iter) const { return _ptr != iter._ptr; }
+		inline bool operator !(void) const { return _ptr == NULL; }
+		inline const OptionElement *operator ->(void) const { return _ptr; }
+		inline const OptionElement &operator *(void) const { return *_ptr; }
 
-		OptionElement *get(void) { return _ptr; }
-		bool end(void) const { return _ptr == NULL; }
+		inline const OptionElement *get(void) const { return _ptr; }
+		inline bool end(void) const { return _ptr == NULL; }
 	};
 
 	class __declspec(dllexport) OptionTree : public DebugFrame
@@ -103,7 +126,7 @@ namespace Identi3D
 		/*
 		 * Get root level iterator.
 		 */
-		inline const OptionIterator getRootIterator(void) const 
+		inline OptionIterator getRootIterator(void) const 
 		{ 
 			return OptionIterator(_root);
 		}

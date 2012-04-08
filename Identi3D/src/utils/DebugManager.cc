@@ -15,6 +15,7 @@ namespace Identi3D {
 									"Oct", "Nov", "Dec" };
 
 	size_t DebugManager::_allocated_memory = 0;
+	bool DebugManager::_is_valid = false;
 
 	DebugManager::~DebugManager(void)
 	{
@@ -79,20 +80,23 @@ namespace Identi3D {
 
 		char msg[max_buffer_length];
 		va_list arg;
+		
+		try
+		{
+			va_start(arg, str);
+			_vsnprintf_s(msg, max_buffer_length, str, arg);
+			va_end(arg);
 
-		va_start(arg, str);
-		_vsnprintf_s(msg, max_buffer_length, str, arg);
-		va_end(arg);
+			if(_flag & DebugFlag_ConsoleOutput)
+				std::clog << msg;
 
-		if(_flag & DebugFlag_ConsoleOutput)
-			std::clog << msg;
+			if(_flag & DebugFlag_FileOutput) {
+				if(!_log.is_open())
+					if(!setOutputFileName()) return ;
 
-		if(_flag & DebugFlag_FileOutput) {
-			if(!_log.is_open())
-				if(!setOutputFileName()) return ;
-
-			_log << msg;
-		}
+				_log << msg;
+			}
+		} catch(...) {} ;
 	}
 
 	bool DebugManager::print(const char *src_path, 
@@ -133,18 +137,31 @@ namespace Identi3D {
 							 bool verbose, 
 							 const char *message, ...)
 	{
-		if(src_path == NULL) return false;
-
-		const int max_buffer_length = 512;
-
-		char format[max_buffer_length];
+		bool retval;
 		va_list arg;
 
 		try
 		{
 			va_start(arg, message);
-			_vsnprintf_s(format, max_buffer_length, message, arg);
+			retval = print(src_path, line_number, verbose, message, arg);
 			va_end(arg);
+		} catch(...) {
+			return false;
+		}
+
+		return true;
+	}
+
+	bool DebugManager::print(const char *src_path, int line_number, bool verbose, const char *message, va_list &arg)
+	{
+		const int max_buffer_length = 512;
+		char format[max_buffer_length];
+		
+		if(src_path == NULL) return false;
+
+		try
+		{
+			_vsnprintf_s(format, max_buffer_length, message, arg);
 
 			std::string msg;
 
@@ -221,7 +238,7 @@ namespace Identi3D {
 
 		CONTEXT context;
 		STACKFRAME64 stackframe;
-		HANDLE process, thread;
+		HANDLE process = 0, thread = 0;
 		PSYMBOL_INFO symbol = NULL;
 		IMAGEHLP_LINE64 source_info;
 		DWORD displacement;
@@ -232,7 +249,8 @@ namespace Identi3D {
 		{
 			// Initialize symbol info structure.
 			bufsize = sizeof(SYMBOL_INFO) + (max_name_length - 1) * sizeof(char);
-			symbol = static_cast<PSYMBOL_INFO>(operator new(bufsize));
+			symbol = static_cast<PSYMBOL_INFO>(::operator new(bufsize));
+			if(symbol == NULL) return ;
 			memset(symbol, 0, bufsize);
 			symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 			symbol->MaxNameLen = max_name_length;
@@ -296,7 +314,7 @@ namespace Identi3D {
 		} catch(...) {
 			if(lib_init) SymCleanup(process);
 		}
-		operator delete(symbol);
+		::operator delete(symbol);
 		return ;
 	}
 
@@ -308,6 +326,121 @@ namespace Identi3D {
 	void DebugManager::onDeallocation(size_t size)
 	{
 		_allocated_memory -= size;
+	}
+
+	void DebugManager::printMemoryStatus(void)
+	{
+		printRawString("\tMEMORY STATUS: %d byte(s) allocated.\n", _allocated_memory);
+	}
+
+	bool DebugManager::isValid(void)
+	{
+		return _is_valid;
+	}
+
+	void *DebugManager::operator new(size_t size)
+	{
+		// Only one instance allowed.
+		if(_is_valid) return NULL;
+
+		void *p = ::operator new(size, std::nothrow);
+		if(p != NULL) {
+			_is_valid = true;
+		}
+		return p;
+	}
+
+	void DebugManager::operator delete(void *p)
+	{
+		_is_valid = false;
+		::operator delete(p, std::nothrow);
+	}
+
+	DebugFrame::DebugFrame(DebugManager *debugger, const char *class_sign)
+	{
+		_debugger = debugger;
+		if(debugger) {
+			debugger->printRawString("=== object [%s] initialized ===\n", class_sign);
+		}
+		_sign = class_sign;
+	}
+
+	DebugFrame::~DebugFrame(void)
+	{
+		if(_debugger != NULL && DebugManager::isValid()) {
+			_debugger->printRawString("=== object [%s] freed ===\n", _sign.c_str());
+		}
+	}
+
+	void *DebugFrame::operator new(size_t size)
+	{
+		void *p = ::operator new(size, std::nothrow);
+		if(p != NULL) {
+			DebugManager::onAllocation(size);
+		}
+		return p;
+	}
+
+	void *DebugFrame::operator new[](size_t size)
+	{
+		void *p = ::operator new[](size, std::nothrow);
+		if(p != NULL) {
+			DebugManager::onAllocation(size);
+		}
+		return p;
+	}
+
+	void DebugFrame::operator delete(void *p, size_t size)
+	{
+		DebugManager::onDeallocation(size);
+		::operator delete(p, std::nothrow);
+	}
+
+	void DebugFrame::operator delete[](void *p, size_t size)
+	{
+		DebugManager::onDeallocation(size);
+		::operator delete[](p, std::nothrow);
+	}
+
+	void DebugFrame::setDebugManager(DebugManager *debugger)
+	{
+		_debugger = debugger;
+	}
+
+	bool DebugFrame::_printException(const char *src_path, int line_number, const std::exception &e) const
+	{
+		if(_debugger != NULL && DebugManager::isValid()) {
+			return _debugger->print(src_path, line_number, e);
+		}
+		return false;
+	}
+
+	bool DebugFrame::_printVerboseMessage(const char *src_path, int line_number, const char *message, ...) const
+	{
+		if(_debugger != NULL && DebugManager::isValid()) {
+			va_list arg;
+			bool retval;
+
+			va_start(arg, message);
+			retval = _debugger->print(src_path, line_number, true, message, arg);
+			va_end(arg);
+			return retval;
+		}
+		return false;
+	}
+
+	bool DebugFrame::_printMessage(const char *src_path, int line_number, const char *message, ...) const
+	{
+		if(_debugger != NULL && DebugManager::isValid()) {
+			va_list arg;
+			bool retval;
+
+			va_start(arg, message);
+			retval = _debugger->print(src_path, line_number, false, message, arg);
+			va_end(arg);
+			return retval;
+		}
+		return false;
 	}
 
 };

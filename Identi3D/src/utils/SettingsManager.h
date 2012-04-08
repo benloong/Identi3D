@@ -26,11 +26,11 @@ namespace Identi3D
 		SettingsManager &operator=(SettingsManager &rhs);
 
 	private:
-		void saveElementRecursively(OptionElement *elem, std::wofstream &fout);
+		void saveElementRecursively(const OptionElement *elem, std::wofstream &fout);
 
 	public:
-		SettingsManager(DebugManager *debugger = NULL);
-		~SettingsManager(void);
+		SettingsManager(DebugManager *debugger = NULL) : DebugFrame(debugger), _tree(debugger) {} ;
+		~SettingsManager(void) {} ;
 
 		/*
 		 * Load configuration from file.
@@ -44,10 +44,11 @@ namespace Identi3D
 
 		/*
 		 * Get the handle of global OptionTree.
+		 * Return reference to prohibit unexpected delete operation.
 		 */
-		inline OptionTree *getOptionTree(void)
+		inline OptionTree &getOptionTree(void)
 		{
-			return &_tree;
+			return _tree;
 		}
 
 		/*
@@ -55,7 +56,7 @@ namespace Identi3D
 		 */
 		void setDebugManager(DebugManager *debugger = NULL)
 		{
-			_debugger = debugger;
+			this->DebugFrame::setDebugManager(debugger);
 			_tree.setDebugManager(debugger);
 		}
 	};

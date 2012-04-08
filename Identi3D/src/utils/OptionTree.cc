@@ -10,7 +10,7 @@ namespace Identi3D
 {
 
 	OptionTree::OptionTree(DebugManager *debugger) 
-		: _root(NULL), DebugFrame(debugger)
+		: _root(NULL), DebugFrame(debugger, "OptionTree")
 	{
 		memset(_table, 0, sizeof(_table));
 	}
@@ -50,7 +50,7 @@ namespace Identi3D
 
 			p = getElement(location);		// If already exists, assign the value and return.
 			if(p != NULL) {
-				_DebugPrintV(_debugger, W_OPTION_ELEMENT_ALREADY_EXISTS, name);
+				_printVerboseMessage(__FILE__, __LINE__, W_OPTION_ELEMENT_ALREADY_EXISTS, name);
 				p->value = value;
 				return p;
 			}
@@ -74,7 +74,7 @@ namespace Identi3D
 			p->table_next = _table[p->hash];
 			_table[p->hash] = p;
 
-			_DebugPrintV(_debugger, I_NEW_OPTION_ELEMENT_ADDED, p->name.c_str(), p->value.c_str());
+			_printVerboseMessage(__FILE__, __LINE__, I_NEW_OPTION_ELEMENT_ADDED, p->name.c_str(), p->value.c_str());
 		} catch(std::exception &e) {
 			if(p != NULL) {
 				if(father == NULL) {
@@ -87,7 +87,7 @@ namespace Identi3D
 				delete p;
 				p = NULL;
 			}
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_printException(__FILE__, __LINE__, e);
 		}
 		return p;
 	}
@@ -140,7 +140,7 @@ namespace Identi3D
 				pos = next;
 			}
 		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_printException(__FILE__, __LINE__, e);
 		}
 		return NULL;
 	}
@@ -183,11 +183,11 @@ namespace Identi3D
 			_root = NULL;
 			memset(_table, 0, sizeof(_table));
 		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_printException(__FILE__, __LINE__, e);
 			return false;
 		}
 
-		_DebugPrintV(_debugger, I_OPTION_TREE_REMOVED);
+		_printVerboseMessage(__FILE__, __LINE__, I_OPTION_TREE_REMOVED);
 		return true;
 	}
 
@@ -212,10 +212,10 @@ namespace Identi3D
 			p = getElement(location);
 			if(p != NULL) {
 				p->value = value;
-				_DebugPrintV(_debugger, I_OPTION_VALUE_MODIFIED, p->name, value);
+				_printVerboseMessage(__FILE__, __LINE__, I_OPTION_VALUE_MODIFIED, p->name, value);
 			}
 		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_printException(__FILE__, __LINE__, e);
 		}
 
 		return false;
@@ -234,7 +234,7 @@ namespace Identi3D
 				p = p->table_next;
 			}
 		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
+			_printException(__FILE__, __LINE__, e);
 		}
 
 		return std::wstring(__T(""));

@@ -8,7 +8,6 @@
 #define IDENTI3D_SRC_MATH_PLANE_H
 
 #include <src/identi3d/General.h>
-#include <src/math/Angle.h>
 #include <src/math/Vector.h>
 
 namespace Identi3D

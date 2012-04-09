@@ -15,7 +15,6 @@
 #include <src/identi3d/EventListener.h>
 
 #include <src/math/AABB.h>
-#include <src/math/Angle.h>
 #include <src/math/Matrix.h>
 #include <src/math/OBB.h>
 #include <src/math/Plane.h>

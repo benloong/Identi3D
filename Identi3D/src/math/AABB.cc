@@ -13,12 +13,14 @@ namespace Identi3D
 {
 
 	AxisAlignedBoundingBox::AxisAlignedBoundingBox(const Vector3 &min, const Vector3 &max)
+		 : DebugFrame(NULL)
 	{
 		_bounds[0] = min;
 		_bounds[1] = max;
 	}
 
 	AxisAlignedBoundingBox::AxisAlignedBoundingBox(const OrientedBoundingBox &obb)
+		 : DebugFrame(NULL)
 	{
 		construct(obb);
 	}

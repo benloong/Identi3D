@@ -10,7 +10,7 @@ namespace Identi3D
 {
 
 	OptionTree::OptionTree(DebugManager *debugger) 
-		: _root(NULL), DebugFrame(debugger, "OptionTree")
+		: _root(NULL), DebugFrame(debugger)
 	{
 		memset(_table, 0, sizeof(_table));
 	}

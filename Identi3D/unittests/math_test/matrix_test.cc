@@ -3,6 +3,7 @@
 // ====================
 //
 
+#include "vector_test.h"
 #include "matrix_test.h"
 
 using namespace std;

@@ -42,7 +42,7 @@ namespace Identi3D
 
 	void Ray::detransform(const Matrix &m)
 	{
-		Matrix s = m;
+		Matrix s(m);
 		
 		_origin._x -= s._d1;
 		_origin._y -= s._d2;
@@ -65,7 +65,7 @@ namespace Identi3D
 		det = edge1 * pvec;
 
 		if(cull_backside) {
-			if(det < _DEFAULT_EPSILON) return false;
+			if(det < FLT_EPSILON) return false;
 			inv_det = 1.0f / det;
 			tvec = _origin - v0;
 			u = tvec * pvec;
@@ -81,7 +81,7 @@ namespace Identi3D
 				(*hit) = v0 * (1 - u - v) + v1 * u + v2 * v;
 			}
 		} else {
-			if(_fzero(det)) return false;
+			if(fabs(det) < FLT_EPSILON) return false;
 			inv_det = 1.0f / det;
 			tvec = _origin - v0;
 			u = tvec * pvec * inv_det;
@@ -99,7 +99,7 @@ namespace Identi3D
 	bool Ray::intersect(const Plane &p, bool cull_backside, float *distance, Vector3 *hit) const
 	{
 		float f = p._normal * _direction;
-		if(f > -_DEFAULT_EPSILON && (f < _DEFAULT_EPSILON || cull_backside)) return false;
+		if(f > -FLT_EPSILON && (f < FLT_EPSILON || cull_backside)) return false;
 		float t = (-(p._normal * _origin) + p._dist) / f;
 		if(t < 0.0f) return false;
 
@@ -150,7 +150,7 @@ namespace Identi3D
 			a = obb._axis[i] * p;
 			b = obb._axis[i] * _direction;
 
-			if(_fzero(b)) {
+			if(fabs(b) < FLT_EPSILON) {
 				if((-a - obb._extent[i]) > 0.0f ||
 					(-a + obb._extent[i]) < 0.0f) {
 						return false;

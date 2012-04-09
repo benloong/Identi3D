@@ -29,7 +29,8 @@ namespace Identi3D
 		void saveElementRecursively(const OptionElement *elem, std::wofstream &fout);
 
 	public:
-		SettingsManager(DebugManager *debugger = NULL) : DebugFrame(debugger), _tree(debugger) {} ;
+		SettingsManager(DebugManager *debugger = NULL) 
+			: DebugFrame(debugger), _tree(debugger) {} ;
 		~SettingsManager(void) {} ;
 
 		/*

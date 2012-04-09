@@ -172,11 +172,10 @@ namespace Identi3D {
 	{
 	protected:
 		DebugManager *_debugger;
-		std::string _sign;
 
 	public:
 
-		DebugFrame(DebugManager *debugger = NULL, const char *class_sign = DEBUGFRAME_UNDEFINEDSIGNATURE);
+		DebugFrame(DebugManager *debugger = NULL);
 		virtual ~DebugFrame(void) = 0;
 
 #if defined(_MEMORY_LEAK_DETECTION)

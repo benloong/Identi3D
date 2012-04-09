@@ -13,6 +13,9 @@
 
 #include "timer.h"
 
+#define _fcomp(a, b) (fabs((a) - (b)) < FLT_EPSILON)
+#define _fzero(a) (fabs(a) < FLT_EPSILON)
+
 namespace Identi3D
 {
 

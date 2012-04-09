@@ -82,7 +82,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
-    <ClInclude Include="Angle.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Plane.h" />

@@ -10,7 +10,7 @@
 namespace Identi3D
 {
 
-	CpuInfo::CpuInfo(DebugManager *debugger) : DebugFrame(debugger, "CpuInfo")
+	CpuInfo::CpuInfo(DebugManager *debugger) : DebugFrame(debugger)
 	{
 		int data[4];
 		

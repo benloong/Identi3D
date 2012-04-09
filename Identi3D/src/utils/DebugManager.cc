@@ -356,20 +356,13 @@ namespace Identi3D {
 		::operator delete(p, std::nothrow);
 	}
 
-	DebugFrame::DebugFrame(DebugManager *debugger, const char *class_sign)
+	DebugFrame::DebugFrame(DebugManager *debugger)
 	{
 		_debugger = debugger;
-		if(debugger) {
-			debugger->printRawString("=== object [%s] initialized ===\n", class_sign);
-		}
-		_sign = class_sign;
 	}
 
 	DebugFrame::~DebugFrame(void)
 	{
-		if(_debugger != NULL && DebugManager::isValid()) {
-			_debugger->printRawString("=== object [%s] freed ===\n", _sign.c_str());
-		}
 	}
 
 	void *DebugFrame::operator new(size_t size)

@@ -17,7 +17,7 @@ using namespace std;
 class MyTest : public DebugFrame
 {
 public:
-	MyTest(DebugManager *debugger) : DebugFrame(debugger, "MyTest") 
+	MyTest(DebugManager *debugger) : DebugFrame(debugger) 
 	{
 		_debugger->printRawString("MyTest class loaded.\n");
 	}

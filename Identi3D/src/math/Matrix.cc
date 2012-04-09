@@ -3,14 +3,15 @@
 // ===============
 //
 
-#include <src/math/Angle.h>
 #include <src/math/Matrix.h>
 #include <src/utils/CPU.h>
+#include <src/math/Vector.h>
 
 namespace Identi3D
 {
 
 	Matrix::Matrix(void)
+		 : DebugFrame(NULL)
 	{
 		_data[0] = _mm_setzero_ps();
 		_data[1] = _mm_setzero_ps();
@@ -18,10 +19,17 @@ namespace Identi3D
 		_data[3] = _mm_setzero_ps();
 	}
 
+	Matrix::Matrix(const Matrix &m)
+		 : DebugFrame(NULL)
+	{
+		this->operator=(m);
+	}
+
 	Matrix::Matrix(float a1, float a2, float a3, float a4,
 				   float b1, float b2, float b3, float b4,
 				   float c1, float c2, float c3, float c4,
 				   float d1, float d2, float d3, float d4)
+		 : DebugFrame(NULL)
 	{
 		_data[0] = _mm_set_ps(a1, a2, a3, a4);
 		_data[1] = _mm_set_ps(b1, b2, b3, b4);
@@ -46,7 +54,7 @@ namespace Identi3D
 			_data[n] = _mm_set_ps(n1, n2, n3, n4);
 		}
 	}
-
+#include <float.h>
 	void Matrix::setColumn(int n, float an, float bn, float cn, float dn)
 	{
 		if(n >= 0 && n < 4) {
@@ -73,9 +81,9 @@ namespace Identi3D
 			_d1 = _d2 = _d3 = 0.0f;
 	}
 
-	void Matrix::rotateX(const Angle &a)
+	void Matrix::rotateX(float a)
 	{
-		float fc = cosf(a._rad), fs = sinf(a._rad);
+		float fc = cosf(a), fs = sinf(a);
 
 		/*
 		 *	1		0		0		0
@@ -93,9 +101,9 @@ namespace Identi3D
 			_d1 = _d2 = _d3 = 0.0f;
 	}
 
-	void Matrix::rotateY(const Angle &a)
+	void Matrix::rotateY(float a)
 	{
-		float fc = cosf(a._rad), fs = sinf(a._rad);
+		float fc = cosf(a), fs = sinf(a);
 
 		/*
 		 *	cos(a)	0		-sin(a)	0
@@ -112,9 +120,9 @@ namespace Identi3D
 			_d2 = _d3 = 0.0f;
 	}
 
-	void Matrix::rotateZ(const Angle &a)
+	void Matrix::rotateZ(float a)
 	{
-		float fc = cosf(a._rad), fs = sinf(a._rad);
+		float fc = cosf(a), fs = sinf(a);
 
 		/*
 		 *	cos(a)	sin(a)	0		0
@@ -132,9 +140,9 @@ namespace Identi3D
 			_d1 = _d2 = _d3 = 0.0f;
 	}
 
-	void Matrix::rotateVector(const Vector3 &vec, const Angle &a)
+	void Matrix::rotateVector(const Vector3 &vec, float a)
 	{
-		float fc = cosf(a._rad), fs = sinf(a._rad), delta = 1.0f - fc;
+		float fc = cosf(a), fs = sinf(a), delta = 1.0f - fc;
 		float fsx = vec._z * fs, fsy = vec._y * fs, fsz = vec._z * fs;
 		__m128 delta_array = {delta, delta, delta, delta};
 
@@ -433,14 +441,6 @@ namespace Identi3D
 			_mm_mul_ps(_mm_shuffle_ps(_data[3], _data[3], _MM_SHUFFLE(2, 2, 2, 2)), m._data[2])),
 			_mm_mul_ps(_mm_shuffle_ps(_data[3], _data[3], _MM_SHUFFLE(3, 3, 3, 3)), m._data[3]));
 		return result;
-	}
-
-	const Vector3 Matrix::operator *(const Vector3 &v) const
-	{
-		/*
-		 * Call vector operator to do this.
-		 */
-		return v.operator*(*this);
 	}
 
 	std::ostream &operator <<(std::ostream &out, const Matrix &m)

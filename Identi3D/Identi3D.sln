@@ -25,6 +25,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "direct3d9", "src\plugins\di
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math", "src\math\math.vcxproj", "{1992210E-6253-4735-8E3D-CC641250B393}"
+	ProjectSection(ProjectDependencies) = postProject
+		{166B2D45-BBD2-4D48-A042-BDB7F02C9837} = {166B2D45-BBD2-4D48-A042-BDB7F02C9837}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math_test", "unittests\math_test\math_test.vcxproj", "{623D55D3-62A2-4F58-9877-DC0045AE0A66}"
 	ProjectSection(ProjectDependencies) = postProject

@@ -70,8 +70,8 @@ namespace Identi3D
 	{
 		float dist = fabs(_normal * point) + _dist;
 
-		if(dist > _DEFAULT_EPSILON) return PlanePosition_Front;
-		if(dist < _DEFAULT_EPSILON) return PlanePosition_Back;
+		if(dist > FLT_EPSILON) return PlanePosition_Front;
+		if(dist < FLT_EPSILON) return PlanePosition_Back;
 		return PlanePosition_Planar;
 	}
 
@@ -89,7 +89,7 @@ namespace Identi3D
 		c.cross(_normal, plane._normal);
 		sqrlen = c.getSquaredLength();
 
-		if(_fzero(sqrlen)) return false;
+		if(fabs(sqrlen) < FLT_EPSILON) return false;
 
 		if(ray)
 		{
@@ -98,7 +98,7 @@ namespace Identi3D
 			float product = _normal * plane._normal;
 			float det = slen1 * slen2 - product * product;
 
-			if(_fzero(det)) return false;
+			if(fabs(sqrlen) < FLT_EPSILON) return false;
 
 			det = 1.0f / det;
 			float c1 = (slen2 * _dist - product * plane._dist) * det;

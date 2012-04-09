@@ -14,6 +14,6 @@ int main()
 	VectorTest::runAllTest();
 	MatrixTest::runAllTest();
 	RayTest::runAllTest();
-	system("pause");
+	//system("pause");
 	return 0;
 }

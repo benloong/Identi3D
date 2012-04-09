@@ -97,22 +97,12 @@ namespace Identi3D
 
 	int VMMTimerTest::func1(void)
 	{
-		Vector3 v = VectorTest::generateRandomVector();
-		__m128 u;
-
-		u.m128_f32[3] = 13.0f;
-		_mm_div_ps(v.getData(), _mm_shuffle_ps(u, u, _MM_SHUFFLE(3, 3, 3, 3)));
-		return int(v.getX());
+		return 0;
 	}
 
 	int VMMTimerTest::func2(void)
 	{
-		Vector3 v = VectorTest::generateRandomVector();
-		__m128 u;
-
-		u.m128_f32[3] = 13.0f;
-		v.set(v.getX() / u.m128_f32[3], v.getY() / u.m128_f32[3], v.getZ() / u.m128_f32[3]);
-		return int(v.getX());
+		return 0;
 	}
 
 };

@@ -8,6 +8,7 @@
 #define IDENTI3D_SRC_MATH_AABB_H
 
 #include <src/identi3d/General.h>
+#include <src/utils/DebugManager.h>
 #include <src/math/Vector.h>
 
 namespace Identi3D
@@ -22,7 +23,7 @@ namespace Identi3D
 		AABBCullResult_ForceInt	= 0xFFFF
 	};
 
-	class __declspec(dllexport) AxisAlignedBoundingBox
+	class __declspec(dllexport) AxisAlignedBoundingBox : public DebugFrame
 	{
 		friend class Ray;
 		friend class Plane;
@@ -31,7 +32,7 @@ namespace Identi3D
 		Vector3 _bounds[2];
 
 	public:
-		AxisAlignedBoundingBox(void) {} ;
+		AxisAlignedBoundingBox(void) : DebugFrame(NULL) {} ;
 		AxisAlignedBoundingBox(const Vector3 &min, const Vector3 &max);
 		AxisAlignedBoundingBox(const OrientedBoundingBox &obb);
 		~AxisAlignedBoundingBox(void) {} ;

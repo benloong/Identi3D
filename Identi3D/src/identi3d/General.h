@@ -134,7 +134,6 @@ namespace Identi3D
 	class EventDispatcher;
 	class EventListener;
 
-	class Angle;
 	class AxisAlignedBoundingBox;
 	class Matrix;
 	class OrientedBoundingBox;

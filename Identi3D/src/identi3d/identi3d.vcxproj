@@ -73,18 +73,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Basetypes.h" />
-    <ClInclude Include="EventDispatcher.h" />
-    <ClInclude Include="EventListener.h" />
     <ClInclude Include="Identi3D.h" />
     <ClInclude Include="General.h" />
     <ClInclude Include="IdentiExceptions.h" />
     <ClInclude Include="Messages.h" />
-    <ClInclude Include="System.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="EventDispatcher.cc" />
-    <ClCompile Include="EventListener.cc" />
-    <ClCompile Include="System.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

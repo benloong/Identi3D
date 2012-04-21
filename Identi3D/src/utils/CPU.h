@@ -8,7 +8,9 @@
 #define IDENTI3D_SRC_UTILS_CPU_H
 
 #include <src/identi3d/General.h>
-#include <src/utils/DebugManager.h>
+
+#include <src/utils/Singleton.h>
+#include <src/utils/DebugFrame.h>
 
 namespace Identi3D
 {
@@ -26,7 +28,11 @@ namespace Identi3D
 		CpuVendor_ForceInt = 65535
 	};
 
-	class __declspec(dllexport) CpuInfo : public DebugFrame
+	class __declspec(dllexport) CpuInfo : 
+		public Singleton<CpuInfo>,
+#if defined(_MEMORY_LEAK_DETECTION)
+		public DebugFrame
+#endif // _MEMORY_LEAK_DETECTION
 	{
 	private:
 		CpuVendor vendor;
@@ -40,7 +46,7 @@ namespace Identi3D
 		};
 
 	public:
-		CpuInfo(DebugManager *debugger = NULL);
+		CpuInfo(void);
 		~CpuInfo(void);
 
 		/*

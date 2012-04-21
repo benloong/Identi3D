@@ -13,7 +13,6 @@ namespace Identi3D
 
 	const Vector3 VectorTest::generateRandomVector(void)
 	{
-		srand((unsigned int)time(NULL));
 		Vector3 v((float)(rand() % 100), (float)(rand() % 100), (float)(rand() % 100));
 		return v;
 	}
@@ -93,16 +92,6 @@ namespace Identi3D
 		if(checkVCAnswer(u, v, result)) cout << "VC> Correct." << endl;
 		else cout << "VC> Incorrect." << endl;
 		cout << endl;
-	}
-
-	int VMMTimerTest::func1(void)
-	{
-		return 0;
-	}
-
-	int VMMTimerTest::func2(void)
-	{
-		return 0;
 	}
 
 };

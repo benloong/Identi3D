@@ -29,17 +29,11 @@ namespace Identi3D
 
 		static void runAllTest(void)
 		{
+			srand((unsigned int)time(NULL));
 			testVectorMatrixMultiply();
 			testVectorNormalize();
 			testVectorCross();
 		}
-	};
-
-	class VMMTimerTest : public TimerTest
-	{
-	public:
-		int func1(void);
-		int func2(void);
 	};
 
 };

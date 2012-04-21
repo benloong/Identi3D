@@ -21,10 +21,10 @@ namespace Identi3D
 #if !defined(_SSE_ONLY)
 
 		if(!CpuInfo::instance().isSSESupported()) {
-			vec._x = _x * m._a1 + _y * m._b1 + _z * m._c1 + m._d1;
-			vec._y = _x * m._a2 + _y * m._b2 + _z * m._c2 + m._d2;
-			vec._z = _x * m._a3 + _y * m._b3 + _z * m._c3 + m._d3;
-			vec._w = _x * m._a4 + _y * m._b4 + _z * m._c4 + m._d4;
+			vec._x = v._x * m._a1 + v._y * m._b1 + v._z * m._c1 + m._d1;
+			vec._y = v._x * m._a2 + v._y * m._b2 + v._z * m._c2 + m._d2;
+			vec._z = v._x * m._a3 + v._y * m._b3 + v._z * m._c3 + m._d3;
+			vec._w = v._x * m._a4 + v._y * m._b4 + v._z * m._c4 + m._d4;
 
 			vec._x /= vec._w;
 			vec._y /= vec._w;

@@ -9,6 +9,7 @@
 
 #include <src/identi3d/General.h>
 #include <src/math/Vector.h>
+#include <src/math/Matrix.h>
 
 namespace Identi3D
 {
@@ -27,19 +28,58 @@ namespace Identi3D
 
 	public:
 
+		/*
+		 * Constructor: Do nothing.
+		 */
 		Ray(void) {} ;
-		Ray(const Vector3 &origin, const Vector3 &direction);
+		
+		/*
+		 * Constructor: Set origin and direction.
+		 */
+		Ray(const Vector3 &origin, const Vector3 &direction)
+		{
+			set(origin, direction);
+		}
+
+		/*
+		 * Destructor: Do nothing.
+		 */
 		~Ray(void) {} ;
 
 		/*
 		 * Create a ray using its origin and direction.
 		 */
-		void set(const Vector3 &origin, const Vector3 &direction);
+		inline void set(const Vector3 &origin, const Vector3 &direction)
+		{
+			_origin = origin;
+			_direction = direction;
+			_direction.normalize();
+
+			_inverse.set(1.0f / _direction._x, 
+						 1.0f / _direction._y, 
+						 1.0f / _direction._z);
+			_sign[0] = _inverse._x < 0;
+			_sign[1] = _inverse._y < 0;
+			_sign[2] = _inverse._z < 0;
+		}
 
 		/*
 		 * Detransform the ray by the specified matrix.
 		 */
-		void detransform(const Matrix &m);
+		inline void detransform(const Matrix &m)
+		{	
+			Matrix s(m);
+		
+			_origin._x -= s._d1;
+			_origin._y -= s._d2;
+			_origin._z -= s._d3;
+		
+			s.translate(0.0f, 0.0f, 0.0f);
+			s.inverse(s);
+
+			_origin *= s;
+			_direction *= s;
+		}
 
 		/*
 		 * Test intersection with a triangle.

@@ -9,6 +9,8 @@
 
 #include <src/identi3d/General.h>
 #include <src/math/Vector.h>
+#include <src/math/Matrix.h>
+#include <src/math/Plane.h>
 
 namespace Identi3D
 {
@@ -39,12 +41,32 @@ namespace Identi3D
 		/*
 		 * Detransform the box by the specified matrix.
 		 */
-		void detransform(const OrientedBoundingBox &obb, const Matrix &m);
+		inline void detransform(const OrientedBoundingBox &obb, const Matrix &m)
+		{
+			Matrix n = m;
+			Vector3 t(m(3, 0), m(3, 1), m(3, 2));
+			n(3, 0) = n(3, 1) = n(3, 2) = 0.0f;
+
+			_center = obb._center * m;
+			_center += t;
+			_axis[0] = obb._axis[0] * m;
+			_axis[1] = obb._axis[1] * m;
+			_axis[2] = obb._axis[2] * m;
+
+			_extent[0] = obb._extent[0];
+			_extent[1] = obb._extent[1];
+			_extent[2] = obb._extent[2];
+		}
 
 		/*
 		 * Do a cull test to the box.
 		 */
-		int cull(const Plane *plane_arr, int plane_count);
+		OBBCullResult cull(PlaneArray &planes) const;
+
+		/*
+		 * Intersect with triangle.
+		 */
+		bool intersect(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2) const;
 
 		/*
 		 * Get extent on specified axis. 0 - x, 1 - y, 2 - z.

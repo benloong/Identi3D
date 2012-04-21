@@ -8,7 +8,7 @@
 #define IDENTI3D_SRC_UTILS_OPTIONTREE_H
 
 #include <src/identi3d/General.h>
-#include <src/utils/DebugManager.h>
+#include <src/utils/DebugFrame.h>
 #include <string>
 #include <iterator>
 

@@ -23,6 +23,7 @@ namespace Identi3D
 
 		static void runAllTest(void)
 		{
+			srand((unsigned int)time(NULL));
 			testMatrixMatrixMultiply();
 			testMatrixInverse();
 		}

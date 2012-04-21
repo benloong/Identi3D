@@ -21,41 +21,8 @@ namespace Identi3D
 		b = a;
 	}
 
-	Ray::Ray(const Vector3 &origin, const Vector3 &direction)
-	{ 
-		set(origin, direction);
-	}
-
-	void Ray::set(const Vector3 &origin, const Vector3 &direction)
-	{
-		_origin = origin;
-		_direction = direction;
-		_direction.normalize();
-
-		_inverse.set(1.0f / _direction._x, 
-					 1.0f / _direction._y, 
-					 1.0f / _direction._z);
-		_sign[0] = _inverse._x < 0;
-		_sign[1] = _inverse._y < 0;
-		_sign[2] = _inverse._z < 0;
-	}
-
-	void Ray::detransform(const Matrix &m)
-	{
-		Matrix s(m);
-		
-		_origin._x -= s._d1;
-		_origin._y -= s._d2;
-		_origin._z -= s._d3;
-		
-		s.translate(0.0f, 0.0f, 0.0f);
-		s.inverse(s);
-
-		_origin *= s;
-		_direction *= s;
-	}
-
-	bool Ray::intersect(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2, bool cull_backside, float *distance, Vector3 *hit) const
+	bool Ray::intersect(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2, 
+						bool cull_backside, float *distance, Vector3 *hit) const
 	{
 		Vector3 edge1 = v1 - v0, edge2 = v2 - v0;
 		Vector3 tvec, pvec, qvec;

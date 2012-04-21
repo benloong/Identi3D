@@ -21,6 +21,7 @@ namespace Identi3D {
 	{
 		try
 		{
+
 #if defined(_MEMORY_LEAK_DETECTION)
 			if(_allocated_memory) {
 				printRawString(" [WARNING] Memory leaks detected before DebugManager freed. Orphan size: %d\n",
@@ -43,7 +44,7 @@ namespace Identi3D {
 		return ;
 	}
 
-	const std::string DebugManager::getTimeStamp(void) const
+	const std::string getTimeStamp(void)
 	{
 		const int max_buffer_length = 64;
 
@@ -61,7 +62,7 @@ namespace Identi3D {
 		return std::string(temp);
 	}
 
-	const std::string DebugManager::getFormattedSourcePath(const char *src_path, int line_number) const
+	const std::string getFormattedSourcePath(const char *src_path, int line_number)
 	{
 		const int max_buffer_length = 256;
 		
@@ -354,86 +355,6 @@ namespace Identi3D {
 	{
 		_is_valid = false;
 		::operator delete(p, std::nothrow);
-	}
-
-	DebugFrame::DebugFrame(DebugManager *debugger)
-	{
-		_debugger = debugger;
-	}
-
-	DebugFrame::~DebugFrame(void)
-	{
-	}
-
-	void *DebugFrame::operator new(size_t size)
-	{
-		void *p = ::operator new(size, std::nothrow);
-		if(p != NULL) {
-			DebugManager::onAllocation(size);
-		}
-		return p;
-	}
-
-	void *DebugFrame::operator new[](size_t size)
-	{
-		void *p = ::operator new[](size, std::nothrow);
-		if(p != NULL) {
-			DebugManager::onAllocation(size);
-		}
-		return p;
-	}
-
-	void DebugFrame::operator delete(void *p, size_t size)
-	{
-		DebugManager::onDeallocation(size);
-		::operator delete(p, std::nothrow);
-	}
-
-	void DebugFrame::operator delete[](void *p, size_t size)
-	{
-		DebugManager::onDeallocation(size);
-		::operator delete[](p, std::nothrow);
-	}
-
-	void DebugFrame::setDebugManager(DebugManager *debugger)
-	{
-		_debugger = debugger;
-	}
-
-	bool DebugFrame::_printException(const char *src_path, int line_number, const std::exception &e) const
-	{
-		if(_debugger != NULL && DebugManager::isValid()) {
-			return _debugger->print(src_path, line_number, e);
-		}
-		return false;
-	}
-
-	bool DebugFrame::_printVerboseMessage(const char *src_path, int line_number, const char *message, ...) const
-	{
-		if(_debugger != NULL && DebugManager::isValid()) {
-			va_list arg;
-			bool retval;
-
-			va_start(arg, message);
-			retval = _debugger->print(src_path, line_number, true, message, arg);
-			va_end(arg);
-			return retval;
-		}
-		return false;
-	}
-
-	bool DebugFrame::_printMessage(const char *src_path, int line_number, const char *message, ...) const
-	{
-		if(_debugger != NULL && DebugManager::isValid()) {
-			va_list arg;
-			bool retval;
-
-			va_start(arg, message);
-			retval = _debugger->print(src_path, line_number, false, message, arg);
-			va_end(arg);
-			return retval;
-		}
-		return false;
 	}
 
 };

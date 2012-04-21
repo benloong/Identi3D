@@ -65,7 +65,7 @@
  *   cutting away normal calculations seems to be fine.
  */
 #if !defined (_SSE_ONLY)
-# define _SSE_ONLY
+//# define _SSE_ONLY
 #endif // !defined (_SSE_ONLY)
 
 /*
@@ -88,6 +88,7 @@
 #include <new>
 #include <fstream>
 #include <string>
+#include <vector>
 #include <tchar.h>
 
 /*

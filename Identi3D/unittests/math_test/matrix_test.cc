@@ -13,7 +13,6 @@ namespace Identi3D
 	
 	const Matrix MatrixTest::generateRandomMatrix(void)
 	{
-		srand((unsigned int)time(NULL));
 		Matrix m((float)(rand() % 100), (float)(rand() % 100), (float)(rand() % 100), (float)(rand() % 100),
 				 (float)(rand() % 100), (float)(rand() % 100), (float)(rand() % 100), (float)(rand() % 100),
 				 (float)(rand() % 100), (float)(rand() % 100), (float)(rand() % 100), (float)(rand() % 100),
@@ -56,12 +55,12 @@ namespace Identi3D
 		for(int i = 0; i < 4; i++) {
 			for(int j = 0; j < 4; j++) {
 				if(i == j) {
-					if(!_fcomp(t(i, j), 1)) {
+					if(!_fcomp(t(i, j), 1.0f)) {
 						cout << "MI> Unmatching pair detected at (" << i << ", " << j << ")" << endl;
 						return false;
 					}
 				} else {
-					if(!_fcomp(t(i, j), 0)) {
+					if(!_fcomp(t(i, j), 0.0f)) {
 						cout << "MI> Unmatching pair detected at (" << i << ", " << j << ")" << endl;
 						return false;
 					}
@@ -73,7 +72,7 @@ namespace Identi3D
 
 	void MatrixTest::testMatrixInverse(void)
 	{
-		Matrix m = generateRandomMatrix();
+		Matrix m(1, 3, 4, 6, 7, 7, 1, 3, 4, 1, 5, 4, 2, 4, 5, 6);
 		Matrix result;
 
 		cout << "MI> Inverse the matrix -" << endl << m;

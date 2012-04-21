@@ -160,63 +160,9 @@ namespace Identi3D {
 		static bool _is_valid;
 
 	private:
+		// Forbid assignment.
 		DebugManager(DebugManager &mgr);
 		DebugManager &operator=(DebugManager &rhs);
-
-	private:
-		const std::string getTimeStamp(void) const;
-		const std::string getFormattedSourcePath(const char *src_path, int line_number) const;
-	};
-
-	class __declspec(dllexport) DebugFrame
-	{
-	protected:
-		DebugManager *_debugger;
-
-	public:
-
-		DebugFrame(DebugManager *debugger = NULL);
-		virtual ~DebugFrame(void) = 0;
-
-#if defined(_MEMORY_LEAK_DETECTION)
-		/*
-		 * Override object's new operator.
-		 */
-		static void *operator new(size_t size);
-		static void *operator new[](size_t size);
-
-		/*
-		 * Override object's delete operator.
-		 */
-		static void operator delete(void *p, size_t size);
-		static void operator delete[](void *p, size_t size);
-
-#endif // defined(_MEMORY_LEAK_DETECTION)
-		
-		/*
-		 * Set a debug manager.
-		 */
-		virtual void setDebugManager(DebugManager *debugger = NULL);
-		
-	protected:
-
-		/*
-		 * Print an exception.
-		 * Pass __FILE__ and __LINE__ for first two arguments.
-		 */
-		bool _printException(const char *src_path, int line_number, const std::exception &e) const;
-
-		/*
-		 * Print verbose message.
-		 * Pass __FILE__ and __LINE__ for first two arguments.
-		 */
-		bool _printVerboseMessage(const char *src_path, int line_number, const char *message, ...) const;
-
-		/*
-		 * Print normal message.
-		 * Pass __FILE__ and __LINE__ for first two arguments.
-		 */
-		bool _printMessage(const char *src_path, int line_number, const char *message, ...) const;
 	};
 
 };

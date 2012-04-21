@@ -8,12 +8,16 @@
 #define IDENTI3D_SRC_MATH_VECTOR_H
 
 #include <src/identi3d/General.h>
-#include <src/utils/DebugManager.h>
+#include <src/utils/DebugFrame.h>
+
+#if !defined(_SSE_ONLY)
+#include <src/utils/CPU.h>
+#endif
 
 namespace Identi3D
 {
 
-	class __declspec(dllexport) Vector3 : public DebugFrame
+	class __declspec(dllexport) Vector3
 	{
 		friend class Matrix;
 		friend class Ray;
@@ -22,9 +26,9 @@ namespace Identi3D
 
 	public:
 		explicit Vector3(void)
-			: DebugFrame(NULL), _x(0.0f), _y(0.0f), _z(0.0f), _w(1.0f) {} ;
+			: _x(0.0f), _y(0.0f), _z(0.0f), _w(1.0f) {} ;
 		explicit Vector3(float x, float y, float z)
-			: DebugFrame(NULL), _x(x), _y(y), _z(z), _w(1.0f) {} ;
+			: _x(x), _y(y), _z(z), _w(1.0f) {} ;
 		~Vector3(void) {} ;
 
 		/*
@@ -230,7 +234,7 @@ namespace Identi3D
 
 			if(!CpuInfo::instance().isSSESupported()) {
 				float f = sqrt(_x * _x + _y * _y + _z * _z);
-				if(!_fzero(f)) _x /= f, _y /= f, _z /= f;
+				if((fabs(f) > FLT_EPSILON)) _x /= f, _y /= f, _z /= f;
 				return ;
 			}
 

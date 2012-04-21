@@ -5,12 +5,15 @@
 
 #include <src/utils/CPU.h>
 
-#define _TestBit(n, b) (((n & (1 << b)) != 0) ? true : false)
+#define _TestBit(n, b) ((((n) & (1 << (b))) != 0) ? true : false)
 
 namespace Identi3D
 {
 
-	CpuInfo::CpuInfo(DebugManager *debugger) : DebugFrame(debugger)
+	CpuInfo::CpuInfo(void)
+#if defined(_MEMORY_LEAK_DETECTION)
+		: DebugFrame(NULL)
+#endif // _MEMORY_LEAK_DETECTION
 	{
 		int data[4];
 		

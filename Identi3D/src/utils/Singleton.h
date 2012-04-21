@@ -7,7 +7,7 @@
 #ifndef IDENTI3D_SRC_UTILS_SINGLETON_H
 #define IDENTI3D_SRC_UTILS_SINGLETON_H
 
-#include <src/identi3d/Identi3D.h>
+#include <src/identi3d/General.h>
 
 namespace Identi3D
 {

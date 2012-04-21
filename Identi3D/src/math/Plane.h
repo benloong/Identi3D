@@ -8,6 +8,7 @@
 #define IDENTI3D_SRC_MATH_PLANE_H
 
 #include <src/identi3d/General.h>
+#include <src/math/AlignedAllocator.h>
 #include <src/math/Vector.h>
 
 namespace Identi3D
@@ -22,10 +23,14 @@ namespace Identi3D
 		PlanePosition_ForceInt	= 65535
 	};
 
+	typedef std::vector<Plane, AlignedAllocator<Plane, 16>> PlaneArray;
+
 	class __declspec(dllexport) Plane
 	{
-		friend class AxisAlignedBoundingBox;
 		friend class Ray;
+		friend class Polygon;
+		friend class AxisAlignedBoundingBox;
+		friend class OrientedBoundingBox;
 
 	private:
 		Vector3 _normal,	// normal of the plane
@@ -34,40 +39,107 @@ namespace Identi3D
 
 	public:
 
+		/*
+		 * Constructor: Do nothing.
+		 */
 		Plane(void) : _dist(0.0f) {} ;
-		Plane(const Vector3 &normal, const Vector3 &point);
-		Plane(const Vector3 &normal, const Vector3 &point, float distance);
-		Plane(const Vector3 &point0, const Vector3 &point1, const Vector3 &point2);
+
+		/*
+		 * Constructor: Set plane from normal vector and a point on the plane.
+		 */
+		Plane(const Vector3 &normal, const Vector3 &point)
+		{
+			_normal = normal;
+			_point = point;
+			_dist = -(normal * point);
+		}
+
+		/*
+		 * Constructor: Set plane from normal, point and distance to origin.
+		 */
+		Plane(const Vector3 &normal, const Vector3 &point, float distance)
+		{
+			_normal = normal;
+			_point = point;
+			_dist = distance;
+		}
+
+		/*
+		 * Constructor: Set plane from three points on the plane.
+		 */
+		Plane(const Vector3 &point0, const Vector3 &point1, const Vector3 &point2)	
+		{
+			Vector3 v1, v2;
+
+			v1 = point1 - point0;
+			v2 = point2 - point0;
+			_normal.cross(v1, v2);
+			_dist = _normal * point0;
+			_point = point0;
+		}
 
 		/*
 		 * Create a plane using its normal and a point on the plane.
 		 */
-		void set(const Vector3 &normal, const Vector3 &point);
+		inline void set(const Vector3 &normal, const Vector3 &point)
+		{
+			_normal = normal;
+			_point = point;
+			_dist = -(normal * point);
+		}
 
 		/*
 		 * Create a plane using its normal, a point on the plane and its distance to the origin.
 		 */
-		void set(const Vector3 &normal, const Vector3 &point, float distance);
+		inline void set(const Vector3 &normal, const Vector3 &point, float distance)
+		{
+			_normal = normal;
+			_point = point;
+			_dist = distance;
+		}
 
 		/*
 		 * Create a plane using two vectors formed from three points.
 		 */
-		void set(const Vector3 &point0, const Vector3 &point1, const Vector3 &point2);
+		inline void set(const Vector3 &point0, const Vector3 &point1, const Vector3 &point2)
+		{
+			Vector3 v1, v2;
+
+			v1 = point1 - point0;
+			v2 = point2 - point0;
+			_normal.cross(v1, v2);
+			_dist = _normal * point0;
+			_point = point0;
+		}
 		
 		/*
 		 * Calculate the distance from point to plane.
 		 */
-		float distance(const Vector3 &point) const;
+		inline float distance(const Vector3 &point) const
+		{
+			return (fabs(_normal * point) - _dist);
+		}
 
 		/*
 		 * Classify the point with respect to plane.
 		 */
-		PlanePosition classify(const Vector3 &point) const;
+		inline PlanePosition classify(const Vector3 &point) const
+		{
+			float dist = fabs(_normal * point) + _dist;
+
+			if(dist > FLT_EPSILON) return PlanePosition_Front;
+			if(dist < FLT_EPSILON) return PlanePosition_Back;
+			return PlanePosition_Planar;
+		}
 
 		/*
 		 * Test intersection with a triangle.
 		 */
-		bool intersect(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2) const;
+		inline bool intersect(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2) const
+		{
+			PlanePosition pos = classify(v0);
+			return ((pos == classify(v1)) && (pos == classify(v2)));
+		}
 
 		/*
 		 * Test intersection with a plane.

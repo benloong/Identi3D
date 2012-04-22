@@ -10,10 +10,19 @@
 #include <src/identi3d/General.h>
 #include <src/utils/DebugManager.h>
 
+#define D3DSETTINGS_DEFAULT_WINDOWED			false
+#define D3DSETTINGS_DEFAULT_HARDWAREACCELERATED	true
+#define D3DSETTINGS_DEFAULT_STENCILBUFFER		true
+
+#define D3DSETTINGS_DEFAULT_SCREEN_WIDTH		800
+#define D3DSETTINGS_DEFAULT_SCREEN_HEIGHT		600
+#define D3DSETTINGS_DEFAULT_REFRESH_RATE		60
+#define D3DSETTINGS_DEFAULT_COLOR_DEPTH			32
+
 namespace Identi3D
 {
 	
-	class Direct3D9SettingsManager : public DebugFrame
+	class Direct3D9SettingsManager
 	{
 	private:
 		OptionTree	*_tree;
@@ -23,10 +32,6 @@ namespace Identi3D
 		/*
 		 * Convert from string to bool.
 		 */
-		inline bool convStringToBool(const std::wstring &str)
-		{
-			return (str == std::wstring(TEXT("true")));
-		}
 
 	public:
 		bool _is_windowed;
@@ -39,7 +44,7 @@ namespace Identi3D
 
 	public:
 		
-		Direct3D9SettingsManager(DebugManager *debugger = NULL);
+		Direct3D9SettingsManager(void) { reset(); };
 		~Direct3D9SettingsManager(void) {} ;
 
 		/*

@@ -70,7 +70,7 @@ namespace Identi3D
 		HRESULT CreateRenderDevice(HMODULE plugin, RenderDevice **device, DebugManager *debugger);
 		typedef HRESULT (*CREATERENDERDEVICE)(HMODULE plugin, RenderDevice **device, DebugManager *debugger);
 
-		void ReleaseRenderDevice(RenderDevice **device);
+		void ReleaseRenderDevice(RenderDevice *device);
 		typedef void (*RELEASERENDERDEVICE)(RenderDevice **device);
 	}
 

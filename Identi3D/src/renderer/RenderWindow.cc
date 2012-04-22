@@ -17,10 +17,9 @@ namespace Identi3D
 								WS_SYSMENU		| \
 								WS_MINIMIZEBOX);
 
-	RenderWindow::RenderWindow()
+	RenderWindow::RenderWindow(DebugManager *debugger) 
+		: DebugFrame(debugger), _window(NULL)
 	{
-		window = NULL;
-		debugger = NULL;
 		generateClassName();
 	}
 
@@ -29,13 +28,13 @@ namespace Identi3D
 		release();
 	}
 
-	HRESULT RenderWindow::assign(RenderDevice *device, const wchar_t *title)
+	bool RenderWindow::assign(RenderDevice *device, const wchar_t *title)
 	{
 		HRESULT hr;
 
 		release();
 		if(device == NULL || title == NULL) {
-			_DebugPrint(debugger, E_INVALID_PARAMETERS);
+			_printMessage(__FILE__, __LINE__, E_INVALID_PARAMETERS);
 			return E_FAIL;
 		}
 		registerClass();
@@ -53,6 +52,7 @@ namespace Identi3D
 			DestroyWindow(window);
 			window = NULL;
 		}
+		render_device = NULL;
 		return S_OK;
 	}
 
@@ -61,7 +61,7 @@ namespace Identi3D
 		const wchar_t random_table[37] = __T("abcdefghijklmnopqrstuvwxyz0123456789");
 		const UINT random_length = 7;
 
-		_tcscpy_s(class_name, __T("NRW"));
+		_tcscpy_s(class_name, __T("IRW"));
 		wchar_t *p = class_name + 3;
 		srand((unsigned int)time(NULL));
 		for(int i = 0; i < random_length; i++) {

@@ -9,6 +9,7 @@
 
 #include <src/identi3d/General.h>
 #include <src/renderer/RenderDevice.h>
+#include <src/utils/DebugManager.h>		// TODO: Use new file "DebugFrame.h"
 
 namespace Identi3D
 {
@@ -16,8 +17,8 @@ namespace Identi3D
 	/*
 	 * Types of render backend.
 	 *
-	 *	RenderBackendType_Direct3D9:	Microsoft(R) DirectX(R) 9 render backend.
-	 *	RenderBackendType_OpenGL:		OpenGL render backend (under implementation)
+	 *	RenderBackendType_Direct3D9:	Microsoft DirectX 9 render backend.
+	 *	RenderBackendType_OpenGL:		OpenGL render backend (to be implemented)
 	 */
 	enum RenderBackendType
 	{
@@ -28,34 +29,33 @@ namespace Identi3D
 		RenderBackendType_ForceDword= 0xFFFFFFFF
 	};
 
-	class Renderer
+	class Renderer : public DebugFrame
 	{
-		friend class System;
-
 	private:
 		RenderBackendType _backend_type;
 		RenderDevice	*_render_device;
 		HMODULE			_plugin_handle;
-		DebugManager	*_debugger;
 		OptionTree		*_global_option;
 		RenderWindow	*_render_window;
 
 	private:
-		Renderer(DebugManager *debugger);
 		Renderer(Renderer &r);
-		~Renderer(void) { releaseDevice(); }
+		Renderer &operator =(const Renderer &rhs);
 
 	public:
+
+		Renderer(DebugManager *debugger = NULL);
+		~Renderer(void) { releaseDevice(); }
 
 		/*
 		 * Create a render device.
 		 */
-		HRESULT	createDevice(RenderBackendType type);
+		bool createDevice(RenderBackendType type);
 
 		/*
 		 * Create the default render device.
 		 */
-		HRESULT createDefaultDevice(void);
+		bool createDefaultDevice(void);
 		
 		/*
 		 * Release the device and do some cleaning.
@@ -65,7 +65,7 @@ namespace Identi3D
 		/*
 		 * Assign a render target for the render device.
 		 */
-		HRESULT assignRenderWindow(RenderWindow *window, const wchar_t *window_title = IDENTI3D_NAME);
+		bool assignRenderWindow(RenderWindow *window, const wchar_t *window_title = IDENTI3D_NAME);
 
 		/*
 		 * Get current render device.

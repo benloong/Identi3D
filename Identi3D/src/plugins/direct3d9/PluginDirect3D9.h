@@ -9,8 +9,9 @@
 
 #include <src/identi3d/General.h>
 #include <src/plugins/direct3d9/Settings.h>
-#include <src/utils/DebugManager.h>
 #include <src/renderer/RenderDevice.h>
+//#include <src/utils/DebugFrame.h>
+#include <src/utils/DebugManager.h>		// TODO: Use new file "DebugFrame.h"
 
 #include <d3d9.h>
 
@@ -28,7 +29,6 @@ namespace Identi3D
 		D3DPRESENT_PARAMETERS	_present_parameters;
 		D3DCOLOR				_clear_color;
 
-		DebugManager			*_debugger;
 		Direct3D9SettingsManager _settings;
 		
 		bool _is_running;

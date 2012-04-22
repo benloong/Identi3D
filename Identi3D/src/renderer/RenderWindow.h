@@ -9,19 +9,19 @@
 
 #include <src/identi3d/General.h>
 #include <src/identi3d/Basetypes.h>
+#include <src/utils/DebugManager.h>			// TODO: Use new file "DebugFrame.h"
 
 namespace Identi3D
 {
 
-	class RenderWindow
+	class RenderWindow : public DebugFrame
 	{
 		friend class Renderer;
 
 	private:
-		HWND			window;
-		RenderDevice	*render_device;
-		wchar_t			class_name[256];
-		DebugManager	*debugger;
+		HWND			_window;
+		RenderDevice	*_render_device;
+		wchar_t			_class_name[256];
 
 	private:
 
@@ -38,43 +38,47 @@ namespace Identi3D
 		/*
 		 * Create window with specified attributes.
 		 */
-		HRESULT createWindow(int width, int height, const wchar_t *title);
+		bool createWindow(int width, int height, const wchar_t *title);
 		
 		/*
 		 * Assign a render device for the window.
 		 */
-		HRESULT assign(RenderDevice *device, const wchar_t *title);
+		bool assign(RenderDevice *device, const wchar_t *title);
+
+		/*
+		 * Unload render device.
+		 */
+		inline HRESULT deassign(void) 
+		{
+			release();
+		}
 
 	public:
 
-		RenderWindow();
+		RenderWindow(DebugManager *debugger = NULL);
 		~RenderWindow(void);
 
 		/*
 		 * Release the window and clean up.
 		 */
-		HRESULT release();
+		void release();
 
 		/*
 		 * Message processor.
 		 * # Should not be called directly.
 		 */
-		static	LRESULT WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
+		static LRESULT WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 		/*
 		 * Get the handle of window.
 		 */
-		HWND getHandle(void) { return window; }
+		bool getHandle(void) { return _window; }
 
 		/*
 		 * Get assigned render device.
 		 */
-		RenderDevice *getRenderDevice(void) { return render_device; }
-		
-		/*
-		 * Set DebugManager handle.
-		 */
-		void setDebugManager(DebugManager *new_debugger = NULL) { debugger = new_debugger; }
+		RenderDevice *getRenderDevice(void) { return _render_device; }
+
 	};
 
 };

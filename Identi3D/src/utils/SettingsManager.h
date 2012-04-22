@@ -45,11 +45,10 @@ namespace Identi3D
 
 		/*
 		 * Get the handle of global OptionTree.
-		 * Return reference to prohibit unexpected delete operation.
 		 */
-		inline OptionTree &getOptionTree(void)
+		inline OptionTree *getOptionTree(void) const
 		{
-			return _tree;
+			return &_tree;
 		}
 
 		/*

@@ -13,10 +13,10 @@ namespace Identi3D
 {
 
 	PluginDirect3D9::PluginDirect3D9(HMODULE plugin, DebugManager *debugger)
+		: DebugFrame(debugger)
 	{
 		this->_render_target = NULL;
 		this->_plugin_handle = plugin;
-		this->_debugger = debugger;
 
 		_is_running = false;
 		_is_scene_running = false;
@@ -34,36 +34,58 @@ namespace Identi3D
 
 	bool PluginDirect3D9::init(RenderWindow &target, OptionTree *option)
 	{
-		try
-		{
-			// Only one instance is allowed.
-			if(_is_running) return true;
+		// Only one instance is allowed.
+		if(_is_running) return true;
 
-			// Load configuration.
-			if(option) _settings.read(option);
+		// Load configuration.
+		_settings.reset();
+		if(option) _settings.read(option);
 
-			// Create Direct3D9 object.
-			_direct3d = Direct3DCreate9(D3D_SDK_VERSION);
-			if(_direct3d == NULL) throw InitializationFailedException();
-			
-			// Store render target handle.
-			_render_target = &target;
+		// Create Direct3D9 object.
+		_direct3d = Direct3DCreate9(D3D_SDK_VERSION);
+		if(_direct3d == NULL) {
+			_printMessage(__FILE__, __LINE__, E_D3D9_INITIALIZE_FAILURE);
+			MessageBoxA(NULL, E_D3D9_INITIALIZE_FAILURE, "Error", MB_OK);
+			if(option) _settings.reset();
+			return false;
+		}
+		
+		// Store render target handle.
+		_render_target = &target;
 
-			D3DFORMAT format = (_settings._color_depth == 16) ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+		// Determine display format.
+		D3DFORMAT format = (_settings._color_depth == 16) ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
 
-			// Check display device compatibility.
-			if(!checkPrerequisite(format)) throw PrerequisiteNotSatisfiedException();
-
-			// Initialize device.
-			if(!run(format)) throw InitializationFailedException();
-		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
-			_settings.reset();
-			_render_target = NULL;
-			if(_direct3d) {
+		// Check display device compatibility.
+		if(!checkPrerequisite(format)) {
+			if(option) {
+				_printMessage(__FILE__, __LINE__, W_D3D9_HARDWARE_NOT_COMPATIBLE);
+				MessageBoxA(NULL, W_D3D9_HARDWARE_NOT_COMPATIBLE, "Warning", MB_OK);
+				_settings.reset();
+				if(!checkPrerequisite(format)) {
+					_printMessage(__FILE__, __LINE__, E_D3D9_PREREQUISITE_NOT_SATISFIED);
+					MessageBoxA(NULL, E_D3D9_PREREQUISITE_NOT_SATISFIED, "Error", MB_OK);
+					_direct3d->Release();
+					_direct3d = NULL;
+					return false;
+				} else {
+					_settings.write();
+				}
+			} else {
+				_printMessage(__FILE__, __LINE__, E_D3D9_PREREQUISITE_NOT_SATISFIED);
+				MessageBoxA(NULL, E_D3D9_PREREQUISITE_NOT_SATISFIED, "Error", MB_OK);
 				_direct3d->Release();
 				_direct3d = NULL;
+				return false;
 			}
+		}
+
+		// Initialize device.
+		if(!run(format)) {
+			_printMessage(__FILE__, __LINE__, E_D3D9_INITIALIZE_FAILURE);
+			MessageBoxA(NULL, E_D3D9_INITIALIZE_FAILURE, "Error", MB_OK);
+			_direct3d->Release();
+			_direct3d = NULL;
 			return false;
 		}
 
@@ -192,7 +214,6 @@ namespace Identi3D
 			_direct_device->Release();
 		if(_direct3d != NULL)
 			_direct3d->Release();
-		_settings.write();
 	}
 
 	bool PluginDirect3D9::isRunning(void)
@@ -210,16 +231,10 @@ namespace Identi3D
 		if(clear_stencil && _settings._is_stencil_buffer_enabled) clear_flag |= D3DCLEAR_STENCIL;
 
 		hr = _direct_device->Clear(0, NULL, clear_flag, _clear_color, 1.0f, 0);
-		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_CLEAR_BUFFER_FAILURE);
-			return E_FAIL;
-		}
+		if(FAILED(hr)) return false;
 
 		hr = _direct_device->BeginScene();
-		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_BEGIN_SCENE_FAILURE);
-			return E_FAIL;
-		}
+		if(FAILED(hr)) return false;
 
 		_is_scene_running = true;
 		return S_OK;
@@ -243,27 +258,23 @@ namespace Identi3D
 		if(clear_stencil && _settings._is_stencil_buffer_enabled) clear_flag |= D3DCLEAR_STENCIL;
 
 		if(_is_scene_running) {
-			hr = _direct_device->EndScene();
-			if(FAILED(hr)) {
-				_DebugPrint(_debugger, E_END_SCENE_FAILURE);
-				return E_FAIL;
-			}
+			_direct_device->EndScene();
 		}
 
 		hr = _direct_device->Clear(0, NULL, clear_flag, _clear_color, 1.0f, 0);
 		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_CLEAR_BUFFER_FAILURE);
-			return E_FAIL;
+			if(_is_scene_running) _is_scene_running = false;
+			return false;
 		}
 
 		if(_is_scene_running) {
 			hr = _direct_device->BeginScene();
 			if(FAILED(hr)) {
-				_DebugPrint(_debugger, E_BEGIN_SCENE_FAILURE);
-				return E_FAIL;
+				_is_scene_running = false;
 			}
 		}
-		return S_OK;
+
+		return true;
 	}
 
 	void PluginDirect3D9::setClearColor(float red, float green, float blue)
@@ -274,7 +285,6 @@ namespace Identi3D
 		g = static_cast<BYTE>(green * 255) & 0xFF;
 		b = static_cast<BYTE>(blue * 255) & 0xFF;
 		_clear_color = static_cast<D3DCOLOR>((0xFF << 24) + (r << 16) + (g << 8) + b);
-		_DebugPrintV(_debugger, I_SET_CLEAR_COLOR, r, g, b);
 	}
 
 };

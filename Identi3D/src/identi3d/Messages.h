@@ -12,10 +12,10 @@
 // Information	starts with	letter 'I'
 
 // General
-#define E_FATAL_ERROR						("System encountered a fatal error. Exiting...")
-#define E_OUT_OF_MEMORY						("Memory insufficient.")
-#define E_INVALID_PARAMETERS				("Invalid parameters.")
-#define E_FILE_OPEN_FAILURE					("Unable to open \'%S\'.")
+#define E_FATAL_ERROR						"System encountered a fatal error. Exiting..."
+#define E_OUT_OF_MEMORY						"Memory insufficient."
+#define E_INVALID_PARAMETERS				"Invalid parameters."
+#define E_FILE_OPEN_FAILURE					"Unable to open \'%S\'."
 
 // System
 #define I_SYSTEM_LOAD_CONFIGURATION			"Loading configuration from %S..."
@@ -38,19 +38,24 @@
 #define I_OPTION_VALUE_MODIFIED				("Element \"%S\" value modified: New value = [%S].")
 
 // Renderer
-#define I_RENDERER_INITIALIZED				("Class Renderer initialized.")
-#define E_RENDER_WINDOW_ASSIGN_FAIL			("Failed to assign render target.")
-#define E_RENDER_WINDOW_ASSIGN_SUCCESS		("Successfully assigned render target.")
-#define E_RENDER_DEVICE_CREATE_FAILURE		("Failed to create render device \"%S\".")
-#define E_NO_RENDER_DEVICE_AVAILABLE		("No available render device.")
-#define E_INVALID_RENDER_PLUGIN_TYPE		("Invalid render plugin type: \"%d\".")
-#define E_RENDER_PLUGIN_LOAD_FAILURE		("Render plugin \"%S\" failed to load.")
+#define I_RENDERER_PLUGIN_LOADED			"Plugin \"%S\" loaded."
+#define E_RENDERER_INVALID_PLUGIN_TYPE		"Invalid render plugin type: \"%d\"."
+#define E_RENDERER_PLUGIN_LOAD_FAILURE		"Render plugin \"%S\" failed to load."
+#define E_RENDERER_DEVICE_CREATE_FAILURE	"Failed to create render device \"%S\"."
+#define W_RENDERER_SPECIFIED_NOT_AVAILABLE	"specified render plugin not available. Will retry with other plugins."
+#define E_RENDERER_NO_PLUGIN_AVAILABLE		"No available render plugin."
+#define E_RENDERER_ASSIGN_WINDOW_FAILURE	"Failed to assign a render target for device."
+#define I_RENDERER_ASSIGN_WINDOW_SUCCESS	"Render target assigned successfully."
 
 // Direct3D9 Settings Manager
 #define E_D3D9_OPTION_GROUP_CREATE_FAILED	("Failed to create option group \"%S\"")
 #define E_D3D9_OPTION_WRITE_FAILED			("Failed to write one or more options.")
 
 // Direct3D9 Render Plugin
+#define E_D3D9_INITIALIZE_FAILURE			"Failed to initialize Direct3D. Please ensure your Direct3D version >= 9.0."
+#define W_D3D9_HARDWARE_NOT_COMPATIBLE		"Hardwares not support current settings. Will retry using fallback."
+#define E_D3D9_PREREQUISITE_NOT_SATISFIED	"Initialization failed: Prerequisite not satisfied."
+
 #define E_GET_DEVICE_CAPABILITIES_FAILURE	"Failed to get device capabilities."
 #define W_FSAA_NOT_AVAILABLE				"FSAA not available on your hardware."
 #define E_CREATE_DIRECT3D_DEVICE_FAILURE	"Failed to create Direct3D device."
@@ -61,10 +66,6 @@
 #define E_ENUMERATE_DISPLAY_MODE_FAILURE	"Failed to enumerate display mode."
 #define E_NO_SUITABLE_DISPLAY_MODE			"No suitable display mode found. Please check configuration."
 #define E_NOT_SUPPORTED_MODE				"The selected mode is not supported by the graphics card."
-#define E_CLEAR_BUFFER_FAILURE				"Failed to clear buffers."
-#define E_BEGIN_SCENE_FAILURE				"Failed to begin scene."
-#define E_END_SCENE_FAILURE					"Failed to end scene."
-#define I_SET_CLEAR_COLOR					"Clear color set to (%d, %d, %d)."
 
 // Render Window
 #define E_CREATE_RENDER_WINDOW_FAILURE		("Failed to create render window.")

@@ -13,45 +13,53 @@ namespace Identi3D
 
 	const std::wstring VALUE_TRUE = L"true";
 	const std::wstring VALUE_FALSE = L"false";
-
-	Direct3D9SettingsManager::Direct3D9SettingsManager(DebugManager *debugger = NULL) 
-		: DebugFrame(debugger), _tree(NULL)
+	
+	inline bool convStringToBool(const std::wstring &str)
 	{
-		reset();
+		return (str == VALUE_TRUE);
 	}
 
 	void Direct3D9SettingsManager::reset()
 	{
-		_is_windowed				= false;
-		_is_hardware_accelerated	= true;
-		_is_stencil_buffer_enabled	= true;
+		_is_windowed				= D3DSETTINGS_DEFAULT_WINDOWED;
+		_is_hardware_accelerated	= D3DSETTINGS_DEFAULT_HARDWAREACCELERATED;
+		_is_stencil_buffer_enabled	= D3DSETTINGS_DEFAULT_STENCILBUFFER;
 
-		_screen_width	= 800;
-		_screen_height	= 600;
-		_color_depth	= 32;
-		_refresh_rate	= 60;
+		_screen_width	= D3DSETTINGS_DEFAULT_SCREEN_WIDTH;
+		_screen_height	= D3DSETTINGS_DEFAULT_SCREEN_HEIGHT;
+		_color_depth	= D3DSETTINGS_DEFAULT_COLOR_DEPTH;
+		_refresh_rate	= D3DSETTINGS_DEFAULT_REFRESH_RATE;
 	}
 
 	bool Direct3D9SettingsManager::read(OptionTree *tree)
 	{
-		try
-		{
-			reset();
+		if(tree == NULL) return false;
 
-			if(tree == NULL) return false;
+		std::wstring tmp;
 
-			_is_windowed = convStringToBool(tree->getValue(std::wstring(L"Graphics.Windowed")));
-			_is_hardware_accelerated = convStringToBool(tree->getValue(std::wstring(L"Graphics.HardwareAcceleration")));
-			_is_stencil_buffer_enabled = convStringToBool(tree->getValue(std::wstring(L"Graphics.StencilBuffer")));
-			swscanf_s(tree->getValue(std::wstring(L"Graphics.ScreenResolution")).c_str(), L"%dx%dx%d@%d",
-				&_screen_width, &_screen_height, &_color_depth, &_refresh_rate);
-		} catch(std::exception &e) {
-			reset();
-			_tree = NULL;
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
-			return false;
+		tmp = tree->getValue(std::wstring(L"Graphics.Windowed"));
+		if(tmp.length()) _is_windowed = convStringToBool(tmp);
+		else _is_windowed = D3DSETTINGS_DEFAULT_WINDOWED;
+
+		tmp = tree->getValue(std::wstring(L"Graphics.HardwareAcceleration"));
+		if(tmp.length()) _is_hardware_accelerated = convStringToBool(tmp);
+		else _is_hardware_accelerated = D3DSETTINGS_DEFAULT_HARDWAREACCELERATED;
+
+		tmp = tree->getValue(std::wstring(L"Graphics.StencilBuffer"));
+		if(tmp.length()) _is_stencil_buffer_enabled = convStringToBool(tmp);
+		else _is_stencil_buffer_enabled = D3DSETTINGS_DEFAULT_STENCILBUFFER;
+
+		if(swscanf_s(tree->getValue(std::wstring(L"Graphics.ScreenResolution")).c_str(), L"%dx%dx%d@%d",
+			&_screen_width, &_screen_height, &_color_depth, &_refresh_rate) == 0) {
+				_screen_width	= D3DSETTINGS_DEFAULT_SCREEN_WIDTH;
+				_screen_height	= D3DSETTINGS_DEFAULT_SCREEN_HEIGHT;
+				_color_depth	= D3DSETTINGS_DEFAULT_COLOR_DEPTH;
+				_refresh_rate	= D3DSETTINGS_DEFAULT_REFRESH_RATE;
 		}
-		
+
+		if(_color_depth != 16 && _color_depth != 32) 
+			_color_depth = D3DSETTINGS_DEFAULT_COLOR_DEPTH;
+
 		_tree = tree;
 		return true;
 	}
@@ -60,26 +68,19 @@ namespace Identi3D
 	{
 		if(_tree == NULL) return false;
 
-		try
-		{
-			wchar_t tmpstr[64];
+		// Create screen resolution string.
+		wchar_t tmpstr[64];
+		swprintf_s(tmpstr, TEXT("%dx%dx%d@%d"),
+			_screen_width, _screen_height, _color_depth, _refresh_rate);
 
-			// Create screen resolution string.
-			swprintf_s(tmpstr, TEXT("%dx%dx%d@%d"),
-				_screen_width, _screen_height, _color_depth, _refresh_rate);
-
-			_tree->addElement(std::wstring(L"Graphics.Windowed"),
-				(_is_windowed) ? VALUE_TRUE : VALUE_FALSE);
-			_tree->addElement(std::wstring(L"Graphics.HardwareAcceleration"),
-				(_is_hardware_accelerated) ? VALUE_TRUE : VALUE_FALSE);
-			_tree->addElement(std::wstring(L"Graphics.StencilBuffer"),
-				(_is_stencil_buffer_enabled) ? VALUE_TRUE : VALUE_FALSE);
-			_tree->addElement(std::wstring(L"Graphics.ScreenResolution"),
-				std::wstring(tmpstr));
-		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
-			return false;
-		}
+		if(NULL == _tree->addElement(std::wstring(L"Graphics.Windowed"),
+			(_is_windowed) ? VALUE_TRUE : VALUE_FALSE)) return false;
+		if(NULL == _tree->addElement(std::wstring(L"Graphics.HardwareAcceleration"),
+			(_is_hardware_accelerated) ? VALUE_TRUE : VALUE_FALSE)) return false;
+		if(NULL == _tree->addElement(std::wstring(L"Graphics.StencilBuffer"),
+			(_is_stencil_buffer_enabled) ? VALUE_TRUE : VALUE_FALSE)) return false;
+		if(NULL == _tree->addElement(std::wstring(L"Graphics.ScreenResolution"),
+			std::wstring(tmpstr))) return false;
 
 		return true;
 	}

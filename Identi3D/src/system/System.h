@@ -90,33 +90,33 @@ namespace Identi3D
 		/*
 		 * Get Renderer handle.
 		 */
-		inline Renderer &getRenderer(void) const
+		inline Renderer *getRenderer(void) const
 		{
-			return *_renderer;
+			return _renderer;
 		}
 
 		/*
 		 * Get DebugManager handle.
 		 */
-		inline DebugManager &getDebugManager(void) const 
+		inline DebugManager *getDebugManager(void) const 
 		{
-			return *_debugger;
+			return _debugger;
 		}
 
 		/*
 		 * Get SettingsManager handle.
 		 */
-		inline SettingsManager &getSettingsManager(void) const
+		inline SettingsManager *getSettingsManager(void) const
 		{
-			return *_confmgr;
+			return _confmgr;
 		}
 
 		/*
 		 * Get EventDispatcher handle.
 		 */
-		inline EventDispatcher &getEventDispatcher(void) const
+		inline EventDispatcher getEventDispatcher(void) const
 		{
-			return *_dispatcher;
+			return _dispatcher;
 		}
 
 		/*

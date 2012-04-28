@@ -64,7 +64,7 @@ namespace Identi3D
 	{
 		OptionIterator iter((elem == NULL) ? _tree.getRootIterator() : elem->child);
 		
-		while(!iter) {
+		while(!iter.end()) {
 			if(iter->child) {
 				saveElementRecursively(iter.get(), fout);
 			} else {

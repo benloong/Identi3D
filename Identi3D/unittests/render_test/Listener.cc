@@ -4,7 +4,7 @@
 //
 
 #include "Listener.h"
-#include <src/identi3d/System.h>
+#include <src/system/System.h>
 
 using namespace Identi3D;
 

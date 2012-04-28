@@ -8,8 +8,7 @@
 #define IDENTI3D_SRC_RENDERER_RENDERWINDOW_H
 
 #include <src/identi3d/General.h>
-#include <src/identi3d/Basetypes.h>
-#include <src/utils/DebugManager.h>			// TODO: Use new file "DebugFrame.h"
+#include <src/utils/DebugFrame.h>
 
 namespace Identi3D
 {
@@ -38,17 +37,17 @@ namespace Identi3D
 		/*
 		 * Create window with specified attributes.
 		 */
-		bool createWindow(int width, int height, const wchar_t *title);
+		bool createWindow(int width, int height, const std::wstring &title);
 		
 		/*
 		 * Assign a render device for the window.
 		 */
-		bool assign(RenderDevice *device, const wchar_t *title);
+		bool assign(RenderDevice &device, const std::wstring &title);
 
 		/*
 		 * Unload render device.
 		 */
-		inline HRESULT deassign(void) 
+		inline void deassign(void) 
 		{
 			release();
 		}
@@ -72,7 +71,7 @@ namespace Identi3D
 		/*
 		 * Get the handle of window.
 		 */
-		bool getHandle(void) { return _window; }
+		HWND getHandle(void) { return _window; }
 
 		/*
 		 * Get assigned render device.

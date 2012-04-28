@@ -11,6 +11,15 @@
 #include <memory>
 #include <stdexcept>
 
+/*
+ * NOTICE for MSVC Users:
+ * ======================
+ * Inorder to use AlignedAllocator correctly,
+ * you should hack your <vector> file at line 870 or around,
+ * changing "_Ty _Val" to "_Ty &_Val" because aligned variables
+ * doesn't support to be passed by val.
+ */
+
 namespace Identi3D
 {
 
@@ -40,7 +49,7 @@ namespace Identi3D
 		{
 			_aligned_free(p);
 		}
-	
+
 	};
 
 }

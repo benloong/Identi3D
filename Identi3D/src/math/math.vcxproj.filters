@@ -62,5 +62,8 @@
     <ClCompile Include="OBB.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Polygon.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

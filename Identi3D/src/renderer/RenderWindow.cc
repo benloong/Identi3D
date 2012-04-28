@@ -5,9 +5,8 @@
 
 #include <src/renderer/RenderWindow.h>
 #include <src/renderer/RenderDevice.h>
-#include <src/identi3d/System.h>
-#include <src/identi3d/EventDispatcher.h>
-#include <src/utils/DebugManager.h>
+#include <src/system/System.h>
+#include <src/system/EventDispatcher.h>
 
 namespace Identi3D
 {
@@ -21,6 +20,7 @@ namespace Identi3D
 		: DebugFrame(debugger), _window(NULL)
 	{
 		generateClassName();
+		registerClass();
 	}
 
 	RenderWindow::~RenderWindow(void)
@@ -28,32 +28,26 @@ namespace Identi3D
 		release();
 	}
 
-	bool RenderWindow::assign(RenderDevice *device, const wchar_t *title)
+	bool RenderWindow::assign(RenderDevice &device, const std::wstring &title)
 	{
-		HRESULT hr;
-
 		release();
-		if(device == NULL || title == NULL) {
-			_printMessage(__FILE__, __LINE__, E_INVALID_PARAMETERS);
-			return E_FAIL;
+		if(!createWindow(device.getWidth(), device.getHeight(), title)) {
+			_printMessage(__FILE__, __LINE__, E_WINDOW_CREATE_FAILURE, GetLastError());
+			return false;
 		}
-		registerClass();
-		hr = createWindow(device->getWidth(), device->getHeight(), title);
-		if(FAILED(hr))
-			return E_FAIL;
-		render_device = device;
 
-		return S_OK;
+		_printVerboseMessage(__FILE__, __LINE__, I_WINDOW_CREATE_SUCCESS, title);
+		_render_device = &device;
+		return true;
 	}
 
-	HRESULT RenderWindow::release(void)
+	void RenderWindow::release(void)
 	{
-		if(window != NULL) {
-			DestroyWindow(window);
-			window = NULL;
+		if(_window != NULL) {
+			DestroyWindow(_window);
+			_window = NULL;
 		}
-		render_device = NULL;
-		return S_OK;
+		_render_device = NULL;
 	}
 
 	void RenderWindow::generateClassName(void)
@@ -61,8 +55,8 @@ namespace Identi3D
 		const wchar_t random_table[37] = __T("abcdefghijklmnopqrstuvwxyz0123456789");
 		const UINT random_length = 7;
 
-		_tcscpy_s(class_name, __T("IRW"));
-		wchar_t *p = class_name + 3;
+		_tcscpy_s(_class_name, __T("IRW"));
+		wchar_t *p = _class_name + 3;
 		srand((unsigned int)time(NULL));
 		for(int i = 0; i < random_length; i++) {
 			*p = random_table[rand() % 36];
@@ -87,27 +81,24 @@ namespace Identi3D
 		wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 		wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
 		wcex.lpszMenuName	= NULL;
-		wcex.lpszClassName	= class_name;
+		wcex.lpszClassName	= _class_name;
 		wcex.hIconSm		= LoadIcon(NULL, IDI_APPLICATION);
 
 		RegisterClassEx(&wcex);
 	}
 
-	HRESULT RenderWindow::createWindow(int width, int height, const wchar_t *title)
+	bool RenderWindow::createWindow(int width, int height, const std::wstring &title)
 	{
-		window = CreateWindow(
-			class_name, title, window_style, 
+		_window = CreateWindow(
+			_class_name, title.c_str(), window_style, 
 			CW_USEDEFAULT, 0, width, height, 
-			NULL, NULL, GetModuleHandle(0), (LPVOID)this);
+			NULL, NULL, GetModuleHandle(0), NULL);
 		
-		if(window == NULL) {
-			_DebugPrint(debugger, E_CREATE_RENDER_WINDOW_FAILURE);
-			return E_FAIL;
-		}
+		if(_window == NULL) return false;
 
-		ShowWindow(window, SW_NORMAL);
-		UpdateWindow(window);
-		return S_OK;
+		ShowWindow(_window, SW_NORMAL);
+		UpdateWindow(_window);
+		return true;
 	}
 
 	LRESULT RenderWindow::WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)

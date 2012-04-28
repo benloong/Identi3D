@@ -3,13 +3,13 @@
 // ======================
 //
 
-#include <src/identi3d/EventListener.h>
-#include <src/identi3d/EventDispatcher.h>
+#include <src/system/EventListener.h>
+#include <src/system/EventDispatcher.h>
 
 namespace Identi3D
 {
 
-	bool EventListener::processRawPacket(EventPacket &packet, LRESULT &result)
+	bool EventListener::processRawPacket(EventPacket &packet, int &result)
 	{
 		switch(packet.event_message)
 		{

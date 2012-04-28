@@ -18,12 +18,15 @@
 #define E_FILE_OPEN_FAILURE					"Unable to open \'%S\'."
 
 // System
-#define I_SYSTEM_LOAD_CONFIGURATION			"Loading configuration from %S..."
+#define I_SYSTEM_LOADING_CONFIGURATION		"Loading configuration from %S..."
 #define I_SYSTEM_CONFIGURATION_LOAD_SUCCESS "Configuration load completed."
+#define W_SYSTEM_CONFIGURATION_LOAD_FAILURE	"Unable to load configuration."
 #define I_SYSTEM_CREATE_SUCCESS				"System has been initialized successfully."
 #define I_SYSTEM_RELEASING					"Releasing system..."
-
-#define E_SYSTEM_CONFIGURATION_LOAD_FAIL	"Unable to load specified configuration."
+#define E_SYSTEM_CREATE_RENDERER_FAILURE	"Failed to create a renderer."
+#define E_SYSTEM_CREATE_DEBUGGER_FAILURE	"Failed to create a debugger."
+#define E_SYSTEM_CREATE_DISPATCHER_FAILURE	"Failed to create a event dispatcher."
+#define E_SYSTEM_CREATE_CONFMGR_FAILURE		"Failed to create a settings manager."
 
 // Settings Manager
 #define I_SETTINGS_LOAD_COMPLETED			"Settings load complete. Source: %S, %d/%d accepted."
@@ -47,6 +50,12 @@
 #define E_RENDERER_ASSIGN_WINDOW_FAILURE	"Failed to assign a render target for device."
 #define I_RENDERER_ASSIGN_WINDOW_SUCCESS	"Render target assigned successfully."
 
+// Render Window
+#define E_WINDOW_CREATE_FAILURE				"Failed to create render window. Last Error Code: %d"
+#define I_WINDOW_CREATE_SUCCESS				"New render window created: \"%S\"."
+
+#define E_START_RENDERING_FAILURE			("Failed to start rendering.")
+
 // Direct3D9 Settings Manager
 #define E_D3D9_OPTION_GROUP_CREATE_FAILED	("Failed to create option group \"%S\"")
 #define E_D3D9_OPTION_WRITE_FAILED			("Failed to write one or more options.")
@@ -66,11 +75,5 @@
 #define E_ENUMERATE_DISPLAY_MODE_FAILURE	"Failed to enumerate display mode."
 #define E_NO_SUITABLE_DISPLAY_MODE			"No suitable display mode found. Please check configuration."
 #define E_NOT_SUPPORTED_MODE				"The selected mode is not supported by the graphics card."
-
-// Render Window
-#define E_CREATE_RENDER_WINDOW_FAILURE		("Failed to create render window.")
-#define I_WINDOW_CLASS_NAME_ALLOCATED		("New render window: \"%S\".")
-
-#define E_START_RENDERING_FAILURE			("Failed to start rendering.")
 
 #endif // IDENTI3D_SRC_IDENTI3D_MESSAGES_H

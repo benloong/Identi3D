@@ -9,7 +9,7 @@
 
 #include <src/identi3d/General.h>
 #include <src/renderer/RenderDevice.h>
-#include <src/utils/DebugManager.h>		// TODO: Use new file "DebugFrame.h"
+#include <src/utils/DebugFrame.h>
 
 namespace Identi3D
 {
@@ -22,11 +22,10 @@ namespace Identi3D
 	 */
 	enum RenderBackendType
 	{
-		RenderBackendType_NoDevice	= 0,
-		RenderBackendType_Direct3D9	= 1,
-		RenderBackendType_OpenGL	= 2,
+		RenderBackendType_Direct3D9	= 0,
+		RenderBackendType_OpenGL	= 1,
 
-		RenderBackendType_ForceDword= 0xFFFFFFFF
+		RenderBackendType_NoDevice	= 0xFFFF
 	};
 
 	class Renderer : public DebugFrame
@@ -65,12 +64,17 @@ namespace Identi3D
 		/*
 		 * Assign a render target for the render device.
 		 */
-		bool assignRenderWindow(RenderWindow *window, const wchar_t *window_title = IDENTI3D_NAME);
+		bool assignRenderWindow(RenderWindow &window, const std::wstring &window_title);
 
 		/*
 		 * Get current render device.
 		 */
 		RenderDevice *getDevice(void) { return _render_device; }
+
+		/*
+		 * Get assigned render window.
+		 */
+		RenderWindow *getWindow(void) { return _render_window; }
 
 	};
 

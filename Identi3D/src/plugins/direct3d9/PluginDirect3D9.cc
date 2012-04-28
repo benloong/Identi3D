@@ -100,29 +100,29 @@ namespace Identi3D
 
 		count = _direct3d->GetAdapterModeCount(D3DADAPTER_DEFAULT, format);
 		if(0 == count){
-			_DebugPrint(_debugger, E_NO_DISPLAY_MODE_AVAILABLE);
+			_printMessage(__FILE__, __LINE__, E_NO_DISPLAY_MODE_AVAILABLE);
 			return false;
 		}
 
-		_DebugPrintV(_debugger, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
+		_printVerboseMessage(__FILE__, __LINE__, I_BEGIN_ENUMERATE_DISPLAY_MODE, count);
 
 		for(i = 0; i < count; i++){
 			hr = _direct3d->EnumAdapterModes(D3DADAPTER_DEFAULT, format, i, &mode);
 			if(FAILED(hr)){
-				_DebugPrint(_debugger, E_ENUMERATE_DISPLAY_MODE_FAILURE);
+				_printMessage(__FILE__, __LINE__, E_ENUMERATE_DISPLAY_MODE_FAILURE);
 				return false;
 			}
-			_DebugPrintV(_debugger, I_DISPLAY_MODE_FORMAT, mode.Width, mode.Height, mode.RefreshRate);
+			_printVerboseMessage(__FILE__, __LINE__, I_DISPLAY_MODE_FORMAT, mode.Width, mode.Height, mode.RefreshRate);
 			if(_settings._screen_width == mode.Width && 
 				_settings._screen_height == mode.Height &&
 				_settings._refresh_rate == mode.RefreshRate &&
 				mode.Format == format){
-					_DebugPrint(_debugger, I_DISPLAY_MODE_FOUND);
+					_printVerboseMessage(__FILE__, __LINE__, I_DISPLAY_MODE_FOUND);
 					break;
 			}
 		}
 		if(i >= count){
-			_DebugPrint(_debugger, E_NO_SUITABLE_DISPLAY_MODE);
+			_printMessage(__FILE__, __LINE__, E_NO_SUITABLE_DISPLAY_MODE);
 			return false;
 		}
 
@@ -130,7 +130,7 @@ namespace Identi3D
 			(_settings._is_hardware_accelerated ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
 			format, format, _settings._is_windowed);
 		if(FAILED(hr)){
-			_DebugPrint(_debugger, E_NOT_SUPPORTED_MODE);
+			_printMessage(__FILE__, __LINE__, E_NOT_SUPPORTED_MODE);
 			return false;
 		}
 
@@ -148,7 +148,7 @@ namespace Identi3D
 			(_settings._is_hardware_accelerated ? D3DDEVTYPE_HAL : D3DDEVTYPE_REF),
 			&caps);
 		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_GET_DEVICE_CAPABILITIES_FAILURE);
+			_printMessage(__FILE__, __LINE__, E_GET_DEVICE_CAPABILITIES_FAILURE);
 			return false;
 		}
 		
@@ -185,7 +185,7 @@ namespace Identi3D
 			D3DMULTISAMPLE_2_SAMPLES,
 			NULL);
 		if(FAILED(hr)) {
-			_DebugPrint(_debugger, W_FSAA_NOT_AVAILABLE);
+			_printMessage(__FILE__, __LINE__, W_FSAA_NOT_AVAILABLE);
 			_present_parameters.MultiSampleType = D3DMULTISAMPLE_NONE;
 		} else {
 			_present_parameters.MultiSampleType = D3DMULTISAMPLE_2_SAMPLES;
@@ -198,8 +198,8 @@ namespace Identi3D
 			&_present_parameters,
 			&_direct_device);
 		if(FAILED(hr)) {
-			_DebugPrint(_debugger, E_CREATE_DIRECT3D_DEVICE_FAILURE);
-			_direct_device == NULL;
+			_printMessage(__FILE__, __LINE__, E_CREATE_DIRECT3D_DEVICE_FAILURE);
+			_direct_device = NULL;
 			return false;
 		}
 
@@ -237,7 +237,7 @@ namespace Identi3D
 		if(FAILED(hr)) return false;
 
 		_is_scene_running = true;
-		return S_OK;
+		return true;
 	}
 
 	void PluginDirect3D9::endRendering(void)

@@ -22,14 +22,14 @@ namespace Identi3D {
 		try
 		{
 
-#if defined(_MEMORY_LEAK_DETECTION)
+	#if defined(_MEMORY_LEAK_DETECTION)
 			if(_allocated_memory) {
 				printRawString(" [WARNING] Memory leaks detected before DebugManager freed. Orphan size: %d\n",
 					_allocated_memory);
 			} else {
 				printRawString(" No memory leaks detected.\n");
 			}
-#endif // defined(_MEMORY_LEAK_DETECTION)
+	#endif // defined(_MEMORY_LEAK_DETECTION)
 
 			if(!_prevbuf) {
 				std::clog.rdbuf(_prevbuf);
@@ -56,8 +56,8 @@ namespace Identi3D {
 
 		char temp[max_buffer_length];
 
-		_snprintf_s(temp, max_buffer_length, "%s. %d %02d:%02d ", 
-			month_name[tmetrics.tm_mon], tmetrics.tm_mday, tmetrics.tm_hour, tmetrics.tm_min);
+		_snprintf_s(temp, max_buffer_length, "%s. %d %02d:%02d:%02d ", 
+			month_name[tmetrics.tm_mon], tmetrics.tm_mday, tmetrics.tm_hour, tmetrics.tm_min, tmetrics.tm_sec);
 
 		return std::string(temp);
 	}
@@ -339,7 +339,7 @@ namespace Identi3D {
 		return _is_valid;
 	}
 
-	void *DebugManager::operator new(size_t size)
+	void *DebugManager::operator new(size_t size, const std::nothrow_t &)
 	{
 		// Only one instance allowed.
 		if(_is_valid) return NULL;

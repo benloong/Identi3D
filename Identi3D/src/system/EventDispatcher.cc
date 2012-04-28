@@ -3,39 +3,34 @@
 // ========================
 //
 
-#include <src/identi3d/EventDispatcher.h>
-#include <src/identi3d/EventListener.h>
+#include <src/system/EventDispatcher.h>
+#include <src/system/EventListener.h>
 #include <src/identi3d/IdentiExceptions.h>
+#include <algorithm>
 
 namespace Identi3D
 {
 
 	EventDispatcher::EventDispatcher(DebugManager *debugger) : DebugFrame(debugger)
 	{
-		memset(_hook, 0, sizeof(_hook));
-		_hook_count = 0;
 	}
 
-	HRESULT EventDispatcher::RegisterEventListener(EventListener *listener)
+	bool EventDispatcher::RegisterEventListener(EventListener &listener)
 	{
-		if(listener == NULL) return E_FAIL;
-		if(_hook_count >= MAX_EVENT_LISTENER) return E_FAIL;
-
-		_hook[_hook_count++] = listener;
-		return S_OK;
+		_hook.push_back(&listener);
+		return true;
 	}
 
-	HRESULT EventDispatcher::UnregisterEventListener(EventListener *listener)
+	void EventDispatcher::UnregisterEventListener(EventListener &listener)
 	{
-		// TODO: unregister the listener.
-		return S_OK;
+		_hook.erase(std::find(_hook.begin(), _hook.end(), &listener));
 	}
 
-	LRESULT EventDispatcher::postWindowMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) const
+	int EventDispatcher::postWindowMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
 		EventPacket packet;
 		PAINTSTRUCT ps;
-		LRESULT retval;
+		int retval;
 		bool abandoned;
 		HDC hdc;
 
@@ -58,27 +53,20 @@ namespace Identi3D
 			return DefWindowProc(hwnd, msg, wparam, lparam);
 		}
 
-		try
-		{
-			abandoned = true;
-			retval = 0;
-			for(UINT i = 0; i < _hook_count; i++) {
-				if(_hook[i]->processRawPacket(packet, retval)) abandoned = false;
-			}
-		} catch(std::exception &e) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, e);
-		} catch(...) {
-			if(_debugger) _debugger->print(__FILE__, __LINE__, UnknownException());
+		abandoned = true;
+		retval = 0;
+		for(EventListenerList::iterator iter = _hook.begin(); iter != _hook.end(); ++iter) {
+			if((*iter)->processRawPacket(packet, retval)) abandoned = false;
 		}
 
 		if(abandoned) return DefWindowProc(hwnd, msg, wparam, lparam);
 		return retval;
 	}
 
-	LRESULT EventDispatcher::postEvent(Event e, DWORD param1, DWORD param2) const
+	int EventDispatcher::postEvent(Event e, DWORD param1, DWORD param2)
 	{
 		EventPacket packet;
-		LRESULT retval;
+		int retval;
 
 		packet.event_message = e;
 		packet.param1 = param1;
@@ -86,8 +74,8 @@ namespace Identi3D
 		packet.time_since_last_frame = 0;
 
 		retval = 0;
-		for(UINT i = 0; i < _hook_count; i++) {
-			_hook[i]->processRawPacket(packet, retval);
+		for(EventListenerList::iterator iter = _hook.begin(); iter != _hook.end(); ++iter) {
+			(*iter)->processRawPacket(packet, retval);
 		}
 		return retval;
 	}

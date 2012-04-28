@@ -12,7 +12,7 @@ namespace Identi3D
 	{
 	}
 
-	void *DebugFrame::operator new(size_t size)
+	void *DebugFrame::operator new(size_t size, const std::nothrow_t &)
 	{
 		void *p = ::operator new(size, std::nothrow);
 		if(p != NULL) {
@@ -21,7 +21,7 @@ namespace Identi3D
 		return p;
 	}
 
-	void *DebugFrame::operator new[](size_t size)
+	void *DebugFrame::operator new[](size_t size, const std::nothrow_t &)
 	{
 		void *p = ::operator new[](size, std::nothrow);
 		if(p != NULL) {
@@ -29,16 +29,26 @@ namespace Identi3D
 		}
 		return p;
 	}
-
+	
 	void DebugFrame::operator delete(void *p, size_t size)
 	{
 		DebugManager::onDeallocation(size);
-		::operator delete(p, std::nothrow);
+		::operator delete(p);
 	}
 
 	void DebugFrame::operator delete[](void *p, size_t size)
 	{
 		DebugManager::onDeallocation(size);
+		::operator delete[](p);
+	}
+
+	void DebugFrame::operator delete(void *p, const std::nothrow_t &)
+	{
+		::operator delete(p, std::nothrow);
+	}
+
+	void DebugFrame::operator delete[](void *p, const std::nothrow_t &s)
+	{
 		::operator delete[](p, std::nothrow);
 	}
 

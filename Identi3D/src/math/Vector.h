@@ -323,9 +323,7 @@ namespace Identi3D
 		}
 
 	private:
-		/*
-		 * Data should be aligned to 16 bit for fast SSE computation.
-		 */
+
 		_DATA_ALIGN union
 		{
 			struct { float _x, _y, _z, _w; };

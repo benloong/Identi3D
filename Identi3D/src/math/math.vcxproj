@@ -96,6 +96,7 @@
     <ClCompile Include="Matrix.cc" />
     <ClCompile Include="OBB.cc" />
     <ClCompile Include="Plane.cc" />
+    <ClCompile Include="Polygon.cc" />
     <ClCompile Include="Ray.cc" />
     <ClCompile Include="Vector.cc" />
   </ItemGroup>

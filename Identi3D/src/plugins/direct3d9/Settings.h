@@ -10,7 +10,7 @@
 #include <src/identi3d/General.h>
 #include <src/utils/DebugManager.h>
 
-#define D3DSETTINGS_DEFAULT_WINDOWED			false
+#define D3DSETTINGS_DEFAULT_WINDOWED			true
 #define D3DSETTINGS_DEFAULT_HARDWAREACCELERATED	true
 #define D3DSETTINGS_DEFAULT_STENCILBUFFER		true
 

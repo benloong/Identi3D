@@ -9,17 +9,18 @@
 namespace Identi3D
 {
 
-	HRESULT CreateRenderDevice(HMODULE plugin, RenderDevice **device, DebugManager *debugger)
+	bool CreateRenderDevice(HMODULE plugin, RenderDevice **device, DebugManager *debugger)
 	{
 		if(plugin == NULL || device == NULL)
-			return E_FAIL;
+			return false;
 
-		*device = new (std::nothrow) PluginDirect3D9(plugin, debugger);
+		*device = ntnew PluginDirect3D9(plugin, debugger);
 		if(*device == NULL) {
-			_DebugPrint(debugger, E_OUT_OF_MEMORY);
-			return E_FAIL;
+			if(debugger)
+				debugger->print(__FILE__, __LINE__, false, E_OUT_OF_MEMORY);
+			return false;
 		}
-		return S_OK;
+		return true;
 	}
 
 	void ReleaseRenderDevice(RenderDevice **device)

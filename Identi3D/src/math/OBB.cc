@@ -75,12 +75,12 @@ namespace Identi3D
 		return true;
 	}
 
-	OBBCullResult OrientedBoundingBox::cull(PlaneArray &planes) const
+	OBBCullResult OrientedBoundingBox::cull(PlaneList &planes) const
 	{
 		Vector3 normal;
 		float r, t;
 		OBBCullResult result = OBBCullResult_Visible;
-		PlaneArray::iterator iter;
+		PlaneList::iterator iter;
 
 		for(iter = planes.begin(); iter != planes.end(); ++iter)
 		{

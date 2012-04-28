@@ -8,7 +8,7 @@
 #define IDENTI3D_UNITTESTS_RENDERTEST_APP_H
 
 #include <src/identi3d/Identi3D.h>
-#include <src/identi3d/EventListener.h>
+#include <src/system/EventListener.h>
 
 #include "Listener.h"
 
@@ -20,13 +20,13 @@ private:
 	Identi3D::Renderer		*_renderer;
 	Identi3D::RenderWindow	*_window;
 
-	Listener *listener;
+	Listener *_listener;
 
 public:
 	App(void);
 	~App(void);
 
-	HRESULT	init(void);
+	bool	init(void);
 	int		run(void);
 };
 

@@ -23,7 +23,7 @@ namespace Identi3D
 		PlanePosition_ForceInt	= 65535
 	};
 
-	typedef std::vector<Plane, AlignedAllocator<Plane, 16>> PlaneArray;
+	typedef std::vector<Plane, AlignedAllocator<Plane, 16> > PlaneList;
 
 	class __declspec(dllexport) Plane
 	{

@@ -6,15 +6,14 @@
 #include <src/renderer/Renderer.h>
 #include <src/renderer/RenderDevice.h>
 #include <src/renderer/RenderWindow.h>
-#include <src/identi3d/System.h>
-#include <src/utils/DebugManager.h>
+#include <src/system/System.h>
 
 namespace Identi3D
 {
 	const int render_plugin_count = 2;
 	
 	const wchar_t *render_plugin_name[] = { L"Direct3D9",
-											L"OpenGL"}
+											L"OpenGL"};
 
 #ifndef _DEBUG
 	const wchar_t *render_plugin_path[] = {	L"PluginDirect3D9.dll",
@@ -25,7 +24,7 @@ namespace Identi3D
 #endif
 
 	Renderer::Renderer(DebugManager *debugger)
-		: _render_device(NULL), _plugin_handle(NULL), _debugger(debugger), _render_window(NULL)
+		: DebugFrame(debugger), _render_device(NULL), _plugin_handle(NULL), _render_window(NULL)
 	{
 		_backend_type = RenderBackendType_NoDevice;
 		if(System::instance().getSettingsManager())
@@ -36,7 +35,6 @@ namespace Identi3D
 	{
 		int index = static_cast<int>(type);
 		CREATERENDERDEVICE createRenderDeviceFunc;
-		HRESULT hr;
 
 		if(index >= render_plugin_count) {
 			_printMessage(__FILE__, __LINE__, E_RENDERER_INVALID_PLUGIN_TYPE, type);
@@ -57,8 +55,7 @@ namespace Identi3D
 			return false;
 		}
 
-		hr = createRenderDeviceFunc(_plugin_handle, &_render_device, _debugger);
-		if(FAILED(hr)) {
+		if(!createRenderDeviceFunc(_plugin_handle, &_render_device, _debugger)) {
 			_printMessage(__FILE__, __LINE__, E_RENDERER_DEVICE_CREATE_FAILURE, render_plugin_name[index]);
 			FreeLibrary(_plugin_handle);
 			_plugin_handle = NULL;
@@ -76,7 +73,7 @@ namespace Identi3D
 
 		if(_plugin_handle == NULL || _render_device == NULL) return ;
 		releaseRenderDeviceFunc = (RELEASERENDERDEVICE)GetProcAddress(_plugin_handle, "ReleaseRenderDevice");
-		if(releaseRenderDevice == NULL) {
+		if(releaseRenderDeviceFunc == NULL) {
 			FreeLibrary(_plugin_handle);
 			_plugin_handle = NULL;
 			return ;
@@ -95,9 +92,8 @@ namespace Identi3D
 	
 	bool Renderer::createDefaultDevice(void)
 	{
-		HRESULT hr;
+		int i;
 		RenderBackendType rbt;
-		wchar_t value[64];
 
 		if(!_global_option) {
 			if(System::instance().getSettingsManager())
@@ -107,25 +103,25 @@ namespace Identi3D
 		}
 
 		std::wstring result = _global_option->getValue(__T("System.DefaultRenderDevice"));
-		if(!result.length()) rbt = RenderBackendType_Direct3D9;
+		if(result.length() == 0) rbt = RenderBackendType_Direct3D9;
 		else {
-			for(int i = 0; i < render_plugin_count; i++) {
-				if(result == render_plugin_name[i]) rbt = i;
+			for(i = 0; i < render_plugin_count; i++) {
+				if(result == render_plugin_name[i]) rbt = static_cast<RenderBackendType>(i);
 			}
 			if(i >= render_plugin_count) rbt = RenderBackendType_Direct3D9;
 		}
 
 		if(!createDevice(rbt)) {
 			_printMessage(__FILE__, __LINE__, W_RENDERER_SPECIFIED_NOT_AVAILABLE);
-			MessageBoxA(NULL, W_RENDERER_SPECIFIED_NOT_AVAILABLE, "Warning", MB_OK);
-			for(int i = 0; i < render_plugin_count; i++) {
-				if(i != static_cast<int>(rbt)) {
-					if(createDevice(i)) break;
+			MessageBoxA(NULL, W_RENDERER_SPECIFIED_NOT_AVAILABLE, "Warning", MB_ICONWARNING | MB_OK);
+			for(i = 0; i < render_plugin_count; i++) {
+				if(i != rbt) {
+					if(createDevice(static_cast<RenderBackendType>(i))) break;
 				}
 			}
 			if(i >= render_plugin_count) {
-				_printMessage(__FILE__, __line__, E_RENDERER_NO_PLUGIN_AVAILABLE);
-				MessageBoxA(NULL, E_RENDERER_NO_PLUGIN_AVAILABLE, "Error", MB_OK);
+				_printMessage(__FILE__, __LINE__, E_RENDERER_NO_PLUGIN_AVAILABLE);
+				MessageBoxA(NULL, E_RENDERER_NO_PLUGIN_AVAILABLE, "Error", MB_ICONERROR | MB_OK);
 				return false;
 			}
 		}
@@ -133,30 +129,26 @@ namespace Identi3D
 		return true;
 	}
 
-	bool Renderer::assignRenderWindow(RenderWindow *window, const wchar_t *window_title)
+	bool Renderer::assignRenderWindow(RenderWindow &window, const std::wstring &window_title)
 	{
-		HRESULT hr;
-
 		if(!_render_device) {
 			_printMessage(__FILE__, __LINE__, E_RENDERER_NO_PLUGIN_AVAILABLE);
 			return false;
 		}
 
-		hr = window->assign(_render_device, window_title);
-		if(FAILED(hr)) {
+		if(!window.assign(*_render_device, window_title)) {
 			_printMessage(__FILE__, __LINE__, E_RENDERER_ASSIGN_WINDOW_FAILURE);
 			return false;
 		}
 
-		_render_device->init(window, _global_option);
-		if(FAILED(hr)) {
+		if(!_render_device->init(window, _global_option)) {
 			_printMessage(__FILE__, __LINE__, E_RENDERER_ASSIGN_WINDOW_FAILURE);
-			window->deassign();
+			window.deassign();
 			return FALSE;
 		}
 
-		_render_window = window;
-		_printVerboseMessage(__FILE, __LINE__, I_RENDERER_ASSIGN_WINDOW_SUCCESS);
+		_render_window = &window;
+		_printVerboseMessage(__FILE__, __LINE__, I_RENDERER_ASSIGN_WINDOW_SUCCESS);
 		return true;
 	}
 

@@ -109,6 +109,13 @@
 #include "Messages.h"
 
 /*
+ * Use new with std::nothrow
+ */
+#if !defined (ntnew)
+# define ntnew new (std::nothrow)
+#endif // !defined (ntnew)
+
+/*
  * Forward declaration.
  */
 namespace Identi3D
@@ -134,6 +141,9 @@ namespace Identi3D
 	class System;
 	class EventDispatcher;
 	class EventListener;
+
+	template<class T, size_t alignment>
+	struct AlignedAllocator;
 
 	class AxisAlignedBoundingBox;
 	class Matrix;

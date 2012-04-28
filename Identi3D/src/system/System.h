@@ -4,8 +4,8 @@
 // An interface to Identi3D.
 //
 
-#ifndef IDENTI3D_SRC_IDENTI3D_SYSTEM_H
-#define IDENTI3D_SRC_IDENTI3D_SYSTEM_H
+#ifndef IDENTI3D_SRC_SYSTEM_SYSTEM_H
+#define IDENTI3D_SRC_SYSTEM_SYSTEM_H
 
 #include <src/identi3d/Identi3D.h>
 #include <src/utils/Singleton.h>
@@ -18,6 +18,9 @@ namespace Identi3D
 		bool disable_debug_manager;
 		bool disallow_fallback_config;
 
+		SystemStartupProperties(void) :
+			disable_debug_manager(false),
+			disallow_fallback_config(false) {};
 		SystemStartupProperties(bool disableDebugManager, bool disallowFallbackConfig) :
 			disable_debug_manager(disableDebugManager),
 			disallow_fallback_config(disallowFallbackConfig) {};
@@ -56,11 +59,8 @@ namespace Identi3D
 		
 		/*
 		 * Initialize the system and load configuration.
-		 * Acceptable Flag:
-		 *		SystemFlag_AllowFallbackConfig
-		 *		SystemFlag_DisableDebugManager
 		 */
-		bool init(const std::wstring &config_name, const SystemStartupProperties &prop);
+		bool init(const wchar_t *config_name, const SystemStartupProperties &prop);
 
 		/*
 		 * Release the system and save configuration.
@@ -114,7 +114,7 @@ namespace Identi3D
 		/*
 		 * Get EventDispatcher handle.
 		 */
-		inline EventDispatcher getEventDispatcher(void) const
+		inline EventDispatcher *getEventDispatcher(void) const
 		{
 			return _dispatcher;
 		}
@@ -131,4 +131,4 @@ namespace Identi3D
 
 };
 
-#endif // IDENTI3D_SRC_IDENTI3D_SYSTEM_H
+#endif // IDENTI3D_SRC_SYSTEM_SYSTEM_H

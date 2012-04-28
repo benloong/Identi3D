@@ -10,9 +10,10 @@
 #include <src/identi3d/General.h>
 #include <src/identi3d/Messages.h>
 #include <src/identi3d/Basetypes.h>
-#include <src/identi3d/System.h>
-#include <src/identi3d/EventDispatcher.h>
-#include <src/identi3d/EventListener.h>
+
+#include <src/system/System.h>
+#include <src/system/EventDispatcher.h>
+#include <src/system/EventListener.h>
 
 #include <src/math/AABB.h>
 #include <src/math/Matrix.h>

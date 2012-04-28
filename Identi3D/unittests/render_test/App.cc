@@ -12,47 +12,61 @@ using namespace Identi3D;
 App::App(void)
 {
 	_debugger = NULL;
+	_window = NULL;
+	_listener = NULL;
+	_renderer = NULL;
+	_device = NULL;
 }
 
-HRESULT App::init(void)
+bool App::init(void)
 {
-	HRESULT hr;
-	
-	listener = new (std::nothrow) Listener;
-	if(listener == NULL) return E_FAIL;
+	_listener = ntnew Listener;
+	if(_listener == NULL) return false;
 
-	hr = System::instance().init(NULL, __T("default.conf"));
-	if(FAILED(hr)) return E_FAIL;
+	SystemStartupProperties prop;
+	if(!System::instance().init(L"default.conf", prop)) return false;
 	
-	System::instance().getEventDispatcher()->RegisterEventListener(listener);
+	System::instance().getEventDispatcher()->RegisterEventListener(*_listener);
 
 	_renderer = System::instance().getRenderer();
-	hr = _renderer->createDefaultDevice();
-	if(FAILED(hr)) return E_FAIL;
+	if(!_renderer->createDefaultDevice()) {
+		System::instance().release(false);
+		delete _listener;
+		_listener = NULL;
+		return false;
+	}
 	
-	_window = new (std::nothrow) RenderWindow;
-	if(_window == NULL) return E_FAIL;
+	_window = ntnew RenderWindow;
+	if(_window == NULL) {
+		System::instance().release(false);
+		delete _listener;
+		_listener = NULL;
+		return false;
+	}
 
-	hr = _renderer->assignRenderWindow(_window, __T("Identi3D Test"));
-	if(FAILED(hr)) return E_FAIL;
+	if(!_renderer->assignRenderWindow(*_window, __T("Identi3D Test"))) {
+		System::instance().release(false);
+		delete _window;
+		_window = NULL;
+		delete _listener;
+		_listener = NULL;
+		return false;
+	}
 
 	_device = _renderer->getDevice();
 	_debugger = System::instance().getDebugManager();
-	return S_OK;
+	return true;
 }
 
 int App::run(void)
 {
-	int retval;
-
 	_device->setClearColor(0, 0, 1.0f);
-	retval = System::instance().start();
-
-	return retval;
+	return System::instance().start();
 }
 
 App::~App(void)
 {
 	System::instance().release();
-	delete listener;
+	delete _window;
+	delete _listener;
 }

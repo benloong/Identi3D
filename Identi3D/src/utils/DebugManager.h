@@ -130,7 +130,7 @@ namespace Identi3D {
 		/*
 		 * Overload new operator.
 		 */
-		static void *operator new(size_t size) throw();
+		static void *operator new(size_t size, const std::nothrow_t &) throw();
 
 		/*
 		 * Overload delete operator.
@@ -141,6 +141,7 @@ namespace Identi3D {
 		/*
 		 * Restrict access to create multiple DebugManager object.
 		 */
+		static void *operator new(size_t size);
 		static void *operator new[](size_t size);
 		static void *operator new[](size_t size, void *p);
 

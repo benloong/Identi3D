@@ -8,7 +8,7 @@
 #define UNITTESTS_RENDERTEST_LISTENER_H
 
 #include <src/identi3d/Identi3D.h>
-#include <src/identi3d/EventListener.h>
+#include <src/system/EventListener.h>
 
 class Listener : public Identi3D::EventListener
 {

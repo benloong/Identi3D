@@ -78,11 +78,11 @@ namespace Identi3D
 		_bounds[1] += obb._center;
 	}
 
-	AABBCullResult AxisAlignedBoundingBox::cull(PlaneArray &planes) const
+	AABBCullResult AxisAlignedBoundingBox::cull(PlaneList &planes) const
 	{
 		Vector3 vmin, vmax;
 		bool intersected;
-		PlaneArray::iterator iter;
+		PlaneList::iterator iter;
 
 		for(iter = planes.begin(); iter != planes.end(); ++iter)
 		{

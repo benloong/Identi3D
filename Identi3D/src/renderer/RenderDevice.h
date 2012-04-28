@@ -67,10 +67,10 @@ namespace Identi3D
 
 	extern "C"
 	{
-		HRESULT CreateRenderDevice(HMODULE plugin, RenderDevice **device, DebugManager *debugger);
-		typedef HRESULT (*CREATERENDERDEVICE)(HMODULE plugin, RenderDevice **device, DebugManager *debugger);
+		bool CreateRenderDevice(HMODULE plugin, RenderDevice **device, DebugManager *debugger);
+		typedef bool (*CREATERENDERDEVICE)(HMODULE plugin, RenderDevice **device, DebugManager *debugger);
 
-		void ReleaseRenderDevice(RenderDevice *device);
+		void ReleaseRenderDevice(RenderDevice **device);
 		typedef void (*RELEASERENDERDEVICE)(RenderDevice **device);
 	}
 

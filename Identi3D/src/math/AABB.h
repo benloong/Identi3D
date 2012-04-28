@@ -70,15 +70,14 @@ namespace Identi3D
 
 		/*
 		 * Do a cull test to Axis Aligned Bounding Box.
-		 * On MSVC2010: Hack <vector> at line 879 or around, changing _Ty _Val to _Ty &_Val.
 		 */
-		AABBCullResult cull(PlaneArray &planes) const;
+		AABBCullResult cull(PlaneList &planes) const;
 
 		/*
 		 * Get 6 planes of the box. ENSURE the plane array is larger or equal than 6.
 		 * Order: RIGHT LEFT FRONT BACK TOP BOTTOM.
 		 */
-		void getPlanes(PlaneArray &planes)
+		void getPlanes(PlaneList &planes)
 		{
 			planes.resize(6);
 			planes[0].set(Vector3(1.0f, 0.0f, 0.0f), _bounds[1]);

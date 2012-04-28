@@ -4,13 +4,11 @@
 // Process and dispatch system event.
 //
 
-#ifndef IDENTI3D_SRC_IDENTI3D_EVENTDISPATCHER_H
-#define IDENTI3D_SRC_IDENTI3D_EVENTDISPATCHER_H
+#ifndef IDENTI3D_SRC_SYSTEM_EVENTDISPATCHER_H
+#define IDENTI3D_SRC_SYSTEM_EVENTDISPATCHER_H
 
 #include <src/identi3d/General.h>
 #include <src/utils/DebugFrame.h>
-
-#define MAX_EVENT_LISTENER	5
 
 namespace Identi3D
 {
@@ -33,11 +31,12 @@ namespace Identi3D
 		DWORD param2;
 	};
 
+	typedef std::vector<EventListener *> EventListenerList;
+
 	class EventDispatcher : public DebugFrame
 	{
 	private:
-		EventListener *_hook[MAX_EVENT_LISTENER];
-		UINT _hook_count;
+		EventListenerList _hook;
 
 	private:
 		EventDispatcher(EventDispatcher &dispatcher);
@@ -47,13 +46,13 @@ namespace Identi3D
 		EventDispatcher(DebugManager *debugger = NULL);
 		~EventDispatcher(void) {} ;
 
-		HRESULT RegisterEventListener(EventListener *listener);
-		HRESULT UnregisterEventListener(EventListener *listener);
+		bool RegisterEventListener(EventListener &listener);
+		void UnregisterEventListener(EventListener &listener);
 
-		LRESULT postWindowMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) const;
-		LRESULT postEvent(Event e, DWORD param1 = NULL, DWORD param2 = NULL) const;
+		int postWindowMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+		int postEvent(Event e, DWORD param1 = NULL, DWORD param2 = NULL);
 	};
 
 };
 
-#endif // IDENTI3D_SRC_IDENTI3D_EVENTDISPATCHER_H
+#endif // IDENTI3D_SRC_SYSTEM_EVENTDISPATCHER_H

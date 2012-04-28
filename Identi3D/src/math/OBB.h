@@ -61,7 +61,7 @@ namespace Identi3D
 		/*
 		 * Do a cull test to the box.
 		 */
-		OBBCullResult cull(PlaneArray &planes) const;
+		OBBCullResult cull(PlaneList &planes) const;
 
 		/*
 		 * Intersect with triangle.

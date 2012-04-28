@@ -8,7 +8,6 @@
 #define IDENTI3D_SRC_MATH_POLYGON_H
 
 #include <src/identi3d/General.h>
-#include <src/math/AlignedAllocator.h>
 #include <src/math/Vector.h>
 #include <src/math/Plane.h>
 #include <src/math/AABB.h>
@@ -17,7 +16,7 @@ namespace Identi3D
 {
 
 	typedef std::vector<unsigned int> IndexList;
-	typedef std::vector<Vector3, AlignedAllocator<Vector3, 16>> VertexList;
+	typedef std::vector<Vector3> VertexList;
 
 	class __declspec(dllexport) Polygon
 	{
@@ -49,15 +48,16 @@ namespace Identi3D
 
 			_vertices = vertices;
 			_indices = indices;
-			edge0 = vertices[_indices[1]] - vertices[_indices[0]];
-			for(int i = 2; i < indices.size(); i++) {
-				edge1 = vertices[indices[i]] - vertices[indices[0]];
+
+			edge0 = _vertices[_indices[1]] - _vertices[_indices[0]];
+			for(unsigned int i = 2; i < _indices.size(); i++) {
+				edge1 = _vertices[_indices[i]] - _vertices[_indices[0]];
 				if(fabs(edge0.getAngle(edge1)) > 1e-3) break;
 			}
 			_plane._normal.cross(edge0, edge1);
 			_plane._normal.normalize();
-			_plane._dist = -(_plane._normal * vertices[0]);
-			_plane._point = vertices[0];
+			_plane._dist = -(_plane._normal * _vertices[0]);
+			_plane._point = _vertices[0];
 
 			calculateBoundingBox();
 		}

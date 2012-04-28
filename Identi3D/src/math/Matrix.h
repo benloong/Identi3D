@@ -329,7 +329,7 @@ namespace Identi3D
 		 * Get element directly (const version).
 		 * Calls with i >= 4 or j >= 4 is equivalent to (0, 0).
 		 */
-		inline const float &operator ()(unsigned int i, unsigned int j) const
+		inline float operator ()(unsigned int i, unsigned int j) const
 		{
 			return (i < 4 && j < 4) ? _data[i].m128_f32[j] : _data[0].m128_f32[0];
 		}

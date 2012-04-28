@@ -27,6 +27,7 @@
 #define E_SYSTEM_CREATE_DEBUGGER_FAILURE	"Failed to create a debugger."
 #define E_SYSTEM_CREATE_DISPATCHER_FAILURE	"Failed to create a event dispatcher."
 #define E_SYSTEM_CREATE_CONFMGR_FAILURE		"Failed to create a settings manager."
+#define E_SYSTEM_LOAD_RESOURCES_FAILURE		"Failed to load resources."
 
 // Settings Manager
 #define I_SETTINGS_LOAD_COMPLETED			"Settings load complete. Source: %S, %d/%d accepted."

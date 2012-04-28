@@ -6,6 +6,7 @@
 #include <src/system/System.h>
 #include <src/system/EventDispatcher.h>
 #include <src/identi3d/IdentiExceptions.h>
+#include <src/system/SettingsWindow.h>
 
 namespace Identi3D
 {
@@ -85,6 +86,16 @@ namespace Identi3D
 					return false;
 				}
 			}
+		}
+		
+		if(!SettingsWindow::show(*_confmgr->getOptionTree())) {
+			delete _confmgr;
+			_confmgr = NULL;
+			delete _dispatcher;
+			_dispatcher = NULL;
+			delete _debugger;
+			_debugger = NULL;
+			return false;
 		}
 
 		if(NULL == createRenderer()) {

@@ -21,6 +21,182 @@ namespace Identi3D
 
 	class Color
 	{
+	public:
+
+		/*
+		 * Constructor: Do nothing.
+		 */
+		Color(void) : _a(0.0f), _r(0.0f), _g(0.0f), _b(0.0f) {} ;
+
+		/*
+		 * Constructor: Set alpha, red, green and blue values.
+		 */
+		Color(float alpha, float red, float green, float blue) 
+			: _a(alpha), _r(red), _g(green), _b(blue) {} ;
+
+		/*
+		 * Constructor: Make a copy.
+		 */
+		Color(const Color &c) { _value = c._value; }
+
+		/*
+		 * Destructor: Do nothing.
+		 */
+		~Color(void) {} ;
+
+		/*
+		 * Set color values (ARGB).
+		 */
+		inline void setValue(float alpha, float red, float green, float blue)
+		{
+			_r = red, _g = green, _b = blue, _a = alpha;
+		}
+		
+		/*
+		 * Set transparency (0.0 - 1.0).
+		 */
+		inline void setAlpha(float alpha)
+		{
+			_a = alpha;
+		}
+
+		/*
+		 * Set red value (0.0 - 1.0).
+		 */
+		inline void setRed(float red) { _r = red; }
+
+		/*
+		 * Set green value (0.0 - 1.0).
+		 */
+		inline void setGreen(float green) { _g = green; }
+		
+		/*
+		 * Set blue value (0.0 - 1.0).
+		 */
+		inline void setBlue(float blue) { _b = blue; }
+		
+		/*
+		 * Get transparency.
+		 */
+		inline float getAlpha(void) const
+		{
+			return _a;
+		}
+
+		/*
+		 * Get red value.
+		 */
+		inline float getRed(void) const
+		{
+			return _r;
+		}
+
+		/*
+		 * Get green value.
+		 */
+		inline float getGreen(void) const 
+		{
+			return _g;
+		}
+
+		/*
+		 * Get blue value.
+		 */
+		inline float getBlue(void) const
+		{
+			return _b;
+		}
+
+		/*
+		 * Assignment operator.
+		 */
+		Color &operator =(const Color &c)
+		{
+			if(&c != this) _value = c._value;
+			return *this;
+		}
+
+#if defined (_TARGET_DIRECTX)	// For Direct3D colors.
+
+		/*
+		 * Convert to Direct3D color type.
+		 */
+		inline D3DCOLOR getD3DColor(void) const
+		{
+			return D3DCOLOR_ARGB(
+				(BYTE)(_a * 255.0f), 
+				(BYTE)(_r * 255.0f),
+				(BYTE)(_g * 255.0f),
+				(BYTE)(_b * 255.0f));
+		}
+
+		/*
+		 * Convert from Direct3D colors.
+		 */
+		inline void fromD3DColor(const D3DCOLOR c)
+		{ 
+			_a = (float)((c & 0xFF000000) >> 24) / 255.0f;
+			_r = (float)((c & 0xFF0000) >> 16) / 255.0f;
+			_g = (float)((c & 0xFF00) >> 8) / 255.0f;
+			_b = (float)(c & 0xFF) / 255.0f;
+		}
+
+		/*
+		 * Convert to Direct3D COLORVALUE type.
+		 */
+		inline const D3DCOLORVALUE getD3DColorValue(void) const
+		{
+			D3DCOLORVALUE result = {_r, _g, _b, _a};
+			return result;
+		}
+
+		/*
+		 * Convert from Direct3D COLORVALUE type.
+		 */
+		inline void fromD3DColorValue(const D3DCOLORVALUE &c)
+		{
+			_a = c.a;
+			_r = c.r;
+			_g = c.g;
+			_b = c.b;
+		}
+
+		/*
+		 * D3DCOLOR type cast.
+		 */
+		operator D3DCOLOR () const
+		{
+			return getD3DColor();
+		}
+
+		/*
+		 * D3DCOLORVALUE type cast.
+		 */
+		operator D3DCOLORVALUE () const
+		{
+			return getD3DColorValue();
+		}
+
+		/*
+		 * Assignment operator.
+		 */
+		Color &operator =(D3DCOLOR c)
+		{
+			fromD3DColor(c);
+			return *this;
+		}
+		
+		/*
+		 * Assignment operator.
+		 */
+		Color &operator =(const D3DCOLORVALUE &c)
+		{
+			fromD3DColorValue(c);
+			return *this;
+		}
+
+#endif // defined (_TARGET_DIRECTX)
+		
 	private:
 		_DATA_ALIGN union
 		{
@@ -30,40 +206,6 @@ namespace Identi3D
 			};
 			__m128 _value;
 		};
-
-	public:
-		Color(void) : _a(0.0f), _r(0.0f), _g(0.0f), _b(0.0f) {} ;
-		Color(float alpha, float red, float green, float blue) : _a(alpha), _r(red), _g(green), _b(blue) {} ;
-		virtual ~Color(void) {} ;
-
-		inline void setValue(float alpha, float red, float green, float blue) { _r = red, _g = green, _b = blue, _a = alpha; }
-		inline void setAlpha(float alpha) { _a = alpha; }
-		inline void setRed(float red) { _r = red; }
-		inline void setGreen(float green) { _g = green; }
-		inline void setBlue(float blue) { _b = blue; }
-		
-		inline float getAlpha(void) const { return _a; }
-		inline float getRed(void) const { return _r; }
-		inline float getGreen(void) const { return _g; }
-		inline float getBlue(void) const { return _b; }
-
-		Color &operator =(Color &c) { if(&c != this) _value = c._value; return *this; }
-
-#if defined (_TARGET_DIRECTX)
-		inline D3DCOLOR getD3DColor(void) const { return D3DCOLOR_COLORVALUE(_r, _g, _b, _a); }
-		inline void fromD3DColor(D3DCOLOR c) { 
-			_a = (float)(((c & 0xFF000000) >> 24) / 255), 
-				_r = (float)(((c & 0xFF0000) >> 16) / 255), 
-				_g = (float)(((c & 0xFF00) >> 8) / 255), 
-				_b = (float)((c & 0xFF) / 255); }
-		inline const D3DCOLORVALUE getD3DColorValue(void) const { D3DCOLORVALUE result = {_r, _g, _b, _a}; return result; }
-		inline void fromD3DColorValue(const D3DCOLORVALUE &c) { _a = c.a, _r = c.r, _g = c.g, _b = c.b; }
-
-		operator D3DCOLOR () const { return getD3DColor(); }
-		operator const D3DCOLORVALUE () const { return getD3DColorValue(); }
-		Color &operator =(D3DCOLOR c) { fromD3DColor(c); return *this; }
-		Color &operator =(const D3DCOLORVALUE &c) { fromD3DColorValue(c); return *this; }
-#endif // defined (_TARGET_DIRECTX)
 
 	};
 
@@ -176,6 +318,7 @@ namespace Identi3D
 
 		KeyType_ForceUintPtr		= 0xFFFF
 	};
+
 };
 
 #endif // IDENTI3D_SRC_IDENTI3D_BASETYPES_H

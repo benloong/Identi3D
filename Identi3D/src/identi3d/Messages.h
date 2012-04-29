@@ -34,7 +34,7 @@
 
 // OptionTree
 #define W_OPTION_ELEMENT_ALREADY_EXISTS		"Element \"%S\" already exists in OptionTree. Value will be overwritten."
-#define I_NEW_OPTION_ELEMENT_ADDED			"New element added: Name [%S], Value [%S]."
+#define I_NEW_OPTION_ELEMENT_ADDED			"New element added: Name [%S]."
 #define I_OPTION_TREE_REMOVED				"Option tree removed."
 #define I_OPTION_ELEMENT_REMOVAL_SCHEDULED	("Will now remove: Name [%S].")
 #define E_OPTION_ELEMENT_STACK_OVERFLOW		("Layers of location exceeded %d ; aborting...")

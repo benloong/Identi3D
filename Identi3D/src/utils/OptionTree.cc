@@ -74,7 +74,7 @@ namespace Identi3D
 			p->table_next = _table[p->hash];
 			_table[p->hash] = p;
 
-			_printVerboseMessage(__FILE__, __LINE__, I_NEW_OPTION_ELEMENT_ADDED, p->name.c_str(), p->value.c_str());
+			_printVerboseMessage(__FILE__, __LINE__, I_NEW_OPTION_ELEMENT_ADDED, p->name.c_str());
 		} catch(std::exception &e) {
 			if(p != NULL) {
 				if(father == NULL) {

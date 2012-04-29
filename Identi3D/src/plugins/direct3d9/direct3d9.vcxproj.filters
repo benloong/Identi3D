@@ -37,5 +37,8 @@
     <None Include="direct3d9.debug.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="direct3d9.release.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

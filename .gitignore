@@ -2,6 +2,9 @@
 *.exe
 *.dll
 
+# Configuration
+*.conf
+
 # Excludes system file
 [Tt]humbs.db
 *.DS_Store

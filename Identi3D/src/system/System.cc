@@ -60,6 +60,7 @@ namespace Identi3D
 
 		// Load configuration.
 		if(config_name) {
+			_conf_path = config_name;		// Make a copy of configuration path.
 			if(_debugger)
 				_debugger->print(__FILE__, __LINE__, true, I_SYSTEM_LOADING_CONFIGURATION, config_name);
 
@@ -67,7 +68,6 @@ namespace Identi3D
 				// Load successfully.
 				if(_debugger)
 					_debugger->print(__FILE__, __LINE__, true, I_SYSTEM_CONFIGURATION_LOAD_SUCCESS);
-				_conf_path = config_name;		// Make a copy of configuration path.
 			} else {
 				if(_debugger)
 					_debugger->print(__FILE__, __LINE__, false, W_SYSTEM_CONFIGURATION_LOAD_FAILURE);
@@ -88,7 +88,15 @@ namespace Identi3D
 			}
 		}
 		
-		if(!SettingsWindow::show(*_confmgr->getOptionTree())) {
+		switch(SettingsWindow::show(*_confmgr->getOptionTree()))
+		{
+		case SettingsWindowResult_Modified:
+			_confmgr->save(_conf_path);
+			break;
+		case SettingsWindowResult_NoModification:
+			break;
+		case SettingsWindowResult_Cancelled:
+		default:
 			delete _confmgr;
 			_confmgr = NULL;
 			delete _dispatcher;

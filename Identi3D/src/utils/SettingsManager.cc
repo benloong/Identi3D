@@ -23,7 +23,7 @@ namespace Identi3D
 			fin.open(path);
 			if(!fin.is_open()) throw FileOperationFailureException();
 
-			while(!fin) {
+			while(!fin.eof()) {
 				fin >> name >> value;
 				if(name.length() == 0 || value.length() == 0) continue;
 				if(_tree.addElement(name, value)) correct++;

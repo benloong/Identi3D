@@ -136,12 +136,16 @@ namespace Identi3D
 			return false;
 		}
 
+		if(!_render_device->reloadConfig(_global_option)) {
+			_printMessage(__FILE__, __LINE__, W_RENDERER_LOAD_SETTINGS_FAILURE);
+		}
+
 		if(!window.assign(*_render_device, window_title)) {
 			_printMessage(__FILE__, __LINE__, E_RENDERER_ASSIGN_WINDOW_FAILURE);
 			return false;
 		}
-
-		if(!_render_device->init(window, _global_option)) {
+		
+		if(!_render_device->init(window)) {
 			_printMessage(__FILE__, __LINE__, E_RENDERER_ASSIGN_WINDOW_FAILURE);
 			window.deassign();
 			return FALSE;

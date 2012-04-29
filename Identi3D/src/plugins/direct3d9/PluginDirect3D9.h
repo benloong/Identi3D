@@ -41,11 +41,16 @@ namespace Identi3D
 
 		PluginDirect3D9(HMODULE plugin, DebugManager *debugger = NULL);
 		~PluginDirect3D9(void);
+		
+		/*
+		 * Load configuration.
+		 */
+		bool reloadConfig(OptionTree *option);
 
 		/*
 		 * Initialize the render device.
 		 */
-		bool init(RenderWindow &target, OptionTree *option = NULL);
+		bool init(RenderWindow &target);
 
 		/*
 		 * Release the render device.

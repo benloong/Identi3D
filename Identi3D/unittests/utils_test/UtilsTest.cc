@@ -35,7 +35,8 @@ public:
 
 int main()
 {
-	DebugManager *dbgmgr = new DebugManager();
+	DebugManager *dbgmgr = ntnew DebugManager();
+	if(dbgmgr == NULL) return -255;
 
 	dbgmgr->createDebugConsole();
 	dbgmgr->setFlag(dbgmgr->getFlag() | DebugFlag_ConsoleOutput);
@@ -48,20 +49,17 @@ int main()
 	dbgmgr->dumpCallStack();
 
 	// Basic test for cpu information.
-	CpuInfo *cinfo = new CpuInfo(dbgmgr);
-
 	dbgmgr->print(__FILE__, __LINE__, false, "CPU INFORMATION:");
-	dbgmgr->print(__FILE__, __LINE__, false, "\tVENDOR ID: %d", cinfo->getVendor());
-	dbgmgr->print(__FILE__, __LINE__, false, "\tSSE SUPPORT: %s", (cinfo->isSSESupported()) ? "YES" : "NO");
-	dbgmgr->print(__FILE__, __LINE__, false, "\tSSE2 SUPPORT: %s", (cinfo->isSSE2Supported()) ? "YES" : "NO");
-	dbgmgr->print(__FILE__, __LINE__, false, "\tSSE3 SUPPORT: %s", (cinfo->isSSE3Supported()) ? "YES" : "NO");
-	dbgmgr->print(__FILE__, __LINE__, false, "\t3DNOW! SUPPORT: %s", (cinfo->is3DNowSupported()) ? "YES" : "NO");
-	dbgmgr->print(__FILE__, __LINE__, false, "\tMMX SUPPORT: %s", (cinfo->isMMXSupported()) ? "YES" : "NO");
-
-	delete cinfo;
+	dbgmgr->print(__FILE__, __LINE__, false, "\tVENDOR ID: %d", CpuInfo::instance().getVendor());
+	dbgmgr->print(__FILE__, __LINE__, false, "\tSSE SUPPORT: %s", (CpuInfo::instance().isSSESupported()) ? "YES" : "NO");
+	dbgmgr->print(__FILE__, __LINE__, false, "\tSSE2 SUPPORT: %s", (CpuInfo::instance().isSSE2Supported()) ? "YES" : "NO");
+	dbgmgr->print(__FILE__, __LINE__, false, "\tSSE3 SUPPORT: %s", (CpuInfo::instance().isSSE3Supported()) ? "YES" : "NO");
+	dbgmgr->print(__FILE__, __LINE__, false, "\t3DNOW! SUPPORT: %s", (CpuInfo::instance().is3DNowSupported()) ? "YES" : "NO");
+	dbgmgr->print(__FILE__, __LINE__, false, "\tMMX SUPPORT: %s", (CpuInfo::instance().isMMXSupported()) ? "YES" : "NO");
 
 	// Basic test for option tree.
-	OptionTree *option = new OptionTree(dbgmgr);
+	OptionTree *option = ntnew OptionTree(dbgmgr);
+	if(option == NULL) return -255;
 
 	OptionElement *graphics, *directx, *opengl;
 
@@ -92,7 +90,8 @@ int main()
 	if(p) wcout << p->name << __T(" = ") << p->value << endl;
 	delete option;
 
-	MyTest *test = new MyTest(dbgmgr);
+	MyTest *test = ntnew MyTest(dbgmgr);
+	if(test == NULL) return -255;
 	test->helloworld();
 	delete test;
 	

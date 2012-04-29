@@ -18,9 +18,14 @@ namespace Identi3D
 		virtual ~RenderDevice(void) {};
 
 		/*
+		 * Reload configuration.
+		 */
+		virtual bool reloadConfig(OptionTree *option = NULL) = 0;
+
+		/*
 		 * Initialize specified device.
 		 */
-		virtual bool init(RenderWindow &target, OptionTree *option = NULL) = 0;
+		virtual bool init(RenderWindow &target) = 0;
 
 		/*
 		 * Release specified device.

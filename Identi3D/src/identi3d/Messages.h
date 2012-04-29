@@ -50,6 +50,7 @@
 #define E_RENDERER_NO_PLUGIN_AVAILABLE		"No available render plugin."
 #define E_RENDERER_ASSIGN_WINDOW_FAILURE	"Failed to assign a render target for device."
 #define I_RENDERER_ASSIGN_WINDOW_SUCCESS	"Render target assigned successfully."
+#define W_RENDERER_LOAD_SETTINGS_FAILURE	"Failed to load configuration. Using default."
 
 // Render Window
 #define E_WINDOW_CREATE_FAILURE				"Failed to create render window. Last Error Code: %d"

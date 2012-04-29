@@ -94,55 +94,40 @@ namespace Identi3D
 	
 	OptionElement *OptionTree::addElement(const std::wstring &location, const std::wstring &value)
 	{
-		OptionElement *p;
+		OptionElement *p = NULL, *s = NULL;
 
 		try {
 			std::wstring tmploc(location);
 			size_t pos, next;
-			bool found = false;
 
-			p = NULL;
-			pos = std::wstring::npos;
-			while(tmploc.length() > 0) {
-				// run through hash table.
-				p = _table[hashString(tmploc.substr(0, pos).c_str())];
-				while(p != NULL) {
-					if(tmploc.find(p->name) != std::wstring::npos) {
-						// a acceptable match found.
-						found = true;
-						break;
-					}
-				}
-				if(found) break;
-				// truncate location to last dot.
-				pos = tmploc.find_last_of(TEXT('.'), pos - 1);
-				if(pos == std::wstring::npos) {
-					// all layers should be created; quit loop.
-					p = NULL;
-					pos = 0;
+			pos = 0;
+			while(true) {
+				next = tmploc.find(L'.', pos);
+				p = _table[hashString(tmploc.substr(0, next).c_str())];
+				if(p == NULL) {
 					break;
 				}
+				if(next == std::wstring::npos) break;
+				else pos = next + 1;
+				s = p;
 			}
-			
-			if(p != NULL) {
-				// leading '.' presents.
-				pos++;
-			}
-			tmploc = location;
-			
+			if(pos == std::wstring::npos) {
+				if(p) p->value = value;
+				return p;
+			} else if(tmploc[pos] == '.') pos++;
+
 			while(true) {
-				next = tmploc.find('.', pos + 1);
-				if(next == std::wstring::npos) {
-					return addElement(p, tmploc.substr(pos, next - pos), value);
-				} else {
-					addElement(p, tmploc.substr(pos, next - pos), OPTIONTREE_GROUPVALUE);
-				}
-				pos = next;
+				next = tmploc.find(L'.', pos);
+				s = addElement(s, tmploc.substr(pos, next - pos), OPTIONTREE_GROUPVALUE);
+				if(s == NULL) return NULL;
+				if(next == std::wstring::npos) break;
+				else pos = next + 1;
 			}
+			if(s) s->value = value;
 		} catch(std::exception &e) {
 			_printException(__FILE__, __LINE__, e);
 		}
-		return NULL;
+		return s;
 	}
 
 	void OptionTree::rawDelete(OptionElement *elem)

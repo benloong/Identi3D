@@ -32,21 +32,24 @@ namespace Identi3D
 		release();
 	}
 
-	bool PluginDirect3D9::init(RenderWindow &target, OptionTree *option)
+	bool PluginDirect3D9::reloadConfig(OptionTree *option)
+	{
+		// Load configuration.
+		if(option) return _settings.read(option);
+		else _settings.reset();
+		return true;
+	}
+
+	bool PluginDirect3D9::init(RenderWindow &target)
 	{
 		// Only one instance is allowed.
 		if(_is_running) return true;
-
-		// Load configuration.
-		_settings.reset();
-		if(option) _settings.read(option);
 
 		// Create Direct3D9 object.
 		_direct3d = Direct3DCreate9(D3D_SDK_VERSION);
 		if(_direct3d == NULL) {
 			_printMessage(__FILE__, __LINE__, E_D3D9_INITIALIZE_FAILURE);
 			MessageBoxA(NULL, E_D3D9_INITIALIZE_FAILURE, "Error", MB_OK);
-			if(option) _settings.reset();
 			return false;
 		}
 		
@@ -58,25 +61,17 @@ namespace Identi3D
 
 		// Check display device compatibility.
 		if(!checkPrerequisite(format)) {
-			if(option) {
-				_printMessage(__FILE__, __LINE__, W_D3D9_HARDWARE_NOT_COMPATIBLE);
-				MessageBoxA(NULL, W_D3D9_HARDWARE_NOT_COMPATIBLE, "Warning", MB_OK);
-				_settings.reset();
-				if(!checkPrerequisite(format)) {
-					_printMessage(__FILE__, __LINE__, E_D3D9_PREREQUISITE_NOT_SATISFIED);
-					MessageBoxA(NULL, E_D3D9_PREREQUISITE_NOT_SATISFIED, "Error", MB_OK);
-					_direct3d->Release();
-					_direct3d = NULL;
-					return false;
-				} else {
-					_settings.write();
-				}
-			} else {
+			_printMessage(__FILE__, __LINE__, W_D3D9_HARDWARE_NOT_COMPATIBLE);
+			MessageBoxA(NULL, W_D3D9_HARDWARE_NOT_COMPATIBLE, "Warning", MB_OK);
+			_settings.reset();
+			if(!checkPrerequisite(format)) {
 				_printMessage(__FILE__, __LINE__, E_D3D9_PREREQUISITE_NOT_SATISFIED);
 				MessageBoxA(NULL, E_D3D9_PREREQUISITE_NOT_SATISFIED, "Error", MB_OK);
 				_direct3d->Release();
 				_direct3d = NULL;
 				return false;
+			} else {
+				_settings.write();
 			}
 		}
 

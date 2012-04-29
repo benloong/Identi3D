@@ -1,0 +1,9 @@
+;
+; direct3d9.release.def
+; =====================
+;
+
+LIBRARY "plugindirect3d9.dll"
+EXPORTS
+	CreateRenderDevice
+	ReleaseRenderDevice

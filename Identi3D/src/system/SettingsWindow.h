@@ -12,10 +12,19 @@
 namespace Identi3D
 {
 
+	enum SettingsWindowResult
+	{
+		SettingsWindowResult_Cancelled		= -1,
+		SettingsWindowResult_NoModification	= 0,
+		SettingsWindowResult_Modified		= 1,
+
+		SettingsWindowResult_ForceInt		= 0xFFFF
+	};
+
 	class SettingsWindow
 	{
 	public:
-		static bool show(OptionTree &tree);
+		static SettingsWindowResult show(OptionTree &tree);
 		static INT_PTR CALLBACK DlgProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 	};
 

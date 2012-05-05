@@ -10,7 +10,7 @@
 namespace Identi3D
 {
 
-	static const float IDF_EPSILON = 1e-3;
+	static const float IDF_EPSILON = 0.001f;
 
 	inline bool _fzero(float _f)
 	{

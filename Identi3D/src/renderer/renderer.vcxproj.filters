@@ -27,12 +27,33 @@
     <ClInclude Include="Basetypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SkinManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Renderer.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderWindow.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinManager.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

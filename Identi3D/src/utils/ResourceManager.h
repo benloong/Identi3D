@@ -25,10 +25,12 @@ namespace Identi3D
 	class Resource
 	{
 		friend class ResourcePool;
-	public:
-		
+		friend class ResourceManager;
+
+	private:
+
 		/*
-		 * Constructor: Do nothing.
+		 * Initialize class.
 		 */
 		Resource(ResourceData *data)
 		{
@@ -36,10 +38,12 @@ namespace Identi3D
 			_data->ref_count++;
 		}
 
+	public:
+
 		/*
 		 * Copy constructor.
 		 */
-		Resource(Resource &res)
+		Resource(const Resource &res)
 		{
 			_data = res._data;
 			_data->ref_count++;
@@ -50,7 +54,7 @@ namespace Identi3D
 		 */
 		~Resource(void)
 		{
-			_data->ref_count--;
+			if(_data->ref_count) _data->ref_count--;
 		}
 
 		/*
@@ -58,6 +62,7 @@ namespace Identi3D
 		 */
 		Resource &operator=(Resource &rhs)
 		{
+			if(_data->ref_count) _data->ref_count--;
 			_data = rhs._data;
 			_data->ref_count++;
 		}
@@ -98,7 +103,7 @@ namespace Identi3D
 		explicit Resource(void);
 
 	private:
-		ResourceData *_data;
+		mutable ResourceData *_data;
 	};
 
 	typedef std::vector<ResourceData *> ResourceList;
@@ -108,7 +113,7 @@ namespace Identi3D
 	public:
 
 		/*
-		 * Constructor: Do nothing.
+		 * Initialize class.
 		 */
 		ResourcePool(void) {};
 
@@ -141,7 +146,7 @@ namespace Identi3D
 	public:
 
 		/*
-		 * Constructor: Do nothing.
+		 * Initialize class.
 		 */
 		ResourceManager(void) {} ;
 
@@ -173,9 +178,11 @@ namespace Identi3D
 		/*
 		 * Release a resource.
 		 */
-		inline void unload(Resource *res)
+		inline void unload(Resource &res)
 		{
-			_pool.free(res->getID());
+			if(res._data->ref_count) res._data->ref_count--;
+			// TODO: if ref_count > 0, throw a warning.
+			_pool.free(res.getID());
 		}
 
 		/*

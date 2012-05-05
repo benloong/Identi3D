@@ -108,6 +108,8 @@ int main()
 		puts("Error: Create ResourceManager failed.");
 	}
 
+	///////////////////// JUST 4 FUN /////////////////////////
+
 #define UNSIGN	unsigned
 
 				  UNSIGN        CXXN[]
@@ -148,6 +150,8 @@ int main()
 			pattern = 0;
 		}
 	}
+
+	//////////////////////////////////////////////////////////
 
 	delete option;
 

@@ -12,13 +12,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Basetypes.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="RenderDevice.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderWindow.h" />
+    <ClInclude Include="Skin.h" />
+    <ClInclude Include="SkinManager.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Renderer.cc" />
     <ClCompile Include="RenderWindow.cc" />
+    <ClCompile Include="SkinManager.cc" />
+    <ClCompile Include="TextureManager.cc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8EFC94E1-C041-49B7-9AAA-6990E539EC39}</ProjectGuid>

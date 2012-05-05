@@ -96,21 +96,13 @@ int main()
 	if(resmgr) {
 		resmgr->addLocationGroup(*option);
 		Resource *res1 = resmgr->load(L"texture.png");
-		//Resource *res2 = resmgr->load(L"some_text.txt");
 		if(res1) {
 			putchar((res1->getData())[1]);
 			putchar((res1->getData())[2]);
 			putchar((res1->getData())[3]);
 			puts("");
 		}
-		//if(res2) {
-		//	for(size_t i = 0; i < res2->getSize(); i++) {
-		//		putchar((res2->getData())[i]);
-		//	}
-		//	puts("");
-		//}
 		delete res1;
-		//delete res2;
 		delete resmgr;
 	} else {
 		puts("Error: Create ResourceManager failed.");

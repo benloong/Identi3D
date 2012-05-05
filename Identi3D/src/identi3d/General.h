@@ -133,8 +133,13 @@ namespace Identi3D
 	enum Event;
 
 	// Structures
+	struct Texture;
+	struct Skin;
+
 	struct OptionElement;
 	struct EventPacket;
+
+	struct ResourceData;
 
 	// Classes
 	class Color;
@@ -159,6 +164,8 @@ namespace Identi3D
 	class RenderWindow;
 	class RenderWindow;
 
+	class Material;
+
 	class Direct3D9SettingsManager;
 	class PluginDirect3D9;
 
@@ -166,6 +173,9 @@ namespace Identi3D
 	class DebugManager;
 	class DebugFrame;
 	class OptionTree;
+	class Resource;
+	class ResourceManager;
+	class ResourcePool;
 	class SettingsManager;
 
 };

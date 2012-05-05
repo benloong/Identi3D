@@ -89,6 +89,7 @@
   <ItemGroup>
     <ClInclude Include="AABB.h" />
     <ClInclude Include="AlignedAllocator.h" />
+    <ClInclude Include="Basetypes.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Plane.h" />

@@ -8,6 +8,7 @@
 #define IDENTI3D_SRC_IDENTI3D_BASETYPES_H
 
 #include <src/identi3d/General.h>
+#include <src/math/Basetypes.h>
 
 #if defined (_TARGET_DIRECTX)
 #include <d3d9types.h>
@@ -114,6 +115,25 @@ namespace Identi3D
 		{
 			if(&c != this) _value = c._value;
 			return *this;
+		}
+
+		/*
+		 * Is equal.
+		 */
+		bool operator==(const Color &c) const
+		{
+			return (_fequal(_a, c._a) && 
+					_fequal(_r, c._r) &&
+					_fequal(_g, c._g) &&
+					_fequal(_b, c._b));
+		}
+
+		/*
+		 * Is inequal.
+		 */
+		bool operator !=(const Color &c) const
+		{
+			return !((*this) == c);
 		}
 
 #if defined (_TARGET_DIRECTX)	// For Direct3D colors.

@@ -13,14 +13,14 @@
 namespace Identi3D
 {
 
-	typedef struct
+	struct ResourceData
 	{
 		UINT res_id;
 		std::wstring name;
 		size_t size;
 		BYTE *data;
 		UINT ref_count;
-	}ResourceData;
+	};
 
 	class Resource
 	{
